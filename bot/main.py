@@ -4,7 +4,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from config import BOT_TOKEN
 
 # URL Mini App — плейсхолдер, поменяем после Cloudflare Tunnel
-MINIAPP_URL = "https://example.com"
+MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/main_v2.html"
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
