@@ -1,413 +1,348 @@
-# server/api.py
+import os
+import re
+import json
 import time
-import secrets
-from datetime import datetime, timedelta
+import hmac
+import hashlib
+import sqlite3
 from functools import wraps
+from urllib.parse import parse_qsl
 
-from flask import Flask, request, jsonify, g
+from flask import Flask, request, jsonify, g, send_from_directory
 
-from config import (
-    ADMIN_IDS, MAPS, MODES,
-    PREMIUM_PRICE_COINS, PREMIUM_DURATION_DAYS,
-)
-from database import get_conn, init_db
-from auth import validate_init_data
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "cybershoke.db"))
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "")  # пусто = dev-режим без проверки подписи Telegram
+ADMIN_IDS = {int(x) for x in os.environ.get("ADMIN_IDS", "").split(",") if x.strip().isdigit()}
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "shoke26")
+PERMANENT = 4102444800  # 2100-01-01
+ONLINE_TTL = 120
+LOBBY_TTL = 1800
+MAPS = ["Mirage", "Inferno", "Dust II", "Nuke", "Ancient", "Anubis", "Overpass", "Vertigo"]
+MODES = {"1v1": 2, "2v2": 4, "5v5": 10, "DM": 16}
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=None)
+ONLINE = {}
 
-@app.after_request
-def add_cors(resp):
-    resp.headers["Access-Control-Allow-Origin"] = "*"
-    resp.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Telegram-Init-Data, X-Test-Tg-Id"
-    resp.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    return resp
 
-@app.route("/api/<path:_>", methods=["OPTIONS"])
-def cors_preflight(_):
-    return ("", 204)
+def now():
+    return int(time.time())
 
-def make_session(user_id: int) -> str:
-    token = secrets.token_urlsafe(32)
-    expires = (datetime.utcnow() + timedelta(days=7)).isoformat()
-    conn = get_conn()
-    try:
-        conn.execute(
-            "INSERT INTO sessions(token, user_id, expires_at) VALUES(?,?,?)",
-            (token, user_id, expires),
-        )
-        conn.commit()
-    finally:
+
+def db():
+    if "db" not in g:
+        g.db = sqlite3.connect(DB_PATH)
+        g.db.row_factory = sqlite3.Row
+    return g.db
+
+
+@app.teardown_appcontext
+def close_db(_):
+    conn = g.pop("db", None)
+    if conn is not None:
         conn.close()
-    return token
 
-def public_user(row) -> dict:
+
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.executescript("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tg_id INTEGER UNIQUE NOT NULL,
+        nickname TEXT NOT NULL,
+        game_id TEXT UNIQUE NOT NULL,
+        elo INTEGER NOT NULL DEFAULT 1000,
+        coins INTEGER NOT NULL DEFAULT 0,
+        points INTEGER NOT NULL DEFAULT 0,
+        kd REAL NOT NULL DEFAULT 0,
+        avg REAL NOT NULL DEFAULT 0,
+        is_banned INTEGER NOT NULL DEFAULT 0,
+        ban_reason TEXT DEFAULT '',
+        ban_until INTEGER NOT NULL DEFAULT 0,
+        is_muted INTEGER NOT NULL DEFAULT 0,
+        mute_until INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS lobbies (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        owner_tg_id INTEGER NOT NULL,
+        map TEXT NOT NULL,
+        mode TEXT NOT NULL,
+        max_players INTEGER NOT NULL,
+        players INTEGER NOT NULL DEFAULT 1,
+        status TEXT NOT NULL DEFAULT 'open',
+        created_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS lobby_players (
+        lobby_id INTEGER NOT NULL,
+        tg_id INTEGER NOT NULL,
+        PRIMARY KEY (lobby_id, tg_id)
+    );
+    CREATE TABLE IF NOT EXISTS matches (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        lobby_id INTEGER NOT NULL,
+        map TEXT NOT NULL,
+        mode TEXT NOT NULL,
+        started_at INTEGER NOT NULL
+    );
+    """)
+    conn.commit()
+    conn.close()
+
+
+def validate_init_data(init_data):
+    """Проверка подписи Telegram WebApp initData. Возвращает dict пользователя или None."""
+    try:
+        pairs = dict(parse_qsl(init_data, keep_blank_values=True))
+        received_hash = pairs.pop("hash", "")
+        check = "\n".join(f"{k}={v}" for k, v in sorted(pairs.items()))
+        secret = hmac.new(b"WebAppData", BOT_TOKEN.encode(), hashlib.sha256).digest()
+        calc = hmac.new(secret, check.encode(), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(calc, received_hash):
+            return None
+        if now() - int(pairs.get("auth_date", 0)) > 86400:
+            return None
+        return json.loads(pairs["user"])
+    except Exception:
+        return None
+
+
+def tg_user():
+    if BOT_TOKEN:
+        return validate_init_data(request.headers.get("X-Init-Data", ""))
+    try:
+        return json.loads(request.headers.get("X-Dev-User", "")) or None
+    except Exception:
+        return None
+
+
+def load_user(tg_id):
+    row = db().execute("SELECT * FROM users WHERE tg_id=?", (tg_id,)).fetchone()
     if row is None:
         return None
+    t = now()
+    if row["is_banned"] and row["ban_until"] <= t:
+        db().execute("UPDATE users SET is_banned=0, ban_reason='', ban_until=0 WHERE tg_id=?", (tg_id,))
+    if row["is_muted"] and row["mute_until"] <= t:
+        db().execute("UPDATE users SET is_muted=0, mute_until=0 WHERE tg_id=?", (tg_id,))
+    db().commit()
+    return db().execute("SELECT * FROM users WHERE tg_id=?", (tg_id,)).fetchone()
+
+
+def public_user(row):
     return {
-        "id": row["id"],
-        "tg_id": row["tg_id"],
-        "nickname": row["nickname"],
-        "game_id": row["game_id"],
-        "elo": row["elo"],
-        "coins": row["coins"],
-        "is_premium": bool(row["is_premium"]),
-        "premium_until": row["premium_until"],
-        "created_at": row["created_at"],
+        "tg_id": row["tg_id"], "nickname": row["nickname"], "game_id": row["game_id"],
+        "elo": row["elo"], "coins": row["coins"], "points": row["points"],
+        "kd": row["kd"], "avg": row["avg"],
+        "is_muted": bool(row["is_muted"]), "mute_until": row["mute_until"],
+        "is_admin": row["tg_id"] in ADMIN_IDS,
     }
 
-def require_auth(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        init_data = request.headers.get("X-Telegram-Init-Data", "")
 
-        # ТЕСТОВЫЙ РЕЖИМ: X-Test-Tg-Id
-        test_tg_id = request.headers.get("X-Test-Tg-Id")
-        if test_tg_id:
-            try:
-                tg_id = int(test_tg_id)
-                conn = get_conn()
-                try:
-                    row = conn.execute("SELECT * FROM users WHERE tg_id=?", (tg_id,)).fetchone()
-                finally:
-                    conn.close()
-                if not row:
-                    return jsonify({"ok": False, "error": "need_register", "tg_id": tg_id}), 403
-                g.user = row
-                return f(*args, **kwargs)
-            except ValueError:
-                return jsonify({"ok": False, "error": "bad_test_id"}), 400
+def ban_payload(row):
+    return {"banned": True, "ban_reason": row["ban_reason"] or "не указана", "ban_until": row["ban_until"]}
 
-        v = validate_init_data(init_data)
-        if not v:
-            return jsonify({"ok": False, "error": "invalid_init_data"}), 401
-        tg_id = int(v["user"]["id"])
-        conn = get_conn()
-        try:
-            row = conn.execute("SELECT * FROM users WHERE tg_id=?", (tg_id,)).fetchone()
-        finally:
-            conn.close()
-        if not row:
-            return jsonify({"ok": False, "error": "need_register", "tg_id": tg_id}), 403
-        g.user = row
-        g.tg_user = v["user"]
-        return f(*args, **kwargs)
-    return wrapper
 
-def is_admin(tg_id: int) -> bool:
-    return tg_id in ADMIN_IDS
+def auth(allow_unregistered=False, allow_banned=False):
+    def deco(fn):
+        @wraps(fn)
+        def wrapper(*a, **kw):
+            u = tg_user()
+            if not u or "id" not in u:
+                return jsonify(error="Не удалось проверить Telegram-сессию"), 401
+            ONLINE[u["id"]] = now()
+            row = load_user(u["id"])
+            g.tg = u
+            g.user = row
+            if row is None and not allow_unregistered:
+                return jsonify(error="Сначала пройдите регистрацию"), 403
+            if row is not None and row["is_banned"] and not allow_banned:
+                return jsonify(ban_payload(row)), 403
+            return fn(*a, **kw)
+        return wrapper
+    return deco
 
-@app.route("/api/health")
-def health():
-    return jsonify({"ok": True, "ts": int(time.time())})
 
-@app.route("/api/auth/login", methods=["POST"])
-def auth_login():
-    data = request.get_json(silent=True) or {}
-    init_data = data.get("init_data", "")
+def online_count():
+    t = now()
+    for k in [k for k, v in ONLINE.items() if t - v > ONLINE_TTL]:
+        ONLINE.pop(k, None)
+    return len(ONLINE)
 
-    test_tg_id = request.headers.get("X-Test-Tg-Id")
-    if test_tg_id:
-        tg_id = int(test_tg_id)
-        tg_user = {"id": tg_id, "username": f"test_{tg_id}", "first_name": "Test"}
-    else:
-        v = validate_init_data(init_data)
-        if not v:
-            return jsonify({"ok": False, "error": "invalid_init_data"}), 401
-        tg_user = v["user"]
-        tg_id = int(tg_user["id"])
 
-    conn = get_conn()
-    try:
-        row = conn.execute("SELECT * FROM users WHERE tg_id=?", (tg_id,)).fetchone()
-        if not row:
-            return jsonify({
-                "ok": True,
-                "need_register": True,
-                "tg": {
-                    "id": tg_id,
-                    "username": tg_user.get("username"),
-                    "first_name": tg_user.get("first_name"),
-                },
-            })
-        conn.execute(
-            "UPDATE users SET last_login=CURRENT_TIMESTAMP WHERE id=?", (row["id"],)
-        )
-        conn.commit()
-        token = make_session(row["id"])
-    finally:
-        conn.close()
+@app.post("/api/auth")
+@auth(allow_unregistered=True, allow_banned=True)
+def api_auth():
+    if g.user is not None:
+        if g.user["is_banned"]:
+            return jsonify({"registered": True, **ban_payload(g.user)})
+        return jsonify(registered=True, banned=False, user=public_user(g.user))
 
-    return jsonify({
-        "ok": True,
-        "need_register": False,
-        "token": token,
-        "user": public_user(row),
-        "is_admin": is_admin(tg_id),
-    })
+    body = request.get_json(silent=True) or {}
+    nickname = str(body.get("nickname", "")).strip()
+    game_id = str(body.get("game_id", "")).strip()
+    if not nickname and not game_id:
+        return jsonify(registered=False)
+    if not re.fullmatch(r"[A-Za-z0-9_\-А-Яа-яЁё]{3,20}", nickname):
+        return jsonify(error="Ник: 3–20 символов, буквы, цифры, _ и -"), 400
+    if not re.fullmatch(r"\d{4,12}", game_id):
+        return jsonify(error="ID CounterFlame: от 4 до 12 цифр"), 400
+    if db().execute("SELECT 1 FROM users WHERE game_id=?", (game_id,)).fetchone():
+        return jsonify(error="Этот ID CounterFlame уже зарегистрирован"), 409
+    db().execute(
+        "INSERT INTO users (tg_id, nickname, game_id, created_at) VALUES (?,?,?,?)",
+        (g.tg["id"], nickname, game_id, now()),
+    )
+    db().commit()
+    return jsonify(registered=True, banned=False, user=public_user(load_user(g.tg["id"])))
 
-@app.route("/api/auth/register", methods=["POST"])
-def auth_register():
-    data = request.get_json(silent=True) or {}
-    init_data = data.get("init_data", "")
-    nickname = (data.get("nickname") or "").strip()
-    game_id = (data.get("game_id") or "").strip() or None
 
-    if not nickname or len(nickname) > 32:
-        return jsonify({"ok": False, "error": "bad_nickname"}), 400
+@app.get("/api/profile")
+@auth()
+def api_profile():
+    return jsonify(user=public_user(g.user))
 
-    test_tg_id = request.headers.get("X-Test-Tg-Id")
-    if test_tg_id:
-        tg_id = int(test_tg_id)
-    else:
-        v = validate_init_data(init_data)
-        if not v:
-            return jsonify({"ok": False, "error": "invalid_init_data"}), 401
-        tg_id = int(v["user"]["id"])
 
-    conn = get_conn()
-    try:
-        exists = conn.execute("SELECT id FROM users WHERE tg_id=?", (tg_id,)).fetchone()
-        if exists:
-            return jsonify({"ok": False, "error": "already_registered"}), 409
-        conn.execute(
-            "INSERT INTO users(tg_id, nickname, game_id) VALUES(?,?,?)",
-            (tg_id, nickname, game_id),
-        )
-        conn.commit()
-        row = conn.execute("SELECT * FROM users WHERE tg_id=?", (tg_id,)).fetchone()
-        token = make_session(row["id"])
-    finally:
-        conn.close()
+@app.get("/api/online")
+@auth()
+def api_online():
+    return jsonify(online=online_count())
 
-    return jsonify({
-        "ok": True,
-        "token": token,
-        "user": public_user(row),
-        "is_admin": is_admin(tg_id),
-    })
 
-@app.route("/api/profile/me")
-@require_auth
-def profile_me():
-    return jsonify({
-        "ok": True,
-        "user": public_user(g.user),
-        "is_admin": is_admin(g.user["tg_id"]),
-    })
+@app.get("/api/leaderboard")
+@auth()
+def api_leaderboard():
+    rows = db().execute(
+        "SELECT nickname, elo, kd FROM users WHERE is_banned=0 ORDER BY elo DESC, id ASC LIMIT 20"
+    ).fetchall()
+    return jsonify(players=[dict(r) for r in rows])
 
-@app.route("/api/profile/nickname", methods=["POST"])
-@require_auth
-def profile_nickname():
-    data = request.get_json(silent=True) or {}
-    nick = (data.get("nickname") or "").strip()
-    if not nick or len(nick) > 32:
-        return jsonify({"ok": False, "error": "bad_nickname"}), 400
-    conn = get_conn()
-    try:
-        conn.execute("UPDATE users SET nickname=? WHERE id=?", (nick, g.user["id"]))
-        conn.commit()
-    finally:
-        conn.close()
-    return jsonify({"ok": True, "nickname": nick})
 
-@app.route("/api/profile/premium/buy", methods=["POST"])
-@require_auth
-def profile_premium_buy():
-    user = g.user
-    price = PREMIUM_PRICE_COINS
-    conn = get_conn()
-    try:
-        row = conn.execute(
-            "SELECT coins, premium_until FROM users WHERE id=?", (user["id"],)
-        ).fetchone()
-        if row["coins"] < price:
-            return jsonify({
-                "ok": False,
-                "error": "not_enough_coins",
-                "need": price, "have": row["coins"],
-            }), 402
-        base = datetime.utcnow()
-        if row["premium_until"]:
-            try:
-                base = max(base, datetime.fromisoformat(row["premium_until"]))
-            except ValueError:
-                pass
-        until = (base + timedelta(days=PREMIUM_DURATION_DAYS)).isoformat()
-        conn.execute(
-            "UPDATE users SET coins=coins-?, is_premium=1, premium_until=? WHERE id=?",
-            (price, until, user["id"]),
-        )
-        conn.commit()
-    finally:
-        conn.close()
-    return jsonify({"ok": True, "premium_until": until, "price": price})
+def lobby_dict(r):
+    return {"id": r["id"], "map": r["map"], "mode": r["mode"], "players": r["players"],
+            "max_players": r["max_players"], "created_at": r["created_at"]}
 
-@app.route("/api/lobbies")
-@require_auth
-def lobbies_list():
-    conn = get_conn()
-    try:
-        rows = conn.execute(
-            """SELECT l.*, u.nickname AS creator_nickname
-               FROM lobbies l JOIN users u ON u.id = l.creator_id
-               WHERE l.status='open' ORDER BY l.created_at DESC LIMIT 50"""
+
+@app.route("/api/lobbies", methods=["GET", "POST"])
+@auth()
+def api_lobbies():
+    t = now()
+    db().execute("UPDATE lobbies SET status='closed' WHERE status='open' AND created_at<?", (t - LOBBY_TTL,))
+    db().commit()
+
+    if request.method == "GET":
+        rows = db().execute(
+            "SELECT * FROM lobbies WHERE status='open' ORDER BY created_at DESC LIMIT 50"
         ).fetchall()
+        return jsonify(lobbies=[lobby_dict(r) for r in rows])
+
+    body = request.get_json(silent=True) or {}
+    action = body.get("action", "create")
+    if g.user["is_muted"]:
+        return jsonify(error="Вы заглушены и не можете создавать или входить в лобби"), 403
+
+    if action == "create":
+        map_name, mode = body.get("map"), body.get("mode")
+        if map_name not in MAPS or mode not in MODES:
+            return jsonify(error="Неверная карта или режим"), 400
+        cur = db().execute(
+            "INSERT INTO lobbies (owner_tg_id, map, mode, max_players, created_at) VALUES (?,?,?,?,?)",
+            (g.user["tg_id"], map_name, mode, MODES[mode], t),
+        )
+        db().execute("INSERT INTO lobby_players VALUES (?,?)", (cur.lastrowid, g.user["tg_id"]))
+        db().commit()
+        return jsonify(ok=True, id=cur.lastrowid)
+
+    if action == "join":
+        lobby = db().execute("SELECT * FROM lobbies WHERE id=? AND status='open'", (body.get("id"),)).fetchone()
+        if not lobby:
+            return jsonify(error="Лобби уже закрыто"), 404
+        if db().execute("SELECT 1 FROM lobby_players WHERE lobby_id=? AND tg_id=?",
+                        (lobby["id"], g.user["tg_id"])).fetchone():
+            return jsonify(error="Вы уже в этом лобби"), 409
+        players = lobby["players"] + 1
+        status = "started" if players >= lobby["max_players"] else "open"
+        db().execute("INSERT INTO lobby_players VALUES (?,?)", (lobby["id"], g.user["tg_id"]))
+        db().execute("UPDATE lobbies SET players=?, status=? WHERE id=?", (players, status, lobby["id"]))
+        if status == "started":
+            db().execute("INSERT INTO matches (lobby_id, map, mode, started_at) VALUES (?,?,?,?)",
+                         (lobby["id"], lobby["map"], lobby["mode"], t))
+        db().commit()
+        return jsonify(ok=True, started=status == "started")
+
+    return jsonify(error="Неизвестное действие"), 400
+
+
+@app.post("/api/admin")
+@auth()
+def api_admin():
+    if g.user["tg_id"] not in ADMIN_IDS:
+        return jsonify(error="Нет доступа"), 403
+    if not hmac.compare_digest(request.headers.get("X-Admin-Password", ""), ADMIN_PASSWORD):
+        return jsonify(error="Неверный пароль"), 403
+
+    body = request.get_json(silent=True) or {}
+    action = body.get("action", "list")
+    if action == "list":
+        rows = db().execute(
+            "SELECT tg_id, nickname, game_id, elo, is_banned, ban_reason, ban_until, is_muted, mute_until "
+            "FROM users ORDER BY id DESC LIMIT 300"
+        ).fetchall()
+        t = now()
         out = []
         for r in rows:
-            cnt = conn.execute(
-                "SELECT COUNT(*) AS c FROM lobby_members WHERE lobby_id=?", (r["id"],)
-            ).fetchone()["c"]
-            out.append({
-                "id": r["id"], "code": r["code"], "mode": r["mode"], "map": r["map"],
-                "max_players": r["max_players"], "status": r["status"],
-                "creator": r["creator_nickname"], "players": cnt,
-                "created_at": r["created_at"],
-            })
-    finally:
-        conn.close()
-    return jsonify({"ok": True, "lobbies": out, "maps": MAPS, "modes": MODES})
+            d = dict(r)
+            d["is_banned"] = bool(d["is_banned"] and d["ban_until"] > t)
+            d["is_muted"] = bool(d["is_muted"] and d["mute_until"] > t)
+            out.append(d)
+        return jsonify(players=out)
 
-@app.route("/api/lobbies", methods=["POST"])
-@require_auth
-def lobbies_create():
-    data = request.get_json(silent=True) or {}
-    code = (data.get("code") or "").strip()
-    mode = (data.get("mode") or "").strip()
-    map_ = (data.get("map") or "").strip()
+    target = body.get("tg_id")
+    if not db().execute("SELECT 1 FROM users WHERE tg_id=?", (target,)).fetchone():
+        return jsonify(error="Игрок не найден"), 404
+    if target in ADMIN_IDS:
+        return jsonify(error="Нельзя применять наказания к администратору"), 400
 
-    if not code or not mode or not map_:
-        return jsonify({"ok": False, "error": "missing_fields"}), 400
-    if mode not in [m["id"] for m in MODES]:
-        return jsonify({"ok": False, "error": "bad_mode"}), 400
-    if map_ not in MAPS:
-        return jsonify({"ok": False, "error": "bad_map"}), 400
-
-    max_p = next(m["max_players"] for m in MODES if m["id"] == mode)
-    conn = get_conn()
-    try:
-        cur = conn.execute(
-            "INSERT INTO lobbies(creator_id, code, mode, map, max_players) VALUES(?,?,?,?,?)",
-            (g.user["id"], code, mode, map_, max_p),
-        )
-        conn.commit()
-        lobby_id = cur.lastrowid
-        conn.execute(
-            "INSERT INTO lobby_members(lobby_id, user_id) VALUES(?,?)",
-            (lobby_id, g.user["id"]),
-        )
-        conn.commit()
-    finally:
-        conn.close()
-    return jsonify({"ok": True, "lobby_id": lobby_id})
-
-@app.route("/api/lobbies/<int:lid>/join", methods=["POST"])
-@require_auth
-def lobbies_join(lid):
-    conn = get_conn()
-    try:
-        lb = conn.execute("SELECT * FROM lobbies WHERE id=?", (lid,)).fetchone()
-        if not lb:
-            return jsonify({"ok": False, "error": "not_found"}), 404
-        if lb["status"] != "open":
-            return jsonify({"ok": False, "error": "not_open"}), 400
-        cnt = conn.execute(
-            "SELECT COUNT(*) AS c FROM lobby_members WHERE lobby_id=?", (lid,)
-        ).fetchone()["c"]
-        if cnt >= lb["max_players"]:
-            conn.execute("UPDATE lobbies SET status='full' WHERE id=?", (lid,))
-            conn.commit()
-            return jsonify({"ok": False, "error": "full"}), 409
+    if action in ("ban", "mute"):
         try:
-            conn.execute(
-                "INSERT INTO lobby_members(lobby_id, user_id) VALUES(?,?)",
-                (lid, g.user["id"]),
-            )
-            conn.commit()
-        except Exception:
-            return jsonify({"ok": False, "error": "already_joined"}), 409
-        if cnt + 1 >= lb["max_players"]:
-            conn.execute("UPDATE lobbies SET status='full' WHERE id=?", (lid,))
-            conn.commit()
-    finally:
-        conn.close()
-    return jsonify({"ok": True})
-
-@app.route("/api/lobbies/<int:lid>/leave", methods=["POST"])
-@require_auth
-def lobbies_leave(lid):
-    conn = get_conn()
-    try:
-        conn.execute(
-            "DELETE FROM lobby_members WHERE lobby_id=? AND user_id=?",
-            (lid, g.user["id"]),
-        )
-        conn.execute(
-            "UPDATE lobbies SET status='open' WHERE id=? AND status='full'", (lid,)
-        )
-        conn.commit()
-    finally:
-        conn.close()
-    return jsonify({"ok": True})
+            minutes = int(body.get("minutes", 0))
+        except (TypeError, ValueError):
+            return jsonify(error="Неверное время"), 400
+        until = PERMANENT if minutes <= 0 else now() + minutes * 60
+        reason = str(body.get("reason", "")).strip()[:200]
+        if action == "ban":
+            if not reason:
+                return jsonify(error="Укажите причину бана"), 400
+            db().execute("UPDATE users SET is_banned=1, ban_reason=?, ban_until=? WHERE tg_id=?",
+                         (reason, until, target))
+        else:
+            db().execute("UPDATE users SET is_muted=1, mute_until=? WHERE tg_id=?", (until, target))
+    elif action == "unban":
+        db().execute("UPDATE users SET is_banned=0, ban_reason='', ban_until=0 WHERE tg_id=?", (target,))
+    elif action == "unmute":
+        db().execute("UPDATE users SET is_muted=0, mute_until=0 WHERE tg_id=?", (target,))
+    else:
+        return jsonify(error="Неизвестное действие"), 400
+    db().commit()
+    return jsonify(ok=True)
 
 
-@app.route("/api/player/<nickname>")
-@require_auth
-def player_profile(nickname):
-    conn = get_conn()
-    try:
-        row = conn.execute("SELECT * FROM users WHERE nickname=?", (nickname,)).fetchone()
-        if not row:
-            return jsonify({"ok": False, "error": "not_found"}), 404
-        # Считаем статистику (пока просто заглушка, в будущем - из match_players)
-        wins = 0
-        matches = 0
-        return jsonify({
-            "ok": True,
-            "user": {
-                "nickname": row["nickname"],
-                "elo": row["elo"],
-                "is_premium": bool(row["is_premium"]),
-                "game_id": row["game_id"],
-                "created_at": row["created_at"],
-            }
-        })
-    finally:
-        conn.close()
+@app.get("/")
+def index():
+    return send_from_directory(BASE_DIR, "index.html")
 
 
-@app.route("/api/online")
-@require_auth
-def get_online():
-    conn = get_conn()
-    try:
-        # Считаем уникальных игроков в лобби со статусом open/full
-        count = conn.execute("SELECT COUNT(DISTINCT user_id) FROM lobby_members JOIN lobbies ON lobbies.id = lobby_members.lobby_id WHERE lobbies.status IN ('open', 'full')").fetchone()[0]
-        return jsonify({"ok": True, "online": count})
-    finally:
-        conn.close()
+@app.get("/style.css")
+def css():
+    return send_from_directory(BASE_DIR, "style.css")
 
-@app.route("/api/stats/top")
-@require_auth
-def stats_top():
-    conn = get_conn()
-    try:
-        rows = conn.execute(
-            """SELECT nickname, elo, is_premium FROM users
-               ORDER BY elo DESC, id ASC LIMIT 50"""
-        ).fetchall()
-    finally:
-        conn.close()
-    return jsonify({
-        "ok": True,
-        "top": [
-            {"nickname": r["nickname"], "elo": r["elo"], "is_premium": bool(r["is_premium"])}
-            for r in rows
-        ],
-    })
+
+@app.get("/app.js")
+def js():
+    return send_from_directory(BASE_DIR, "app.js")
+
 
 init_db()
 
 if __name__ == "__main__":
-    from config import HOST, PORT
-    print(f"🚀 API на http://{HOST}:{PORT}")
-    app.run(host=HOST, port=PORT, debug=False)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
