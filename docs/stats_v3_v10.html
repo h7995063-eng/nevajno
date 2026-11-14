@@ -35,12 +35,12 @@
 <body>
 <div class="container">
   <div class="header">
-    <a href="main_v3.html" class="back"><svg style="width:20px;height:20px"><use href="assets/icons/back.svg#i"/></svg></a>
+    <a href="main_v3_v10.html" class="back"><svg style="width:20px;height:20px"><use href="assets/icons/back.svg#i"/></svg></a>
     <div class="title"><h1>ЛИДЕРБОРД</h1><div class="sub">РЕЙТИНГ ИГРОКОВ</div></div>
   </div>
   <div id="top-list"></div>
 </div>
-<script src="js/app_v3.js?v=8"></script>
+<script src="js/app_v10.js?v=1"></script>
 <script>
   (async function () {
     const el = document.getElementById("top-list");
@@ -51,7 +51,7 @@
     if (!data.top.length) { el.innerHTML = '<div class="empty">Пока нет игроков</div>'; return; }
 
     el.innerHTML = `<div class="top-list">${data.top.map((u, i) => `
-      <a href="player.html?nick=${encodeURIComponent(u.nickname)}" class="top-item">
+      <a href="player_v10.html?nick=${encodeURIComponent(u.nickname)}" class="top-item">
         <div class="rank">#${i + 1}</div>
         <div class="avatar">${u.nickname.charAt(0).toUpperCase()}</div>
         <div class="nick">${u.nickname} ${u.is_premium ? '<span class="badge badge-premium">★ PRO</span>' : ''}</div>
@@ -61,10 +61,10 @@
   })();
 </script>
 <nav class="bottom-nav">
-  <a href="main_v3.html"><svg><use href="assets/icons/home.svg#i"/></svg>Главная</a>
-  <a href="lobby.html"><svg><use href="assets/icons/sword.svg#i"/></svg>Лобби</a>
-  <a href="stats_v3.html"><svg><use href="assets/icons/trophy.svg#i"/></svg>Топы</a>
-  <a href="profile_v3.html"><svg><use href="assets/icons/user.svg#i"/></svg>Профиль</a>
+  <a href="main_v3_v10.html"><svg><use href="assets/icons/home.svg#i"/></svg>Главная</a>
+  <a href="lobby_v10.html"><svg><use href="assets/icons/sword.svg#i"/></svg>Лобби</a>
+  <a href="stats_v3_v10.html"><svg><use href="assets/icons/trophy.svg#i"/></svg>Топы</a>
+  <a href="profile_v3_v10.html"><svg><use href="assets/icons/user.svg#i"/></svg>Профиль</a>
 </nav>
 </body>
 </html>

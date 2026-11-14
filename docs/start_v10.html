@@ -48,18 +48,18 @@
     </form>
   </div>
 </div>
-<script src="js/app_v3.js?v=8"></script>
+<script src="js/app_v10.js?v=1"></script>
 <script>
   function nextScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
   (async function () {
     const { data } = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ init_data: initData }) });
-    if (data?.ok && !data.need_register) { localStorage.setItem("cs_token", data.token); location.replace("main_v3.html"); return; }
+    if (data?.ok && !data.need_register) { localStorage.setItem("cs_token", data.token); location.replace("main_v3_v10.html"); return; }
     setTimeout(() => nextScreen('screen-rules'), 1500);
     document.getElementById("reg-form").onsubmit = async (e) => {
       e.preventDefault(); const btn = document.getElementById("submit-btn"); btn.disabled = true; btn.textContent = "ЖДИТЕ...";
       const fd = new FormData(e.target);
       const { data: r } = await api("/api/auth/register", { method: "POST", body: JSON.stringify({ init_data: initData, nickname: fd.get("nickname"), game_id: fd.get("game_id") }) });
-      if (r?.ok) { localStorage.setItem("cs_token", r.token); location.replace("main_v3.html"); }
+      if (r?.ok) { localStorage.setItem("cs_token", r.token); location.replace("main_v3_v10.html"); }
       else { toast("Ошибка", "error"); btn.disabled = false; btn.textContent = "ПРИВЯЗАТЬ"; }
     };
   })();
