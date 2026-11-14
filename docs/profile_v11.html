@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Профиль — CYBERSHOKE</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .profile-head { text-align: center; padding: 20px 0; }
+  .avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: #fff; font-size: 32px; font-weight: 900; }
+  .nick { font-family: 'Orbitron'; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .game-id { color: var(--muted); font-size: 13px; margin-top: 4px; letter-spacing: 1px; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+  .stat-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+  .stat-box .v { font-family: 'Orbitron'; font-size: 20px; font-weight: 900; color: var(--accent-2); }
+  .stat-box .l { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <a href="main_v11.html" class="back"><svg><use href="assets/icons/back.svg#i"/></svg></a>
+    <div class="title"><h1>ПРОФИЛЬ</h1></div>
+  </div>
+
+  <div class="profile-head" id="profile-data">
+    <div class="loader"></div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-box"><div class="v" id="kd">0.00</div><div class="l">КД (Общий)</div></div>
+    <div class="stat-box"><div class="v" id="avg">0</div><div class="l">АВГ (Урон)</div></div>
+    <div class="stat-box"><div class="v" id="map-kd">0.00</div><div class="l">КД по картам</div></div>
+    <div class="stat-box"><div class="v" id="map-avg">0</div><div class="l">АВГ по картам</div></div>
+  </div>
+  
+  <div style="margin-top: 20px;">
+    <a href="premium_v11.html" class="btn btn-primary">ПЕРЕЙТИ К ПОДПИСКАМ</a>
+  </div>
+</div>
+<nav class="bottom-nav">
+  <a href="main_v11.html"><svg><use href="assets/icons/home.svg#i"/></svg>Главная</a>
+  <a href="lobby_v11.html"><svg><use href="assets/icons/sword.svg#i"/></svg>Лобби</a>
+  <a href="stats_v11.html"><svg><use href="assets/icons/trophy.svg#i"/></svg>Топы</a>
+  <a href="profile_v11.html" class="active"><svg><use href="assets/icons/user.svg#i"/></svg>Профиль</a>
+</nav>
+<script src="js/app_v10.js?v=3"></script>
+<script>
+  (async function () {
+    const el = document.getElementById("profile-data");
+    const { data } = await api("/api/profile/me");
+    if (!data?.ok) { el.innerHTML = '<div class="empty">Ошибка</div>'; return; }
+    const u = data.user;
+
+    el.innerHTML = `
+      <div class="avatar">${u.nickname.charAt(0).toUpperCase()}</div>
+      <div class="nick">${u.nickname} ${u.is_premium ? '<span class="badge badge-premium">★ PRO</span>' : ''}</div>
+      <div class="game-id">ID: ${u.game_id || 'Не привязан'}</div>
+      <div style="margin-top:12px; display:flex; justify-content:center; gap:16px;">
+        <span class="badge badge-elo">${u.elo} CP</span>
+        <span class="badge badge-elo" style="color:#f0b358; border-color:rgba(240,179,88,.3)">🪙 ${u.coins}</span>
+      </div>
+    `;
+
+    // Заглушки для КД/АВГ (пока нет матчей)
+    // В будущем здесь будет реальный расчет из базы
+    document.getElementById("kd").textContent = "1.25";
+    document.getElementById("avg").textContent = "85";
+    document.getElementById("map-kd").textContent = "1.15";
+    document.getElementById("map-avg").textContent = "80";
+  })();
+</script>
+</body>
+</html>
