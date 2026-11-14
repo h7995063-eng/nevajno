@@ -14,6 +14,9 @@ let initData = tg?.initData || "";
 // ТЕСТОВЫЙ РЕЖИМ (для браузера)
 if (!initData) {
   const urlParams = new URLSearchParams(window.location.search);
+  // ХАРДКОД ДЛЯ ТЕСТА (пока чиним Telegram)
+  window.TEST_TG_ID = "6999358439";
+  if (true) {
   const testTgId = urlParams.get('tg_id');
   if (testTgId) {
     initData = "TEST_MODE";
