@@ -1,4 +1,4 @@
-// js/config.js
+// js/config_v2.js
 const API_URL = "https://areas-facilitate-finds-insulation.trycloudflare.com";
 
 const tg = window.Telegram?.WebApp;
@@ -11,27 +11,17 @@ if (tg) {
 
 let initData = tg?.initData || "";
 
-// --- ТЕСТОВЫЙ РЕЖИМ (костыль) ---
+// ТЕСТОВЫЙ РЕЖИМ (для браузера)
 if (!initData) {
   const urlParams = new URLSearchParams(window.location.search);
   const testTgId = urlParams.get('tg_id');
   if (testTgId) {
-    // Фейковый initData для теста (не пройдёт валидацию HMAC на сервере, если она включена)
-    // Поэтому мы обойдём валидацию на сервере для теста.
     initData = "TEST_MODE";
     window.TEST_TG_ID = testTgId;
     console.log("[TEST MODE] Using tg_id:", testTgId);
   }
 }
-// ---------------------------------
 
-console.log("[DEBUG] Telegram object:", window.Telegram);
-console.log("[DEBUG] WebApp:", window.Telegram?.WebApp);
-console.log("[DEBUG] initData length:", (window.Telegram?.WebApp?.initData || "").length);
-console.log("[DEBUG] initDataUnsafe:", window.Telegram?.WebApp?.initDataUnsafe);
-
-
-// ── Хелперы ──
 function $(sel, root = document) { return root.querySelector(sel); }
 function $$(sel, root = document) { return [...root.querySelectorAll(sel)]; }
 
@@ -41,6 +31,9 @@ async function api(path, opts = {}) {
     "X-Telegram-Init-Data": initData,
     ...(opts.headers || {}),
   };
+  if (window.TEST_TG_ID) {
+    headers["X-Test-Tg-Id"] = window.TEST_TG_ID;
+  }
   const res = await fetch(API_URL + path, { ...opts, headers });
   let data = null;
   try { data = await res.json(); } catch (_) {}
@@ -73,8 +66,4 @@ function requireAuthOrRedirect() {
     return false;
   }
   return true;
-}
-
-function ico(name, cls = "") {
-  return `<svg class="${cls}" style="width:1em;height:1em;vertical-align:-0.15em"><use href="assets/icons/${name}.svg#i"/></svg>`;
 }
