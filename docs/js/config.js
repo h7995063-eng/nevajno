@@ -11,6 +11,12 @@ if (tg) {
 
 const initData = tg?.initData || "";
 
+console.log("[DEBUG] Telegram object:", window.Telegram);
+console.log("[DEBUG] WebApp:", window.Telegram?.WebApp);
+console.log("[DEBUG] initData length:", (window.Telegram?.WebApp?.initData || "").length);
+console.log("[DEBUG] initDataUnsafe:", window.Telegram?.WebApp?.initDataUnsafe);
+
+
 // ── Хелперы ──
 function $(sel, root = document) { return root.querySelector(sel); }
 function $$(sel, root = document) { return [...root.querySelectorAll(sel)]; }
