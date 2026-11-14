@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Регистрация — CYBERSHOK</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img src="assets/logo.svg" alt="CYBERSHOK" class="logo">
+    <div class="title">
+      <h1>РЕГИСТРАЦИЯ</h1>
+      <div class="sub">СОЗДАЙ ПРОФИЛЬ</div>
+    </div>
+  </div>
+
+  <form id="reg-form" class="form">
+    <div class="field">
+      <label>Ник в игре</label>
+      <input name="nickname" placeholder="Например: Shadow" required maxlength="32">
+    </div>
+    <div class="field">
+      <label>ID в CounterFlame (опционально)</label>
+      <input name="game_id" placeholder="Например: 12345" maxlength="64">
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <svg style="width:18px;height:18px"><use href="assets/icons/check.svg#i"/></svg>
+      СОЗДАТЬ ПРОФИЛЬ
+    </button>
+  </form>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+(async function () {
+  if (!requireAuthOrRedirect()) return;
+  const { data } = await api("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ init_data: initData }),
+  });
+  if (!data?.ok) { toast("Ошибка", "error"); return; }
+  if (!data.need_register) {
+    localStorage.setItem("cs_token", data.token);
+    localStorage.setItem("cs_user", JSON.stringify(data.user));
+    location.replace("index.html");
+    return;
+  }
+  $("#reg-form").onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const { data: r } = await api("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify({
+        init_data: initData,
+        nickname: fd.get("nickname"),
+        game_id: fd.get("game_id"),
+      }),
+    });
+    if (r?.ok) {
+      localStorage.setItem("cs_token", r.token);
+      localStorage.setItem("cs_user", JSON.stringify(r.user));
+      toast("Добро пожаловать ✅", "ok");
+      setTimeout(() => location.replace("index.html"), 700);
+    } else if (r?.error === "already_registered") {
+      location.replace("index.html");
+    } else {
+      toast(r?.error || "Ошибка", "error");
+    }
+  };
+})();
+</script>
+</body>
+</html>
