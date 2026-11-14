@@ -349,6 +349,31 @@ def lobbies_leave(lid):
         conn.close()
     return jsonify({"ok": True})
 
+
+@app.route("/api/player/<nickname>")
+@require_auth
+def player_profile(nickname):
+    conn = get_conn()
+    try:
+        row = conn.execute("SELECT * FROM users WHERE nickname=?", (nickname,)).fetchone()
+        if not row:
+            return jsonify({"ok": False, "error": "not_found"}), 404
+        # Считаем статистику (пока просто заглушка, в будущем - из match_players)
+        wins = 0
+        matches = 0
+        return jsonify({
+            "ok": True,
+            "user": {
+                "nickname": row["nickname"],
+                "elo": row["elo"],
+                "is_premium": bool(row["is_premium"]),
+                "game_id": row["game_id"],
+                "created_at": row["created_at"],
+            }
+        })
+    finally:
+        conn.close()
+
 @app.route("/api/stats/top")
 @require_auth
 def stats_top():
