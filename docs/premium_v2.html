@@ -10,43 +10,11 @@
     --premium-color: #f0b358;
     --lite-color: #6080ff;
   }
-  .premium-header {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  .premium-header h1 {
-    font-size: 28px;
-    margin-bottom: 8px;
-  }
-  .premium-header .sub {
-    color: var(--muted);
-    font-size: 14px;
-  }
-  .promo-banner {
-    background: linear-gradient(90deg, #1a1f2e, #2a1a2e);
-    border: 1px solid #4a3a5a;
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-    margin-bottom: 24px;
-  }
-  .promo-banner .title {
-    font-family: 'Orbitron', sans-serif;
-    color: #fff;
-    font-size: 16px;
-  }
-  .promo-banner .timer {
-    color: var(--accent);
-    font-weight: 700;
-    font-size: 18px;
-    margin-top: 4px;
-  }
+  .premium-header { text-align: center; margin-bottom: 24px; }
+  .premium-header h1 { font-size: 26px; margin-bottom: 8px; line-height: 1.2; }
+  .premium-header .sub { color: var(--muted); font-size: 14px; }
   
-  .plans-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+  .plans-grid { display: flex; flex-direction: column; gap: 16px; }
   
   .plan-card {
     background: var(--card);
@@ -56,102 +24,45 @@
     position: relative;
     overflow: hidden;
   }
-  .plan-card.premium {
-    border-color: var(--premium-color);
-    box-shadow: 0 0 20px rgba(240, 179, 88, 0.15);
-  }
-  .plan-card.lite {
-    border-color: var(--lite-color);
-  }
+  .plan-card.premium { border-color: var(--premium-color); box-shadow: 0 0 20px rgba(240, 179, 88, 0.15); }
+  .plan-card.lite { border-color: var(--lite-color); }
   
   .plan-badge {
-    position: absolute;
-    top: 12px;
-    right: -30px;
-    transform: rotate(45deg);
-    background: var(--premium-color);
-    color: #000;
-    font-size: 10px;
-    font-weight: 900;
-    padding: 4px 40px;
-    letter-spacing: 1px;
+    position: absolute; top: 12px; right: -30px; transform: rotate(45deg);
+    background: var(--premium-color); color: #000;
+    font-size: 10px; font-weight: 900; padding: 4px 40px; letter-spacing: 1px;
   }
   
-  .plan-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
-    font-weight: 900;
-    margin-bottom: 4px;
-  }
+  .plan-title { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; margin-bottom: 4px; }
   .plan-card.premium .plan-title { color: var(--premium-color); }
   .plan-card.lite .plan-title { color: var(--lite-color); }
   
-  .plan-price {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 16px 0;
-  }
-  .plan-price span {
-    font-size: 14px;
-    color: var(--muted);
-    font-weight: 400;
-  }
+  .plan-price { font-size: 28px; font-weight: 700; margin: 16px 0; }
+  .plan-price span { font-size: 14px; color: var(--muted); font-weight: 400; }
   
-  .plan-features {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-    text-align: left;
-  }
-  .plan-features li {
-    padding: 8px 0;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .plan-features li::before {
-    content: "✓";
-    color: var(--ok);
-    font-weight: 900;
-  }
+  .plan-features { list-style: none; padding: 0; margin: 20px 0; text-align: left; }
+  .plan-features li { padding: 8px 0; font-size: 14px; display: flex; align-items: flex-start; gap: 10px; }
+  .plan-features li::before { content: "✓"; color: var(--ok); font-weight: 900; margin-top: 2px; }
   
   .plan-btn {
-    width: 100%;
-    padding: 16px;
-    border: none;
-    border-radius: 12px;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    color: #fff;
+    width: 100%; padding: 16px; border: none; border-radius: 12px;
+    font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px;
+    cursor: pointer; color: #fff;
   }
-  .plan-card.premium .plan-btn {
-    background: var(--premium-color);
-    color: #000;
-  }
-  .plan-card.lite .plan-btn {
-    background: var(--lite-color);
-  }
+  .plan-card.premium .plan-btn { background: var(--premium-color); color: #000; }
+  .plan-card.lite .plan-btn { background: var(--lite-color); }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <a href="main_v2.html" class="back"><svg style="width:20px;height:20px"><use href="assets/icons/back.svg#i"/></svg></a>
+    <a href="profile_v2.html" class="back"><svg style="width:20px;height:20px"><use href="assets/icons/back.svg#i"/></svg></a>
     <div class="title"><h1>ПОДПИСКА</h1></div>
   </div>
 
   <div class="premium-header">
     <h1>Одна подписка на более чем 4000 серверов</h1>
     <div class="sub">Выполняй миссии, получай дроп за игру, ставь любые скины и многое другое!</div>
-  </div>
-
-  <div class="promo-banner">
-    <div class="title">ЧЁРНАЯ ПЯТНИЦА</div>
-    <div class="timer">1 д 00:08:42</div>
-    <div style="font-size:12px; color:var(--muted); margin-top:4px;">-40% на годовую подписку</div>
   </div>
 
   <div class="plans-grid">
@@ -162,11 +73,13 @@
       <div class="plan-price">349 ₽ <span>/ мес</span></div>
       <ul class="plan-features">
         <li>Отсутствие рекламы</li>
-        <li>Резервный слот</li>
-        <li>Иммунитет к ограничению AWP</li>
-        <li>Доступ к миссиям и дропу</li>
+        <li>Резервный слот (вход на полный сервер)</li>
+        <li>Иммунитет к ограничению AWP (в DM)</li>
         <li>Смена ника раз в 3 месяца</li>
         <li>Эксклюзивный тег в игре</li>
+        <li>Доступ к скинам (включая агентов)</li>
+        <li>Возможность видеть, где играют PRO и стримеры</li>
+        <li>Приоритетная поддержка</li>
       </ul>
       <button class="plan-btn" onclick="buyPremium()">КУПИТЬ PREMIUM</button>
     </div>
@@ -177,15 +90,18 @@
       <div class="plan-price">149 ₽ <span>/ мес</span></div>
       <ul class="plan-features">
         <li>Отсутствие рекламы</li>
-        <li>Резервный слот</li>
-        <li>Быстрый доступ к серверам</li>
+        <li>Резервный слот (вход на полный сервер)</li>
+        <li>Иммунитет к ограничению AWP (в DM)</li>
+        <li>Смена ника раз в 3 месяца</li>
+        <li>Эксклюзивный тег в игре</li>
+        <li>Доступ к скинам (без агентов)</li>
       </ul>
       <button class="plan-btn" onclick="buyLite()">КУПИТЬ LITE</button>
     </div>
   </div>
 </div>
 
-<script src="js/app_v3.js?v=3"></script>
+<script src="js/app_v3.js?v=4"></script>
 <script>
   async function buyPremium() {
     const { data } = await api("/api/profile/premium/buy", { method: "POST" });
