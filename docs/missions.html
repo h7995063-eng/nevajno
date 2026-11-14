@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>МИССИИ — CYBERSHOKE</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .mission-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px; margin-bottom: 16px;
+    position: relative;
+  }
+  .mission-card.premium-only {
+    border-color: var(--premium-color);
+  }
+  .mission-title {
+    font-family: 'Orbitron', sans-serif; font-size: 16px;
+    font-weight: 700; margin-bottom: 8px;
+  }
+  .mission-desc { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+  .mission-reward {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(240, 179, 88, 0.1); color: var(--premium-color);
+    padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 700;
+  }
+  .mission-progress {
+    height: 6px; background: var(--bg-2); border-radius: 3px;
+    margin-top: 12px; overflow: hidden;
+  }
+  .mission-progress-bar {
+    height: 100%; background: var(--accent); width: 0%;
+  }
+  .lock-icon { position: absolute; top: 16px; right: 16px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <a href="main_v2.html" class="back"><svg style="width:20px;height:20px"><use href="assets/icons/back.svg#i"/></svg></a>
+    <div class="title"><h1>МИССИИ</h1><div class="sub">ЕЖЕНЕДЕЛЬНЫЕ ЗАДАНИЯ</div></div>
+  </div>
+
+  <div id="missions-list">
+    <!-- Карточки миссий будут здесь -->
+  </div>
+</div>
+<script src="js/app_v3.js?v=5"></script>
+<script>
+  // Имитация миссий (пока без бэкенда, просто визуал как у них)
+  const missions = [
+    { title: "Сыграй 3 матча", desc: "Зайди в лобби и сыграй 3 матча в любом режиме", reward: "10 Коинов", progress: 33 },
+    { title: "Сделай 50 убийств", desc: "Убей 50 противников в режиме Deathmatch", reward: "Серебряный Токен", progress: 10, premium: true },
+    { title: "Выиграй 1 дуэль", desc: "Победи в режиме 1x1 Дуэль", reward: "5 Коинов", progress: 0 },
+  ];
+
+  const list = document.getElementById("missions-list");
+  list.innerHTML = missions.map(m => `
+    <div class="mission-card ${m.premium ? 'premium-only' : ''}">
+      ${m.premium ? '<div class="lock-icon">🔒</div>' : ''}
+      <div class="mission-title">${m.title}</div>
+      <div class="mission-desc">${m.desc}</div>
+      <div class="mission-reward">${m.reward}</div>
+      <div class="mission-progress"><div class="mission-progress-bar" style="width: ${m.progress}%"></div></div>
+    </div>
+  `).join("");
+</script>
+</body>
+</html>
