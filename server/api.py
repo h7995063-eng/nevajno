@@ -108,12 +108,16 @@ def validate_init_data(init_data):
 
 
 def tg_user():
+    # --- ТЕСТОВЫЙ РЕЖИМ: сначала пробуем X-Dev-User, потом X-Init-Data ---
+    dev_user = request.headers.get("X-Dev-User", "")
+    if dev_user:
+        try:
+            return json.loads(dev_user)
+        except Exception:
+            pass
     if BOT_TOKEN:
         return validate_init_data(request.headers.get("X-Init-Data", ""))
-    try:
-        return json.loads(request.headers.get("X-Dev-User", "")) or None
-    except Exception:
-        return None
+    return None
 
 
 def load_user(tg_id):
