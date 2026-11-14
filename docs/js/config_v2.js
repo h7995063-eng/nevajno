@@ -61,15 +61,5 @@ function toast(msg, kind = "") {
 }
 
 function requireAuthOrRedirect() {
-  if (!initData) {
-    document.body.innerHTML = `
-      <div class="container">
-        <div class="empty">
-          <p>⚠️ Открой через Telegram-бота</p>
-          <p style="margin-top:8px;font-size:13px">Это приложение работает только внутри Telegram.</p>
-        </div>
-      </div>`;
-    return false;
-  }
-  return true;
+  return true; // Всегда пускаем, проверка идет на бэкенде
 }
