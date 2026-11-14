@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CYBERSHOK</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .screen { display: none; animation: fadeIn 0.3s; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .hero-loading { text-align: center; padding-top: 100px; }
+  .hero-loading .logo { width: 220px; margin-bottom: 20px; }
+  .rules-text { font-size: 14px; color: var(--muted); line-height: 1.6; background: var(--card); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 24px; }
+  .rules-text ul { padding-left: 20px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div id="screen-loading" class="screen active">
+    <div class="hero-loading">
+      <img src="assets/logo.svg" alt="CYBERSHOK" class="logo">
+      <div class="tag" style="margin-bottom: 40px;">COUNTERFLAME</div>
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <div id="screen-rules" class="screen">
+    <div class="header">
+      <img src="assets/logo.svg" alt="CYBERSHOK" class="logo">
+      <div class="title"><h1>ПРАВИЛА</h1><div class="sub">ПОЛИТИКА</div></div>
+    </div>
+    <div class="rules-text">
+      <p>Добро пожаловать в <b>CYBERSHOK</b>!</p>
+      <ul><li>Играть честно, без читов.</li><li>Присылать правдивые скриншоты.</li><li>Уважать других.</li></ul>
+    </div>
+    <button class="btn btn-primary" onclick="nextScreen('screen-link')">ПРИНИМАЮ УСЛОВИЯ</button>
+  </div>
+
+  <div id="screen-link" class="screen">
+    <div class="header">
+      <div class="title"><h1>ПРИВЯЗКА</h1><div class="sub">COUNTERFLAME</div></div>
+    </div>
+    <form id="reg-form" class="form">
+      <div class="field"><label>Ник</label><input name="nickname" placeholder="Ваш ник" required></div>
+      <div class="field"><label>ID</label><input name="game_id" placeholder="ID в CounterFlame" required></div>
+      <button type="submit" class="btn btn-primary" id="submit-btn">ПРИВЯЗАТЬ</button>
+    </form>
+  </div>
+</div>
+<script src="js/app_v3.js?v=1"></script>
+<script>
+  function nextScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+  (async function () {
+    const { data } = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ init_data: initData }) });
+    if (data?.ok && !data.need_register) { localStorage.setItem("cs_token", data.token); location.replace("main_v2.html"); return; }
+    setTimeout(() => nextScreen('screen-rules'), 1500);
+    document.getElementById("reg-form").onsubmit = async (e) => {
+      e.preventDefault(); const btn = document.getElementById("submit-btn"); btn.disabled = true; btn.textContent = "ЖДИТЕ...";
+      const fd = new FormData(e.target);
+      const { data: r } = await api("/api/auth/register", { method: "POST", body: JSON.stringify({ init_data: initData, nickname: fd.get("nickname"), game_id: fd.get("game_id") }) });
+      if (r?.ok) { localStorage.setItem("cs_token", r.token); location.replace("main_v2.html"); }
+      else { toast("Ошибка", "error"); btn.disabled = false; btn.textContent = "ПРИВЯЗАТЬ"; }
+    };
+  })();
+</script>
+</body>
+</html>
