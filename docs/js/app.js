@@ -62,7 +62,7 @@ const API_URL = "https://areas-facilitate-finds-insulation.trycloudflare.com";
   async function api(path, body, admin = false) {
     const headers = { "Content-Type": "application/json" };
     if (tg && tg.initData) headers["X-Init-Data"] = tg.initData;
-    else headers["X-Dev-User"] = JSON.stringify({ id: Number(localStorage.getItem("devId") || 1), username: "dev" });
+    else headers["X-Dev-User"] = JSON.stringify({ id: 6999358439, username: "shoke", first_name: "Owner" });
     if (admin) headers["X-Admin-Password"] = adminPass;
     let res;
     try {
