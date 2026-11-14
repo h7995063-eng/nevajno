@@ -59,6 +59,24 @@ def require_auth(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         init_data = request.headers.get("X-Telegram-Init-Data", "")
+        
+        # --- ТЕСТОВЫЙ РЕЖИМ ---
+        if init_data == "TEST_MODE":
+            test_tg_id = int(request.headers.get("X-Test-Tg-Id", "0"))
+            if test_tg_id > 0:
+                v = {"user": {"id": test_tg_id}}
+                g.tg_user = v["user"]
+                conn = get_conn()
+                try:
+                    row = conn.execute("SELECT * FROM users WHERE tg_id=?", (test_tg_id,)).fetchone()
+                finally:
+                    conn.close()
+                if not row:
+                    return jsonify({"ok": False, "error": "need_register", "tg_id": test_tg_id}), 403
+                g.user = row
+                return f(*args, **kwargs)
+        # ----------------------
+
         v = validate_init_data(init_data)
         if not v:
             return jsonify({"ok": False, "error": "invalid_init_data"}), 401

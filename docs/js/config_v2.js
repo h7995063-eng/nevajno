@@ -9,7 +9,21 @@ if (tg) {
   tg.setBackgroundColor?.("#0a0e14");
 }
 
-const initData = tg?.initData || "";
+let initData = tg?.initData || "";
+
+// --- ТЕСТОВЫЙ РЕЖИМ (костыль) ---
+if (!initData) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const testTgId = urlParams.get('tg_id');
+  if (testTgId) {
+    // Фейковый initData для теста (не пройдёт валидацию HMAC на сервере, если она включена)
+    // Поэтому мы обойдём валидацию на сервере для теста.
+    initData = "TEST_MODE";
+    window.TEST_TG_ID = testTgId;
+    console.log("[TEST MODE] Using tg_id:", testTgId);
+  }
+}
+// ---------------------------------
 
 console.log("[DEBUG] Telegram object:", window.Telegram);
 console.log("[DEBUG] WebApp:", window.Telegram?.WebApp);
