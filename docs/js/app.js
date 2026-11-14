@@ -1,3 +1,4 @@
+const API_URL = "https://areas-facilitate-finds-insulation.trycloudflare.com";
 (() => {
   "use strict";
 
@@ -65,7 +66,7 @@
     if (admin) headers["X-Admin-Password"] = adminPass;
     let res;
     try {
-      res = await fetch(path, { method: body ? "POST" : "GET", headers, body: body ? JSON.stringify(body) : undefined });
+      res = await fetch(API_URL + path, { method: body ? "POST" : "GET", headers, body: body ? JSON.stringify(body) : undefined });
     } catch (e) {
       throw Object.assign(new Error("Нет связи с сервером"), { status: 0 });
     }
