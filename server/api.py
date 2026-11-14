@@ -374,6 +374,18 @@ def player_profile(nickname):
     finally:
         conn.close()
 
+
+@app.route("/api/online")
+@require_auth
+def get_online():
+    conn = get_conn()
+    try:
+        # Считаем уникальных игроков в лобби со статусом open/full
+        count = conn.execute("SELECT COUNT(DISTINCT user_id) FROM lobby_members JOIN lobbies ON lobbies.id = lobby_members.lobby_id WHERE lobbies.status IN ('open', 'full')").fetchone()[0]
+        return jsonify({"ok": True, "online": count})
+    finally:
+        conn.close()
+
 @app.route("/api/stats/top")
 @require_auth
 def stats_top():
