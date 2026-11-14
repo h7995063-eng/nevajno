@@ -63,7 +63,7 @@
   </div>
 </div>
 
-<script src="js/config_v2.js?v=10000"></script>
+<script src="js/config_v2.js?v=8"></script>
 <script>
   function nextScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -79,7 +79,7 @@
     if (data?.ok && !data.need_register) {
       localStorage.setItem("cs_token", data.token);
       localStorage.setItem("cs_user", JSON.stringify(data.user));
-      location.replace("main_v2.html");
+      location.replace("main_v3.html");
       return;
     }
 
@@ -101,9 +101,9 @@
         localStorage.setItem("cs_token", r.token);
         localStorage.setItem("cs_user", JSON.stringify(r.user));
         toast("Аккаунт привязан ✅", "ok");
-        setTimeout(() => location.replace("main_v2.html"), 800);
+        setTimeout(() => location.replace("main_v3.html"), 800);
       } else if (r?.error === "already_registered") {
-        location.replace("main_v2.html");
+        location.replace("main_v3.html");
       } else {
         toast(r?.error || "Ошибка привязки", "error");
         btn.disabled = false;
