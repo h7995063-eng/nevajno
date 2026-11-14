@@ -4,6 +4,7 @@
 
   // Если есть TEST_TG_ID (из URL), отправляем его в заголовке
   const headers = { "Content-Type": "application/json", "X-Telegram-Init-Data": initData };
+  console.log("[AUTH_DEBUG] TEST_TG_ID =", window.TEST_TG_ID, "initData =", initData);
   if (window.TEST_TG_ID) {
     headers["X-Test-Tg-Id"] = window.TEST_TG_ID;
   }
