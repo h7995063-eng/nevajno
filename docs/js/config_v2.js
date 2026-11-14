@@ -34,6 +34,9 @@ async function api(path, opts = {}) {
   if (window.TEST_TG_ID) {
     headers["X-Test-Tg-Id"] = window.TEST_TG_ID;
   }
+  if (window.TEST_TG_ID) {
+    headers["X-Test-Tg-Id"] = window.TEST_TG_ID;
+  }
   const res = await fetch(API_URL + path, { ...opts, headers });
   let data = null;
   try { data = await res.json(); } catch (_) {}
