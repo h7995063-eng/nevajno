@@ -68,6 +68,8 @@ const API_URL = "https://areas-facilitate-finds-insulation.trycloudflare.com";
     try {
       res = await fetch(API_URL + path, { method: body ? "POST" : "GET", headers, body: body ? JSON.stringify(body) : undefined });
     } catch (e) {
+      console.error("FETCH ERROR:", e);
+      document.body.innerHTML += `<div style="position:fixed; bottom:0; left:0; right:0; background:red; color:white; padding:10px; font-size:12px; z-index:9999;">Ошибка сети: ${e.message}</div>`;
       throw Object.assign(new Error("Нет связи с сервером"), { status: 0 });
     }
     let data = {};
