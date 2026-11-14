@@ -1,0 +1,36 @@
+/* Боковое меню */
+.sidebar {
+  position: fixed; top: 0; left: -280px; width: 280px; height: 100vh;
+  background: rgba(10, 14, 20, 0.95); backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 2000; transition: left 0.3s ease;
+  padding: 20px; display: flex; flex-direction: column; gap: 8px;
+}
+.sidebar.open { left: 0; }
+.sidebar .nav-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  border-radius: 12px; color: var(--muted); text-decoration: none;
+  font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700;
+  transition: all 0.2s;
+}
+.sidebar .nav-item:active, .sidebar .nav-item.active {
+  background: rgba(255, 70, 85, 0.15); color: var(--accent);
+}
+.sidebar .nav-item svg { width: 20px; height: 20px; }
+.sidebar .nav-item .badge { margin-left: auto; background: var(--glass); font-size: 10px; padding: 2px 6px; border-radius: 6px; }
+
+/* Затемнение фона */
+.overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+  z-index: 1999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.overlay.show { opacity: 1; pointer-events: auto; }
+
+/* Кнопка гамбургер */
+.menu-btn {
+  width: 40px; height: 40px; border-radius: 12px; background: var(--glass);
+  border: 1px solid var(--glass-border); display: flex; align-items: center;
+  justify-content: center; color: var(--text); cursor: pointer;
+}
+.menu-btn svg { width: 24px; height: 24px; }
