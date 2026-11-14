@@ -11,9 +11,11 @@ bot = telebot.TeleBot(BOT_TOKEN)
 @bot.message_handler(commands=["start"])
 def cmd_start(message):
     kb = InlineKeyboardMarkup()
+    # Костыль: передаем tg_id в URL
+    url_with_id = f"{MINIAPP_URL}?tg_id={message.from_user.id}"
     kb.add(InlineKeyboardButton(
         "🎮 Открыть CYBERSHOK",
-        web_app=WebAppInfo(url=MINIAPP_URL)
+        web_app=WebAppInfo(url=url_with_id)
     ))
     bot.send_message(
         message.chat.id,
