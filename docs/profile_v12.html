@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Профиль</title><link rel="stylesheet" href="css/style.css"></head>
+<body><div class="container">
+<div class="header"><a href="main_v12.html" class="back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></a><div class="title"><h1>ПРОФИЛЬ</h1></div></div>
+<div id="profile-content" style="text-align:center; padding:20px 0;"><div class="loader"></div></div>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;"><div class="card" style="text-align:center; margin:0;"><div style="font-family:'Orbitron'; font-size:20px; font-weight:900; color:var(--accent-2);" id="kd">0.00</div><div style="font-size:11px; color:var(--muted); text-transform:uppercase; margin-top:4px;">КД</div></div><div class="card" style="text-align:center; margin:0;"><div style="font-family:'Orbitron'; font-size:20px; font-weight:900; color:var(--accent-2);" id="map-kd">0.00</div><div style="font-size:11px; color:var(--muted); text-transform:uppercase; margin-top:4px;">КД по картам</div></div></div>
+<div style="margin-top: 20px;"><a href="premium_v12.html" class="btn btn-primary">ПЕРЕЙТИ К ПОДПИСКАМ</a></div>
+</div>
+<script src="js/app_v10.js?v=5"></script>
+<script>
+  (async function () {
+    const el = document.getElementById("profile-content");
+    const { data } = await api("/api/profile/me");
+    if (!data?.ok) { el.innerHTML = '<div class="empty">Ошибка</div>'; return; }
+    const u = data.user;
+    el.innerHTML = `<div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg, var(--accent), var(--accent-2)); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; color:#fff; font-size:32px; font-weight:900;">${u.nickname.charAt(0).toUpperCase()}</div>
+      <div style="font-family:'Orbitron'; font-size:22px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:8px;">${u.nickname} ${u.is_premium ? '<span class="badge badge-premium">★ PRO</span>' : ''}</div>
+      <div style="color:var(--muted); font-size:13px; margin-top:4px;">ID: ${u.game_id || 'Не привязан'}</div>
+      <div style="margin-top:12px; display:flex; justify-content:center; gap:16px;"><span class="badge badge-elo">${u.elo} CP</span><span class="badge badge-elo" style="color:#f0b358; border-color:rgba(240,179,88,.3)">🪙 ${u.coins}</span></div>`;
+    document.getElementById("kd").textContent = "1.25";
+    document.getElementById("map-kd").textContent = "1.15";
+  })();
+</script></body></html>
