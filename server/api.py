@@ -18,7 +18,7 @@ app = Flask(__name__)
 @app.after_request
 def add_cors(resp):
     resp.headers["Access-Control-Allow-Origin"] = "*"
-    resp.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Telegram-Init-Data"
+    resp.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Telegram-Init-Data, X-Test-Tg-Id"
     resp.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     return resp
 
@@ -59,23 +59,23 @@ def require_auth(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         init_data = request.headers.get("X-Telegram-Init-Data", "")
-        
-        # --- ТЕСТОВЫЙ РЕЖИМ ---
-        if init_data == "TEST_MODE":
-            test_tg_id = int(request.headers.get("X-Test-Tg-Id", "0"))
-            if test_tg_id > 0:
-                v = {"user": {"id": test_tg_id}}
-                g.tg_user = v["user"]
+
+        # ТЕСТОВЫЙ РЕЖИМ: X-Test-Tg-Id
+        test_tg_id = request.headers.get("X-Test-Tg-Id")
+        if test_tg_id:
+            try:
+                tg_id = int(test_tg_id)
                 conn = get_conn()
                 try:
-                    row = conn.execute("SELECT * FROM users WHERE tg_id=?", (test_tg_id,)).fetchone()
+                    row = conn.execute("SELECT * FROM users WHERE tg_id=?", (tg_id,)).fetchone()
                 finally:
                     conn.close()
                 if not row:
-                    return jsonify({"ok": False, "error": "need_register", "tg_id": test_tg_id}), 403
+                    return jsonify({"ok": False, "error": "need_register", "tg_id": tg_id}), 403
                 g.user = row
                 return f(*args, **kwargs)
-        # ----------------------
+            except ValueError:
+                return jsonify({"ok": False, "error": "bad_test_id"}), 400
 
         v = validate_init_data(init_data)
         if not v:
@@ -104,12 +104,17 @@ def health():
 def auth_login():
     data = request.get_json(silent=True) or {}
     init_data = data.get("init_data", "")
-    v = validate_init_data(init_data)
-    if not v:
-        return jsonify({"ok": False, "error": "invalid_init_data"}), 401
 
-    tg_user = v["user"]
-    tg_id = int(tg_user["id"])
+    test_tg_id = request.headers.get("X-Test-Tg-Id")
+    if test_tg_id:
+        tg_id = int(test_tg_id)
+        tg_user = {"id": tg_id, "username": f"test_{tg_id}", "first_name": "Test"}
+    else:
+        v = validate_init_data(init_data)
+        if not v:
+            return jsonify({"ok": False, "error": "invalid_init_data"}), 401
+        tg_user = v["user"]
+        tg_id = int(tg_user["id"])
 
     conn = get_conn()
     try:
@@ -150,12 +155,14 @@ def auth_register():
     if not nickname or len(nickname) > 32:
         return jsonify({"ok": False, "error": "bad_nickname"}), 400
 
-    v = validate_init_data(init_data)
-    if not v:
-        return jsonify({"ok": False, "error": "invalid_init_data"}), 401
-
-    tg_user = v["user"]
-    tg_id = int(tg_user["id"])
+    test_tg_id = request.headers.get("X-Test-Tg-Id")
+    if test_tg_id:
+        tg_id = int(test_tg_id)
+    else:
+        v = validate_init_data(init_data)
+        if not v:
+            return jsonify({"ok": False, "error": "invalid_init_data"}), 401
+        tg_id = int(v["user"]["id"])
 
     conn = get_conn()
     try:
