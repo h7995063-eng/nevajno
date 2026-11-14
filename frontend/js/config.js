@@ -1,5 +1,5 @@
 // js/config.js
-const API_URL = "http://127.0.0.1:5000";
+const API_URL = "https://areas-facilitate-finds-insulation.trycloudflare.com";
 
 const tg = window.Telegram?.WebApp;
 if (tg) {
