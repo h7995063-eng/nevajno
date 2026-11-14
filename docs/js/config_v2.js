@@ -1,4 +1,3 @@
-// js/config_v2.js
 const API_URL = "https://areas-facilitate-finds-insulation.trycloudflare.com";
 
 const tg = window.Telegram?.WebApp;
@@ -9,24 +8,16 @@ if (tg) {
   tg.setBackgroundColor?.("#0a0e14");
 }
 
+// ТВОЙ TG ID ДЛЯ ТЕСТА (временный костыль)
+const HARDCODED_TG_ID = "6999358439";
+
 let initData = tg?.initData || "";
+window.TEST_TG_ID = HARDCODED_TG_ID;
 
-// ТЕСТОВЫЙ РЕЖИМ (для браузера)
-if (!initData) {
-  const urlParams = new URLSearchParams(window.location.search);
-  // ХАРДКОД ДЛЯ ТЕСТА (пока чиним Telegram)
-  window.TEST_TG_ID = "6999358439";
-  if (true) {
-  const testTgId = urlParams.get('tg_id');
-  if (testTgId) {
-    initData = "TEST_MODE";
-    window.TEST_TG_ID = testTgId;
-    console.log("[TEST MODE] Using tg_id:", testTgId);
-  }
+// Отключаем заглушку
+function requireAuthOrRedirect() {
+  return true;
 }
-
-function $(sel, root = document) { return root.querySelector(sel); }
-function $$(sel, root = document) { return [...root.querySelectorAll(sel)]; }
 
 async function api(path, opts = {}) {
   const headers = {
@@ -34,32 +25,20 @@ async function api(path, opts = {}) {
     "X-Telegram-Init-Data": initData,
     ...(opts.headers || {}),
   };
-  if (window.TEST_TG_ID) {
-    headers["X-Test-Tg-Id"] = window.TEST_TG_ID;
-  }
-  if (window.TEST_TG_ID) {
-    headers["X-Test-Tg-Id"] = window.TEST_TG_ID;
-  }
+  // Всегда отправляем заголовок с нашим ID
+  headers["X-Test-Tg-Id"] = window.TEST_TG_ID;
+
   const res = await fetch(API_URL + path, { ...opts, headers });
   let data = null;
   try { data = await res.json(); } catch (_) {}
   return { status: res.status, data };
 }
 
+function $(sel, root = document) { return root.querySelector(sel); }
 function toast(msg, kind = "") {
   let el = $(".toast");
-  if (!el) {
-    el = document.createElement("div");
-    el.className = "toast";
-    document.body.appendChild(el);
-  }
-  el.textContent = msg;
-  el.className = "toast " + kind;
+  if (!el) { el = document.createElement("div"); el.className = "toast"; document.body.appendChild(el); }
+  el.textContent = msg; el.className = "toast " + kind;
   requestAnimationFrame(() => el.classList.add("show"));
-  clearTimeout(window.__toastT);
-  window.__toastT = setTimeout(() => el.classList.remove("show"), 2600);
-}
-
-function requireAuthOrRedirect() {
-  return true; // Всегда пускаем, проверка идет на бэкенде
+  setTimeout(() => el.classList.remove("show"), 2600);
 }

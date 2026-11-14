@@ -5,106 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Регистрация — CYBERSHOK</title>
 <link rel="stylesheet" href="css/style.css">
-<style>
-  .screen { display: none; }
-  .screen.active { display: block; }
-  .rules-text {
-    font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px;
-    background: var(--card); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border);
-  }
-  .rules-text ul { padding-left: 20px; margin-top: 10px; }
-  .rules-text li { margin-bottom: 6px; }
-</style>
 </head>
 <body>
 <div class="container">
-
-  <!-- Экран 1: Загрузка -->
-  <div id="screen-loading" class="screen active">
-    <div class="hero" style="padding-top: 100px;">
-      <img src="assets/logo.svg" alt="CYBERSHOK" class="logo-big">
-      <div class="loader" style="margin-top: 40px;"></div>
+  <div class="header">
+    <img src="assets/logo.svg" alt="CYBERSHOK" class="logo">
+    <div class="title">
+      <h1>РЕГИСТРАЦИЯ</h1>
+      <div class="sub">СОЗДАЙ ПРОФИЛЬ</div>
     </div>
   </div>
 
-  <!-- Экран 2: Правила -->
-  <div id="screen-rules" class="screen">
-    <div class="header">
-      <img src="assets/logo.svg" alt="CYBERSHOK" class="logo">
-      <div class="title">
-        <h1>ДОБРО ПОЖАЛОВАТЬ</h1>
-        <div class="sub">ПРАВИЛА СИСТЕМЫ</div>
-      </div>
+  <form id="reg-form" class="form">
+    <div class="field">
+      <label>Ник в игре</label>
+      <input name="nickname" placeholder="Придумайте ник" required maxlength="32">
     </div>
-    <div class="rules-text">
-      <p>Для использования <b>CYBERSHOK</b> необходимо соблюдать простые правила:</p>
-      <ul>
-        <li>Играть честно (без читов).</li>
-        <li>Уважать других игроков.</li>
-        <li>Предоставлять правдивые скриншоты матчей.</li>
-      </ul>
-      <p style="margin-top: 12px;">При нарушении — бан без права восстановления.</p>
+    <div class="field">
+      <label>ID в CounterFlame</label>
+      <input name="game_id" placeholder="Введите ваш ID в CounterFlame" required maxlength="64">
     </div>
-    <button class="btn btn-primary" onclick="nextScreen('screen-link')">
-      ПРИНИМАЮ УСЛОВИЯ
+    <button type="submit" class="btn btn-primary">
+      СОЗДАТЬ ПРОФИЛЬ
     </button>
-  </div>
-
-  <!-- Экран 3: Привязка -->
-  <div id="screen-link" class="screen">
-    <div class="header">
-      <a href="#" class="back" onclick="nextScreen('screen-rules')"><svg><use href="assets/icons/back.svg#i"/></svg></a>
-      <div class="title">
-        <h1>ПРИВЯЗКА</h1>
-        <div class="sub">COUNTERFLAME</div>
-      </div>
-    </div>
-    <form id="reg-form" class="form">
-      <div class="field">
-        <label>Ник в игре</label>
-        <input name="nickname" placeholder="Придумайте ник" required maxlength="32">
-      </div>
-      <div class="field">
-        <label>ID в CounterFlame</label>
-        <input name="game_id" placeholder="Введите ваш ID в CounterFlame" required maxlength="64">
-      </div>
-      <button type="submit" class="btn btn-primary">
-        СОЗДАТЬ ПРОФИЛЬ
-      </button>
-    </form>
-  </div>
-
+  </form>
 </div>
 
-<script src="js/config_v2.js?v=5"></script>
+<script src="js/config_v2.js?v=100"></script>
 <script>
-  function nextScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
-
-  // Логика проверки и регистрации
   (async function () {
-    if (!requireAuthOrRedirect()) return;
-
-    // Проверяем авторизацию (уже зарегистрирован?)
-    const { status, data } = await api("/api/auth/login", {
+    // Сразу проверяем, зарегистрирован ли
+    const { data } = await api("/api/auth/login", {
       method: "POST",
       body: JSON.stringify({ init_data: initData }),
     });
 
     if (data?.ok && !data.need_register) {
-      // Уже есть аккаунт, отправляем на главную
       localStorage.setItem("cs_token", data.token);
       localStorage.setItem("cs_user", JSON.stringify(data.user));
-      location.replace("main_v2.html" + window.location.search);
+      location.replace("main_v2.html");
       return;
     }
 
-    // Если не зарегистрирован — показываем правила
-    setTimeout(() => nextScreen('screen-rules'), 1500);
-
-    // Обработка формы регистрации
+    // Если нет — показываем форму
     document.getElementById("reg-form").onsubmit = async (e) => {
       e.preventDefault();
       const btn = e.target.querySelector('button');
@@ -125,11 +68,11 @@
         localStorage.setItem("cs_token", r.token);
         localStorage.setItem("cs_user", JSON.stringify(r.user));
         toast("Добро пожаловать ✅", "ok");
-        setTimeout(() => location.replace("main_v2.html" + window.location.search), 800);
+        setTimeout(() => location.replace("main_v2.html"), 800);
       } else if (r?.error === "already_registered") {
-        location.replace("main_v2.html" + window.location.search);
+        location.replace("main_v2.html");
       } else {
-        toast(r?.error || "Ошибка регистрации", "error");
+        toast(r?.error || "Ошибка", "error");
         btn.disabled = false;
         btn.textContent = "СОЗДАТЬ ПРОФИЛЬ";
       }
