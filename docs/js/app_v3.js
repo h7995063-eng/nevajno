@@ -2,16 +2,36 @@ const API_URL = "https://areas-facilitate-finds-insulation.trycloudflare.com";
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor?.("#0a0e14"); tg.setBackgroundColor?.("#0a0e14"); }
 
-let initData = "TEST_MODE";
-window.TEST_TG_ID = "6999358439"; // Твой ID
+let initData = tg?.initData || "";
+
+// Если initData пустой (тест в браузере), берем tg_id из URL
+if (!initData) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const testTgId = urlParams.get('tg_id');
+  if (testTgId) {
+    initData = "TEST_MODE";
+    window.TEST_TG_ID = testTgId;
+  }
+}
 
 function requireAuthOrRedirect() { return true; }
+
 async function api(path, opts = {}) {
-  const headers = { "Content-Type": "application/json", "X-Telegram-Init-Data": initData, "X-Test-Tg-Id": window.TEST_TG_ID, ...(opts.headers || {}) };
+  const headers = {
+    "Content-Type": "application/json",
+    "X-Telegram-Init-Data": initData,
+    ...(opts.headers || {}),
+  };
+  // Если есть тестовый ID, добавляем заголовок
+  if (window.TEST_TG_ID) {
+    headers["X-Test-Tg-Id"] = window.TEST_TG_ID;
+  }
   const res = await fetch(API_URL + path, { ...opts, headers });
-  let data = null; try { data = await res.json(); } catch (_) {}
+  let data = null;
+  try { data = await res.json(); } catch (_) {}
   return { status: res.status, data };
 }
+
 function $(sel, root = document) { return root.querySelector(sel); }
 function toast(msg, kind = "") {
   let el = $(".toast");
