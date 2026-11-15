@@ -735,9 +735,13 @@ const API_URL = NOTIFY_URL;
         el.innerHTML = '<div class="card empty">Пока нет новостей.</div>';
         return;
       }
+      const isAdmin = me && me.is_admin;
       el.innerHTML = data.news.map((n) => `
         <div class="card" style="margin-bottom:12px;">
-          <h3>${esc(n.title)}</h3>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <h3 style="flex:1;">${esc(n.title)}</h3>
+            ${isAdmin ? `<button class="btn danger sm" data-del-news="${n.id}" type="button" style="width:auto;padding:4px 10px;font-size:11px;">Удалить</button>` : ""}
+          </div>
           <p style="color:var(--muted); font-size:14px; margin-top:8px;">${esc(n.content)}</p>
           <p style="color:var(--muted); font-size:11px; margin-top:8px;">Автор: ${esc(n.author)}</p>
         </div>
@@ -953,6 +957,17 @@ const API_URL = NOTIFY_URL;
   document.addEventListener("click", (ev) => {
     const el = ev.target.closest("button");
     if (!el) return;
+    if (el.dataset.delNews) {
+      if (!confirm("Удалить новость?")) return;
+      fetch(API_URL + "/api/news/" + el.dataset.delNews, {
+        method: "DELETE",
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      }).then((r) => r.json()).then((d) => {
+        if (d.ok) { toast("Новость удалена", "ok"); loadNews(); }
+        else toast(d.error || "Ошибка", "err");
+      });
+      return;
+    }
     if (el.dataset.join) return openTeamModal(el.dataset.join);
     if (el.dataset.open) return openRoom(el.dataset.open);
     if (el.dataset.team) return doJoin(el.dataset.team);
