@@ -631,9 +631,11 @@ const API_URL = NOTIFY_URL;
       formData.append("map", l.map);
       formData.append("mode", l.mode);
       formData.append("owner", me.nickname);
-      const allPlayers = (l.teams?.KT || []).concat(l.teams?.T || []);
+      const ktNicks = (l.teams?.KT || []).map((id) => nameOf(id));
+      const tNicks = (l.teams?.T || []).map((id) => nameOf(id));
+      const allPlayers = ktNicks.concat(tNicks);
       formData.append("players", JSON.stringify(allPlayers));
-      formData.append("teams", JSON.stringify({ KT: l.teams?.KT || [], T: l.teams?.T || [] }));
+      formData.append("teams", JSON.stringify({ KT: ktNicks, T: tNicks }));
 
       const uploadRes = await fetch(API_URL + "/api/match/submit", {
         method: "POST",
