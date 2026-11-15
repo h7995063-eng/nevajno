@@ -11,7 +11,7 @@
   const PLAYING_TTL = 10800;
   // Адрес бэкенда с /api/notify (например "https://api.example.com"). Пусто = уведомления в канал выключены.
   const SUPPORT_URL = "https://t.me/crymbog";
-  const NOTIFY_URL = "https://potentially-vacancies-washing-prefix.trycloudflare.com";
+  const NOTIFY_URL = "https://instructors-built-mate-drain.trycloudflare.com";
   const MAPS = ["Dust II", "Mirage", "Inferno", "Vertigo"];
   const MAP_IMAGES = {
     "Mirage": "assets/maps/mirage.jpeg",
