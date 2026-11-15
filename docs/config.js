@@ -1,2 +1,2 @@
 // config.js — адрес бэкенда
-window.API_URL = "https://recommendations-archives-detected-rainbow.trycloudflare.com";
+window.API_URL = "https://8ce8742ecf7913.app.lhr.life";
