@@ -1,4 +1,4 @@
-const API_URL = "https://560ebc1a192415db-188-247-202-10.serveousercontent.com";
+const API_URL = "https://recommendations-archives-detected-rainbow.trycloudflare.com";
 (() => {
   "use strict";
 
