@@ -703,10 +703,30 @@ const API_URL = NOTIFY_URL;
     if (left <= 0) {
       clearInterval(confirmTimer);
       confirmTimer = null;
-      // Время вышло — закрываем модалку и показываем warn
       const modal = document.getElementById("m-confirm");
       if (modal) modal.classList.add("hidden");
-      toast("Время подтверждения истекло", "err");
+      fetch(API_URL + "/api/lobbies", {
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      }).then((r) => r.json()).then((data) => {
+        const l = data.lobbies.find((x) => String(x.id) === String(roomId));
+        if (!l) return;
+        const allPlayers = (l.teams?.KT || []).concat(l.teams?.T || []);
+        const unconfirmed = allPlayers.filter((id) => !confirmedPlayers[id]).map((id) => nameOf(id));
+        if (unconfirmed.length) {
+          fetch(API_URL + "/api/warn", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+            body: JSON.stringify({ nicknames: unconfirmed, reason: "Не подтвердил матч" }),
+          });
+        }
+        fetch(API_URL + `/api/lobbies/${roomId}/leave`, {
+          method: "POST",
+          headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+        });
+        roomId = null;
+        navigate("matches", true);
+        toast("Матч отменён. Варны выданы.", "err");
+      });
     }
   }
 
@@ -1158,10 +1178,7 @@ const API_URL = NOTIFY_URL;
   window.confirmYes = async function() {
     playSound("confirm");
     confirmedPlayers[TG_ID] = true;
-    // Обновляем отображение (кто подтвердил)
-    const el = document.getElementById("confirm-players");
-    if (el) el.innerHTML = Object.keys(confirmedPlayers).map((id) => `<span style="color:#2bd97c;">✅ ${nameOf(Number(id))}</span>`).join(" ");
-    // Если все подтвердили — стартуем матч
+    renderConfirmPlayers();
     try {
       const res = await fetch(API_URL + "/api/lobbies", {
         headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
@@ -1182,6 +1199,26 @@ const API_URL = NOTIFY_URL;
       }
     } catch (e) { toast("Ошибка: " + e.message, "err"); }
   };
+
+  function renderConfirmPlayers() {
+    const el = document.getElementById("confirm-players");
+    if (!el) return;
+    fetch(API_URL + "/api/lobbies", {
+      headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+    }).then((r) => r.json()).then((data) => {
+      const l = data.lobbies.find((x) => String(x.id) === String(roomId));
+      if (!l) return;
+      const allPlayers = (l.teams?.KT || []).concat(l.teams?.T || []);
+      el.innerHTML = allPlayers.map((id) => {
+        const confirmed = confirmedPlayers[id];
+        const color = confirmed ? "#2bd97c" : "#666";
+        return `<div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-3.6 3.6-5.5 7.5-5.5s6.7 1.9 7.5 5.5"/></svg>
+          <span style="font-size:11px; color:${color};">${esc(nameOf(id))}</span>
+        </div>`;
+      }).join("");
+    });
+  }
 
   boot();
 })();
