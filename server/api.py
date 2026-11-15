@@ -18,6 +18,10 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN", "")  # пусто = dev-режим бе�
 ADMIN_IDS = {int(x) for x in os.environ.get("ADMIN_IDS", "6999358439").split(",") if x.strip().isdigit()}
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "shoke26")
 CHANNEL_ID = os.environ.get("CHANNEL_ID", "-1004336512603")
+ADMIN_CHAT_ID = os.environ.get("ADMIN_CHAT_ID", "-5577521115")
+ADMIN_TOPIC_ID = os.environ.get("ADMIN_TOPIC_ID", "")  # ID темы "Проверка результатов"
+PUBLIC_CHAT_ID = os.environ.get("PUBLIC_CHAT_ID", "-1004336512603")
+PUBLIC_TOPIC_ID = os.environ.get("PUBLIC_TOPIC_ID", "")  # ID темы "Результаты матчей"
 TOPIC_ID = os.environ.get("TOPIC_ID", "")  # ID темы «Активные матчи»; пусто = без темы
 MINI_APP_URL = os.environ.get("MINI_APP_URL", "")  # https://t.me/<бот>/<приложение>
 PERMANENT = 4102444800  # 2100-01-01
@@ -436,6 +440,51 @@ def api_lobbies():
 
     return jsonify(error="Неизвестное действие"), 400
 
+
+
+@app.post("/api/match/submit")
+def api_match_submit():
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    b = request.get_json(silent=True) or {}
+    lobby_id = b.get("lobby_id")
+    map_name = b.get("map", "—")
+    mode = b.get("mode", "—")
+    score_kt = b.get("score_kt", 0)
+    score_t = b.get("score_t", 0)
+    winner = b.get("winner", "?")
+    owner = clean(b.get("owner", "Игрок"))
+    players = b.get("players", [])
+
+    text = (
+        f"🎮 Новый результат на проверку!\n"
+        f"Лобби: #{lobby_id}\n"
+        f"Карта: {map_name} · {mode}\n"
+        f"Счёт: KT {score_kt} - {score_t} T\n"
+        f"Победитель: {winner}\n"
+        f"Хост: {owner}\n"
+        f"Игроки: {', '.join(players)}\n\n"
+        f"Введите статистику каждого игрока (Киллы, Смерти, Ассисты, Урон) в ответном сообщении."
+    )
+
+    payload = {"chat_id": ADMIN_CHAT_ID, "text": text}
+    if ADMIN_TOPIC_ID.isdigit():
+        payload["message_thread_id"] = int(ADMIN_TOPIC_ID)
+
+    def worker():
+        try:
+            req = urllib.request.Request(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+            )
+            urllib.request.urlopen(req, timeout=10).read()
+        except Exception as e:
+            app.logger.warning("Admin notify failed: %s", e)
+
+    threading.Thread(target=worker, daemon=True).start()
+    return jsonify(ok=True)
 
 @app.post("/api/notify")
 def api_notify():

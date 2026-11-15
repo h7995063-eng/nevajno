@@ -533,6 +533,30 @@
   /* ----- Комната лобби ----- */
   function openRoom(id) { roomId = Number(id); navigate("lobby"); }
 
+  function submitMatchResult() {
+    guard(() => {
+      const l = getLobby(roomId);
+      if (l.status !== "playing" && l.status !== "open") throw new Error("Матч ещё не начался");
+      const score_a = prompt("Счёт KT (например, 13):");
+      if (score_a === null) return;
+      const score_b = prompt("Счёт T (например, 10):");
+      if (score_b === null) return;
+      const winner = Number(score_a) > Number(score_b) ? "KT" : "T";
+      const payload = {
+        lobby_id: l.id,
+        map: l.map,
+        mode: l.mode,
+        score_kt: Number(score_a),
+        score_t: Number(score_b),
+        winner: winner,
+        owner: me.nickname,
+        players: lobbyPlayers(l).map((id) => nameOf(id)),
+      };
+      notifyChannel({ type: "result", ...payload });
+      toast("Результат отправлен на проверку ✅", "ok");
+    });
+  }
+
   function renderRoom(full) {
     let l;
     try { l = getLobby(roomId); } catch (e) {
@@ -722,6 +746,7 @@
       case "welcome-back": return closeApp();
       case "register-back": return show("s-welcome");
       case "support": return openSupport();
+      case "room-submit": return submitMatchResult();
       case "room-refresh": case "room-comment": case "room-code": case "room-start": case "room-leave":
         return roomAction(el.dataset.act);
     }
