@@ -657,7 +657,7 @@ def api_points_update():
         return jsonify(error="Нет игроков"), 400
     conn = db()
     for nick in nicknames:
-        conn.execute("UPDATE users SET points = points + ? WHERE nickname = ?", (points_delta, nick))
+        conn.execute("UPDATE users SET points = MAX(0, points + ?) WHERE nickname = ?", (points_delta, nick))
     conn.commit()
     return jsonify(ok=True)
 
