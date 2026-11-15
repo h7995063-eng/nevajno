@@ -114,6 +114,22 @@ def close_db(_):
 
 
 def init_db():
+    conn = get_conn()
+    try:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS news (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                content TEXT NOT NULL,
+                author TEXT,
+                created_at INTEGER DEFAULT 0
+            )
+        """)
+        conn.commit()
+    finally:
+        conn.close()
+
+def init_db():
     conn = sqlite3.connect(DB_PATH)
     conn.executescript("""
     CREATE TABLE IF NOT EXISTS users (
@@ -530,6 +546,41 @@ def api_points_update():
             conn.execute("UPDATE users SET points = points + ? WHERE nickname = ?", (points_delta, nick))
         conn.commit()
         return jsonify(ok=True)
+    finally:
+        conn.close()
+
+
+
+@app.post("/api/news")
+def api_news_post():
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    if u["id"] not in ADMIN_IDS:
+        return jsonify(error="Только для админов"), 403
+    b = request.get_json(silent=True) or {}
+    title = b.get("title", "").strip()
+    content = b.get("content", "").strip()
+    if not title or not content:
+        return jsonify(error="Заполните заголовок и текст"), 400
+    conn = get_conn()
+    try:
+        conn.execute(
+            "INSERT INTO news (title, content, author, created_at) VALUES (?, ?, ?, ?)",
+            (title, content, u.get("username", "admin"), now())
+        )
+        conn.commit()
+        return jsonify(ok=True)
+    finally:
+        conn.close()
+
+@app.get("/api/news")
+def api_news_get():
+    conn = get_conn()
+    try:
+        rows = conn.execute("SELECT * FROM news ORDER BY created_at DESC LIMIT 50").fetchall()
+        news = [{"id": r["id"], "title": r["title"], "content": r["content"], "author": r["author"], "created_at": r["created_at"]} for r in rows]
+        return jsonify(ok=True, news=news)
     finally:
         conn.close()
 
