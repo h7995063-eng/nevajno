@@ -667,6 +667,27 @@ def api_stats_update():
     conn.commit()
     return jsonify(ok=True)
 
+
+@app.post("/api/warn")
+def api_warn():
+    b = request.get_json(silent=True) or {}
+    nicknames = b.get("nicknames", [])
+    reason = b.get("reason", "Не подтвердил матч")
+    if not nicknames:
+        return jsonify(error="Нет игроков"), 400
+    conn = db()
+    for nick in nicknames:
+        conn.execute("UPDATE users SET warns = warns + 1 WHERE nickname = ?", (nick,))
+        row = conn.execute("SELECT warns FROM users WHERE nickname = ?", (nick,)).fetchone()
+        if row and row["warns"] >= 3:
+            # Бан на 24 часа
+            import time
+            ban_until = time.time() + 86400
+            conn.execute("UPDATE users SET is_banned=1, ban_reason=?, ban_until=? WHERE nickname=?",
+                         (f"3 варна: {reason}", str(ban_until), nick))
+    conn.commit()
+    return jsonify(ok=True)
+
 @app.post("/api/points/update")
 def api_points_update():
     u = tg_user()
