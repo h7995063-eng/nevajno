@@ -608,6 +608,7 @@ const API_URL = NOTIFY_URL;
   function openRoom(id) { roomId = Number(id); navigate("lobby"); }
 
   async function submitMatchResult() {
+    toast("Отправка скриншота...", "ok");
     try {
       // Получаем лобби с сервера
       const res = await fetch(API_URL + "/api/lobbies", {
