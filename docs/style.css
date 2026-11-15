@@ -328,14 +328,7 @@ main { flex: 1; overflow-y: auto; padding: 20px 18px calc(28px + var(--safe-bott
   border-radius: 50%;
 }
 
-.podium-item .crown {
-  position: absolute;
-  top: -18px;
-  width: 28px;
-  height: 28px;
-  filter: drop-shadow(0 0 6px rgba(240, 179, 88, 0.8));
-  animation: crownFloat 2s ease-in-out infinite;
-}
+
 
 @keyframes crownFloat {
   0%, 100% { transform: translateY(0); }
@@ -397,4 +390,25 @@ main { flex: 1; overflow-y: auto; padding: 20px 18px calc(28px + var(--safe-bott
   height: 72px;
   border-color: #f0b358;
   box-shadow: 0 0 20px rgba(240, 179, 88, 0.5);
+}
+
+.podium-item.pos-1 {
+  position: relative;
+}
+
+.podium-item.pos-1 .crown {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 0 8px rgba(240, 179, 88, 0.9));
+  animation: crownFloat 2s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes crownFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-4px); }
 }
