@@ -184,3 +184,12 @@ main { flex: 1; overflow-y: auto; padding: 20px 18px calc(28px + var(--safe-bott
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* Фикс для PNG-логотипа на экране загрузки */
+.logo-xl.logo-img {
+  width: auto !important;
+  height: 80px !important;
+  max-width: 80% !important;
+  object-fit: contain !important;
+  margin-bottom: 16px;
+}
