@@ -1021,7 +1021,11 @@ const API_URL = NOTIFY_URL;
     try {
       const res = await fetch(API_URL + "/api/admin", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }),
+          "X-Admin-Password": window.ADMIN_PASSWORD || "",
+        },
         body: JSON.stringify({ action: action === "unban" ? "unban" : "unmute", tg_id: p.tg_id }),
       });
       const data = await res.json();
@@ -1044,7 +1048,11 @@ const API_URL = NOTIFY_URL;
       const reason = $("#in-reason").value.trim();
       const res = await fetch(API_URL + "/api/admin", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }),
+          "X-Admin-Password": window.ADMIN_PASSWORD || "",
+        },
         body: JSON.stringify({ action: punish.action, tg_id: punish.id, minutes, reason }),
       });
       const data = await res.json();
