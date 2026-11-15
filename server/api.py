@@ -393,8 +393,8 @@ def api_lobbies_post():
     teams[team if team in teams else "KT"].append(u["id"])
     conn = db()
     cur = conn.execute(
-        "INSERT INTO lobbies (creator_id, owner_tg_id, map, mode, max_players, teams, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (u["id"], u["id"], map_name, mode, max_players, json.dumps(teams), now())
+        "INSERT INTO lobbies (creator_id, owner_tg_id, map, mode, max_players, teams, code, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (u["id"], u["id"], map_name, mode, max_players, json.dumps(teams), "", now())
     )
     conn.commit()
     return jsonify(ok=True, lobby_id=cur.lastrowid)
