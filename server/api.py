@@ -304,7 +304,7 @@ def api_auth():
 
 
 
-@app.get("/api/points/get")
+@app.route("/api/points/get", methods=["GET", "POST"])
 def api_points_get():
     u = tg_user()
     if not u or "id" not in u:
