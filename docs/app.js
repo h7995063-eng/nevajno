@@ -12,7 +12,7 @@
   // Адрес бэкенда с /api/notify (например "https://api.example.com"). Пусто = уведомления в канал выключены.
   const SUPPORT_URL = "https://t.me/crymbog";
   const NOTIFY_URL = "https://potentially-vacancies-washing-prefix.trycloudflare.com";
-  const MAPS = ["Mirage", "Inferno", "Dust II", "Nuke", "Ancient", "Anubis", "Overpass", "Vertigo"];
+  const MAPS = ["Dust II", "Mirage", "Inferno", "Vertigo"];
   const MAP_IMAGES = {
     "Mirage": "assets/maps/mirage.jpeg",
     "Inferno": "assets/maps/inferno.jpg",
@@ -20,7 +20,13 @@
     "Vertigo": "assets/maps/vertigo.webp",
     // Остальные пока без картинок
   };
-  const MODE_SIZE = { "1v1": 2, "2v2": 4, "5v5": 10, "DM": 16 };
+  const MODE_SIZE = { "1v1": 2, "5v5": 10, "DM": 16 };
+  const MODE_INFO = {
+    "1v1": "Дуэль до 13 раундов",
+    "5v5": "Премьер, до 13 раундов",
+    "DM": "Deathmatch — против всех",
+  };
+  const WARNING_TEXT = "После матча вы обязаны отправить скриншот с результатами. Если не отправите — вы будете заглушены на площадке CYBERSHOKE.";
   const MISSIONS = [
     { title: "Сыграй 3 матча", reward: 150, goal: 3 },
     { title: "Победи в 2 матчах подряд", reward: 300, goal: 2 },
@@ -495,16 +501,22 @@
   function openLobbyModal() {
     $("#sel-map").innerHTML = MAPS.map((m) => `<option>${esc(m)}</option>`).join("");
     $("#sel-mode").innerHTML = Object.keys(MODE_SIZE).map((m) => `<option>${esc(m)}</option>`).join("");
-    $("#sel-team").innerHTML = TEAMS.map((m) => `<option>${esc(m)}</option>`).join("");
+    const updateDesc = () => {
+      const mode = $("#sel-mode").value;
+      $("#mode-desc").textContent = MODE_INFO[mode] || "";
+    };
+    $("#sel-mode").onchange = updateDesc;
+    updateDesc();
     $("#m-lobby").classList.remove("hidden");
   }
 
   function submitLobby() {
     guard(() => {
-      const l = createLobby($("#sel-map").value, $("#sel-mode").value, $("#sel-team").value);
+      const team = Math.random() < 0.5 ? "KT" : "T";
+      const l = createLobby($("#sel-map").value, $("#sel-mode").value, team);
       notifyChannel({ type: "create", owner: me.nickname, ...lobbyInfo(l) });
       closeModals();
-      toast("Лобби создано. Вы хост");
+      toast(`Лобби создано. Вы хост, ваша команда: ${team}`);
       openRoom(l.id);
     });
   }
