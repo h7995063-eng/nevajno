@@ -1004,11 +1004,11 @@ const API_URL = NOTIFY_URL;
       </div>`).join("") : `<div style="text-align:center; padding:40px 20px; color:rgba(139,152,168,0.5); font-size:14px;">Игроки не найдены</div>`;
   }
 
-  function adminAction(action, id) {
+  async function adminAction(action, id) {
     const p = getAllUsers().find((x) => x.tg_id === Number(id));
     if (!p) return;
     if (action === "ban" || action === "mute") {
-      punish = { action, id: p.tg_id };
+      punish = { action, id: p.tg_id, nickname: p.nickname };
       $("#punish-title").textContent = action === "ban" ? "Бан игрока" : "Мут игрока";
       $("#punish-target").textContent = `${p.nickname} · ID ${p.game_id}`;
       $("#sel-time").innerHTML = TIMES.map((t) => `<option value="${t.min}">${esc(t.label)}</option>`).join("");
@@ -1018,21 +1018,41 @@ const API_URL = NOTIFY_URL;
       return;
     }
     try {
-      if (action === "unban") { unbanUser(p.tg_id); toast("Игрок разбанен"); } else { unmuteUser(p.tg_id); toast("Мут снят"); }
-      drawAdminList();
+      const res = await fetch(API_URL + "/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+        body: JSON.stringify({ action: action === "unban" ? "unban" : "unmute", tg_id: p.tg_id }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toast(action === "unban" ? "Игрок разбанен" : "Мут снят");
+        drawAdminList();
+      } else {
+        toast(data.error || "Ошибка", "err");
+      }
     } catch (e) { toast(e.message, "err"); }
   }
 
-  function submitPunish() {
+  async function submitPunish() {
     const err = $("#punish-error");
     err.classList.add("hidden");
     try {
       const minutes = Number($("#sel-time").value);
-      if (punish.action === "ban") banUser(punish.id, $("#in-reason").value, minutes);
-      else muteUser(punish.id, minutes);
-      closeModals();
-      toast(punish.action === "ban" ? "Игрок забанен" : "Игрок заглушён");
-      drawAdminList();
+      const reason = $("#in-reason").value.trim();
+      const res = await fetch(API_URL + "/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+        body: JSON.stringify({ action: punish.action, tg_id: punish.id, minutes, reason }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        closeModals();
+        toast(punish.action === "ban" ? "Игрок забанен" : "Игрок заглушён");
+        drawAdminList();
+      } else {
+        err.textContent = data.error || "Ошибка";
+        err.classList.remove("hidden");
+      }
     } catch (e) {
       err.textContent = e.message;
       err.classList.remove("hidden");
