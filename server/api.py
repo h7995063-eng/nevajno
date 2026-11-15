@@ -423,7 +423,7 @@ def api_lobbies_get():
 @auth()
 def api_leaderboard():
     rows = db().execute(
-        "SELECT nickname, elo, kd FROM users WHERE is_banned=0 ORDER BY elo DESC, id ASC LIMIT 20"
+        "SELECT nickname, points, kd FROM users WHERE is_banned=0 ORDER BY points DESC, id ASC LIMIT 50"
     ).fetchall()
     return jsonify(players=[dict(r) for r in rows])
 
