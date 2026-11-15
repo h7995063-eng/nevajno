@@ -616,9 +616,17 @@ const API_URL = NOTIFY_URL;
     });
   }
 
-  function renderRoom(full) {
+  async function renderRoom(full) {
     let l;
-    try { l = getLobby(roomId); } catch (e) {
+    try {
+      const res = await fetch(API_URL + "/api/lobbies", {
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      });
+      const data = await res.json();
+      if (!data.ok || !data.lobbies) throw new Error("Лобби не найдено");
+      l = data.lobbies.find((x) => String(x.id) === String(roomId));
+      if (!l) throw new Error("Лобби не найдено или закрыто");
+    } catch (e) {
       toast(e.message, "err");
       roomId = null;
       if (stack.length > 1) back(); else navigate("matches", true);
@@ -631,14 +639,15 @@ const API_URL = NOTIFY_URL;
     st.textContent = l.status === "playing" ? "идёт матч" : "набор игроков";
     st.className = `pill ${l.status === "playing" ? "gold" : "blue"}`;
     TEAMS.forEach((tm) => {
-      $(`#count-${tm}`).textContent = `${l.teams[tm].length}/${cap}`;
-      $(`#room-${tm}`).innerHTML = l.teams[tm].length
-        ? l.teams[tm].map((id) => `<li>${ICON(id === l.owner_tg_id ? "crown" : "user")}<span>${esc(nameOf(id))}</span></li>`).join("")
+      const teamArr = l.teams?.[tm] || [];
+      $(`#count-${tm}`).textContent = `${teamArr.length}/${cap}`;
+      $(`#room-${tm}`).innerHTML = teamArr.length
+        ? teamArr.map((id) => `<li>${ICON(id === l.owner_tg_id ? "crown" : "user")}<span>${esc(nameOf(id))}</span></li>`).join("")
         : '<li class="muted">Пока никого</li>';
     });
     $$(".host-only").forEach((el) => el.classList.toggle("hidden", !isHost));
     $$(".guest-only").forEach((el) => el.classList.toggle("hidden", isHost));
-    if (full) { $("#in-comment").value = l.comment; $("#in-code").value = l.code; }
+    if (full) { $("#in-comment").value = l.comment || ""; $("#in-code").value = l.code || ""; }
     $("#room-comment-view").textContent = l.comment || "Комментария нет";
     $("#room-code-view").innerHTML = l.code ? `Код для CounterFlame: <b>${esc(l.code)}</b>` : '<span class="muted">Хост ещё не отправил код</span>';
     $("#btn-room-start").disabled = l.status !== "open";
