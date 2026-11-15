@@ -900,13 +900,14 @@ const API_URL = NOTIFY_URL;
   }
 
   $$(".logo-img").forEach((img) => { if (img.complete && img.naturalWidth === 0) logoFallback(img); });
-  // Загрузка аватарки
-  const btnUploadAvatar = document.getElementById("btn-upload-avatar");
-  if (btnUploadAvatar) {
-    btnUploadAvatar.addEventListener("click", () => {
-      document.getElementById("avatar-upload").click();
+  // Загрузка аватарки (клик на аватарку)
+  const avatarEl = document.getElementById("p-avatar");
+  const avatarInput = document.getElementById("avatar-upload");
+  if (avatarEl && avatarInput) {
+    avatarEl.addEventListener("click", () => {
+      avatarInput.click();
     });
-    document.getElementById("avatar-upload").addEventListener("change", (e) => {
+    avatarInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
