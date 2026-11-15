@@ -1,4 +1,4 @@
-const API_URL = "https://api.trycloudflare.com";
+const API_URL = "https://famous-things-fall.loca.lt";
 (() => {
   "use strict";
 
