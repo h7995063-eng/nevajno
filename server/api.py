@@ -344,6 +344,10 @@ def api_lobbies_leave(lobby_id):
     if not row:
         return jsonify(error="Лобби не найдено"), 404
     teams = json.loads(row["teams"]) if row["teams"] else {"KT": [], "T": []}
+    total = len(teams.get("KT", [])) + len(teams.get("T", []))
+    # Если лобби заполнено (2/2 и больше) и ты не хост — выйти нельзя
+    if total >= row["max_players"] and row["owner_tg_id"] != u["id"]:
+        return jsonify(error="Лобби заполнено, выйти нельзя"), 400
     for tm in ("KT", "T"):
         if u["id"] in teams.get(tm, []):
             teams[tm].remove(u["id"])
