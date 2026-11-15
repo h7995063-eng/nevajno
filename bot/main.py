@@ -17,8 +17,7 @@ def open_keyboard(user_id):
 def cmd_start(message):
     bot.send_message(
         message.chat.id,
-        "⚔️ <b>CYBERSHOKE CounterFlame</b>\n\nСоздавай лобби, голосуй за карту и играй с живыми людьми. "
-        "Когда матч начнётся, я пришлю уведомление и код от хостера.\n\nНажми кнопку ниже, чтобы открыть приложение.",
+        "⚔️ <b>CYBERSHOKE CounterFlame</b>\nНажми кнопку ниже, чтобы открыть приложение.",
         parse_mode="HTML",
         reply_markup=open_keyboard(message.from_user.id),
     )
