@@ -983,5 +983,14 @@ const API_URL = NOTIFY_URL;
     });
   }
 
+  // Кнопка "Создать" в новостях (только админ)
+  const btnCreateNews = document.getElementById("btn-create-news");
+  if (btnCreateNews) {
+    btnCreateNews.addEventListener("click", () => {
+      const modal = document.getElementById("m-news");
+      if (modal) modal.classList.remove("hidden");
+    });
+  }
+
   boot();
 })();
