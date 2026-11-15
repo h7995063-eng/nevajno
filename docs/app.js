@@ -12,6 +12,7 @@
   // Адрес бэкенда с /api/notify (например "https://api.example.com"). Пусто = уведомления в канал выключены.
   const SUPPORT_URL = "https://t.me/crymbog";
   const NOTIFY_URL = "https://instructors-built-mate-drain.trycloudflare.com";
+const API_URL = NOTIFY_URL;
   const MAPS = ["Dust II", "Mirage", "Inferno", "Vertigo"];
   const MAP_IMAGES = {
     "Mirage": "assets/maps/mirage.jpeg",
@@ -728,7 +729,24 @@
   }
 
   /* ----- Профиль ----- */
-  function loadProfile() {
+  async function loadProfile() {
+    // Подтягиваем поинты с сервера (если доступен)
+    try {
+      const res = await fetch(API_URL + "/api/points/get", {
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok && data.points !== undefined) {
+          me.points = data.points;
+          // Обновляем localStorage
+          const db = readDb();
+          const u = db.users.find((x) => x.tg_id === TG_ID);
+          if (u) { u.points = data.points; saveDb(db); }
+        }
+      }
+    } catch (e) { /* сервер недоступен, используем localStorage */ }
+
     $("#p-avatar").textContent = me.nickname.charAt(0).toUpperCase();
     $("#p-nick").textContent = me.nickname;
     $("#p-gid").textContent = me.game_id;
