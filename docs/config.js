@@ -1,2 +1,2 @@
-// config.js — адрес бэкенда. Если пусто — используется тот же домен.
-window.API_URL = "";
+// config.js — адрес бэкенда
+window.API_URL = "https://recommendations-archives-detected-rainbow.trycloudflare.com";
