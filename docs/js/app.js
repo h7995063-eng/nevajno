@@ -45,6 +45,12 @@
     toast.id = setTimeout(() => (t.className = "toast"), 2600);
   }
 
+  function guard(fn) {
+    try { fn(); } catch (e) { if (e.message !== "banned") toast(e.message, "err"); }
+  }
+
+
+
   function fmtDate(ts) {
     if (ts >= PERMANENT) return "навсегда";
     return new Date(ts * 1000).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
