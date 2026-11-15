@@ -61,7 +61,19 @@
     return null;
   }
 
-  const DEV_ID = 6999358439;
+  const DEV_ID = (() => {
+    // 1. Пробуем взять tg_id из URL (?tg_id=...)
+    const urlId = new URLSearchParams(location.search).get("tg_id");
+    if (urlId && /^\d+$/.test(urlId)) return Number(urlId);
+    // 2. Пробуем взять из localStorage (для повторных заходов)
+    const stored = Number(store("cs_dev_id"));
+    if (stored) return stored;
+    // 3. Fallback: твой ID (для теста)
+    return 6999358439;
+  })();
+
+  // Сохраняем ID в localStorage, чтобы он не менялся
+  store("cs_dev_id", String(DEV_ID));
 
   function readInitData() {
     try {
