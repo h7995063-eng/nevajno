@@ -593,9 +593,9 @@ def api_match_submit():
         f"Лобби: #{lobby_id}\n"
         f"Карта: {map_name} · {mode}\n"
         f"Хост: {owner}\n"
-        f"Игроки: {', '.join(players)}\n"
-        f"KT: {', '.join(teams.get('KT', []))}\n"
-        f"T: {', '.join(teams.get('T', []))}\n\n"
+        f"Игроки: {', '.join(map(str, players))}\n"
+        f"KT: {', '.join(map(str, teams.get('KT', [])))}\n"
+        f"T: {', '.join(map(str, teams.get('T', [])))}\n\n"
         f"Введите статистику каждого игрока (Киллы, Смерти, Ассисты) в ответном сообщении."
     )
 
