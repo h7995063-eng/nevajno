@@ -145,6 +145,7 @@ def publish_results(message, state):
 
     # Обновляем поинты в базе (через API)
     try:
+        print(f"[DEBUG] kt_players={kt_players}, t_players={t_players}, winner={winner}, stats={list(state['stats'].keys())}")
         winners = [p for p in state["stats"] if (p in kt_players and winner == "KT") or (p in t_players and winner == "T")]
         losers = [p for p in state["stats"] if p not in winners]
         headers = {"X-Dev-User": json.dumps({"id": 6999358439, "username": "admin"})}
