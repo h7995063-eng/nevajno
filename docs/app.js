@@ -655,6 +655,9 @@ const API_URL = NOTIFY_URL;
   /* ----- Лидерборд, миссии, подписки ----- */
 
   async function loadNews() {
+    // Показываем кнопку создания только админу
+    const btnCreate = $("#btn-create-news");
+    if (btnCreate) btnCreate.classList.toggle("hidden", !me || !me.is_admin);
     const el = $("#news-list");
     el.innerHTML = '<div class="loader"></div>';
     try {
