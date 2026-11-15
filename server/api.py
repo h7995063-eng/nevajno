@@ -464,13 +464,20 @@ def api_match_submit():
         players = json.loads(players_raw)
     except json.JSONDecodeError:
         players = []
+    teams_raw = request.form.get("teams", "{}")
+    try:
+        teams = json.loads(teams_raw)
+    except json.JSONDecodeError:
+        teams = {}
 
     caption = (
         f"🎮 Новый результат на проверку!\n"
         f"Лобби: #{lobby_id}\n"
         f"Карта: {map_name} · {mode}\n"
         f"Хост: {owner}\n"
-        f"Игроки: {', '.join(players)}\n\n"
+        f"Игроки: {', '.join(players)}\n"
+        f"KT: {', '.join(teams.get('KT', []))}\n"
+        f"T: {', '.join(teams.get('T', []))}\n\n"
         f"Введите статистику каждого игрока (Киллы, Смерти, Ассисты) в ответном сообщении."
     )
 

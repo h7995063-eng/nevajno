@@ -569,6 +569,10 @@
       formData.append("mode", l.mode);
       formData.append("owner", me.nickname);
       formData.append("players", JSON.stringify(lobbyPlayers(l).map((id) => nameOf(id))));
+      formData.append("teams", JSON.stringify({
+        KT: l.teams.KT.map((id) => nameOf(id)),
+        T: l.teams.T.map((id) => nameOf(id))
+      }));
 
       try {
         const res = await fetch((NOTIFY_URL || "") + "/api/match/submit", {
