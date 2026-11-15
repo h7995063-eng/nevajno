@@ -524,14 +524,20 @@
   function openTeamModal(id) {
     const l = getLobbies().find((x) => x.id === Number(id));
     if (!l) return toast("Лобби уже закрыто", "err");
-    joinTarget = l.id;
-    $("#team-info").textContent = `${l.map} · ${l.mode}`;
-    TEAMS.forEach((tm) => {
-      const btn = $(`#btn-team-${tm}`);
-      btn.querySelector("span").textContent = `${l.teams[tm].length}/${l.max_players / 2}`;
-      btn.disabled = l.teams[tm].length >= l.max_players / 2;
-    });
-    $("#m-team").classList.remove("hidden");
+    // Автоматически выбираем команду, где меньше игроков (или случайно, если поровну)
+    const ktCount = l.teams.KT.length;
+    const tCount = l.teams.T.length;
+    let team;
+    if (ktCount < l.max_players / 2 && tCount < l.max_players / 2) {
+      team = ktCount <= tCount ? "KT" : "T";
+    } else if (ktCount < l.max_players / 2) {
+      team = "KT";
+    } else if (tCount < l.max_players / 2) {
+      team = "T";
+    } else {
+      return toast("Лобби заполнено", "err");
+    }
+    doJoin(team);
   }
 
   function doJoin(team) {
