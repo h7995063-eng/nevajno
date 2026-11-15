@@ -2,14 +2,14 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from config import BOT_TOKEN
 
-MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/final_app.html?v=200"
+MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/index.html"
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
 
 def open_keyboard(user_id):
     kb = InlineKeyboardMarkup()
-    kb.add(InlineKeyboardButton("🎮 Открыть CYBERSHOKE", web_app=WebAppInfo(url=f"{MINIAPP_URL}&tg_id={user_id}")))
+    kb.add(InlineKeyboardButton("🎮 Открыть CYBERSHOKE", web_app=WebAppInfo(url=f"{MINIAPP_URL}?tg_id={user_id}")))
     return kb
 
 
