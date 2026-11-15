@@ -105,7 +105,21 @@ def publish_results(message, state):
         lines.append(f"{player}: {s['kills']}/{s['deaths']}/{s['assists']} (КД {s['kd']})")
 
     text = "\n".join(lines)
+    # Отправляем админу (в админ-чат)
     bot.reply_to(message, text, parse_mode="HTML")
+
+    # Публикуем в паблик-чат (тема "Результаты матчей")
+    try:
+        bot.send_message(
+            chat_id=-1004336512603,
+            message_thread_id=23,
+            text=text,
+            parse_mode="HTML",
+        )
+        bot.reply_to(message, "✅ Результат опубликован в паблик-чате (тема «Результаты матчей»).")
+    except Exception as e:
+        bot.reply_to(message, f"❌ Ошибка публикации в паблик: {e}")
+
     states.pop(message.from_user.id, None)
 
 
