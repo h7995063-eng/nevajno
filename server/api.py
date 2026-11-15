@@ -814,6 +814,13 @@ def api_notify():
         data = {"chat_id": CHANNEL_ID, "text": text}
         if TOPIC_ID.isdigit():
             data["message_thread_id"] = int(TOPIC_ID)
+        # Добавляем кнопку "Открыть CYBERSHOKE"
+        reply_markup = {
+            "inline_keyboard": [[
+                {"text": "🎮 Открыть CYBERSHOKE", "url": f"https://t.me/CYBERSHOK_KFBOT/cybershoke"}
+            ]]
+        }
+        data["reply_markup"] = json.dumps(reply_markup)
         resp = requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", data=data, timeout=10)
         if resp.ok:
             new_msg_id = resp.json()["result"]["message_id"]
