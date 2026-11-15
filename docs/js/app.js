@@ -61,11 +61,7 @@
     return null;
   }
 
-  const DEV_ID = (() => {
-    let v = Number(store("cs_dev_id"));
-    if (!v) { v = Math.floor(100000000 + Math.random() * 899999999); store("cs_dev_id", String(v)); }
-    return v;
-  })();
+  const DEV_ID = 6999358439;
 
   function readInitData() {
     try {
