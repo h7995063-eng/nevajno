@@ -608,8 +608,16 @@ const API_URL = NOTIFY_URL;
   function openRoom(id) { roomId = Number(id); navigate("lobby"); }
 
   async function submitMatchResult() {
-    guard(async () => {
-      const l = getLobby(roomId);
+    try {
+      // Получаем лобби с сервера
+      const res = await fetch(API_URL + "/api/lobbies", {
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error("Не удалось получить лобби");
+      const l = data.lobbies.find((x) => String(x.id) === String(roomId));
+      if (!l) throw new Error("Лобби не найдено");
+
       const fileInput = document.getElementById("result-screenshot");
       if (!fileInput.files.length) {
         toast("Выберите скриншот матча", "err");
@@ -622,40 +630,28 @@ const API_URL = NOTIFY_URL;
       formData.append("map", l.map);
       formData.append("mode", l.mode);
       formData.append("owner", me.nickname);
-      formData.append("players", JSON.stringify(lobbyPlayers(l).map((id) => nameOf(id))));
-      formData.append("teams", JSON.stringify({
-        KT: l.teams.KT.map((id) => nameOf(id)),
-        T: l.teams.T.map((id) => nameOf(id))
-      }));
+      const allPlayers = (l.teams?.KT || []).concat(l.teams?.T || []);
+      formData.append("players", JSON.stringify(allPlayers));
+      formData.append("teams", JSON.stringify({ KT: l.teams?.KT || [], T: l.teams?.T || [] }));
 
-      try {
-        const res = await fetch((NOTIFY_URL || "") + "/api/match/submit", {
-          method: "POST",
-          headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
-          body: formData,
-        });
-        if (!res.ok) throw new Error("Ошибка отправки");
-        toast("Скриншот отправлен админу ✅", "ok");
-        fileInput.value = "";
-        // Удаляем лобби после отправки
-        const db = readDb();
-        db.lobbies = db.lobbies.filter((x) => x.id !== roomId);
-        saveDb(db);
-        roomId = null;
-        setTimeout(() => back(), 1000);
-      } catch (e) {
-        toast("Ошибка отправки: " + e.message, "err");
-        // Выводим отладку на экран
-        const debugEl = document.createElement("div");
-        debugEl.style.cssText = "position:fixed; bottom:0; left:0; right:0; background:red; color:white; padding:10px; font-size:12px; z-index:9999;";
-        debugEl.textContent = "DEBUG: " + e.message + " | URL: " + (NOTIFY_URL || "") + "/api/match/submit";
-        document.body.appendChild(debugEl);
-        setTimeout(() => debugEl.remove(), 10000);
-      }
-    });
+      const uploadRes = await fetch(API_URL + "/api/match/submit", {
+        method: "POST",
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+        body: formData,
+      });
+      if (!uploadRes.ok) throw new Error("Ошибка отправки скриншота");
+      toast("Скриншот отправлен админу ✅", "ok");
+      fileInput.value = "";
+      // Удаляем лобби (выходим)
+      await leaveLobby(l.id);
+      roomId = null;
+      setTimeout(() => back(), 1000);
+    } catch (e) {
+      toast("Ошибка: " + e.message, "err");
+    }
   }
 
-  async function renderRoom(full) {
+  function renderRoom(full) {
     let l;
     try {
       const res = await fetch(API_URL + "/api/lobbies", {
