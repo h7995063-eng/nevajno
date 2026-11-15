@@ -594,17 +594,7 @@ const API_URL = NOTIFY_URL;
   }
 
   /* ----- Комната лобби ----- */
-  function openRoom(id) {
-    console.log("[DEBUG] openRoom called with id:", id);
-    roomId = Number(id);
-    navigate("lobby");
-    // Отладка на экран
-    const debugEl = document.createElement("div");
-    debugEl.style.cssText = "position:fixed; top:60px; left:0; right:0; background:blue; color:white; padding:8px; font-size:12px; z-index:9999;";
-    debugEl.textContent = "DEBUG: openRoom id=" + id + " roomId=" + roomId;
-    document.body.appendChild(debugEl);
-    setTimeout(() => debugEl.remove(), 5000);
-  }
+  function openRoom(id) { roomId = Number(id); navigate("lobby"); }
 
   async function submitMatchResult() {
     guard(async () => {
