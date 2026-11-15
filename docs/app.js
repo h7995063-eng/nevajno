@@ -1060,5 +1060,28 @@ const API_URL = NOTIFY_URL;
     });
   }
 
+  window.submitNews = async function() {
+    const title = document.getElementById("in-news-title").value.trim();
+    const content = document.getElementById("in-news-content").value.trim();
+    if (!title || !content) return toast("Заполните заголовок и текст", "err");
+    try {
+      const res = await fetch(API_URL + "/api/news", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+        body: JSON.stringify({ title, content }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toast("Новость опубликована ✅", "ok");
+        closeModals();
+        document.getElementById("in-news-title").value = "";
+        document.getElementById("in-news-content").value = "";
+        loadNews();
+      } else {
+        toast(data.error || "Ошибка", "err");
+      }
+    } catch (e) { toast("Ошибка сервера", "err"); }
+  };
+
   boot();
 })();
