@@ -425,7 +425,7 @@ def api_leaderboard():
     rows = db().execute(
         "SELECT nickname, points, kd FROM users WHERE is_banned=0 ORDER BY points DESC, id ASC LIMIT 50"
     ).fetchall()
-    return jsonify(players=[dict(r) for r in rows])
+    return jsonify(ok=True, players=[dict(r) for r in rows])
 
 
 def is_member(lobby_id, uid):
