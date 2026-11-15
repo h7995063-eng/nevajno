@@ -163,7 +163,11 @@
         <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Профиль</h2></div>
         <div id="mute-banner" class="banner hidden"><svg><use href="#i-mute"/></svg><span></span><button class="btn ghost sm" data-act="support" type="button"><svg><use href="#i-headset"/></svg>Поддержка</button></div>
         <div class="card profile-card">
-          <div id="p-avatar" class="avatar">?</div>
+          <div style="position:relative; display:inline-block;">
+            <div id="p-avatar" class="avatar">?</div>
+            <input type="file" id="avatar-upload" accept="image/*" style="display:none;">
+            <button type="button" id="btn-upload-avatar" style="position:absolute; bottom:0; right:0; background:#ff4655; border:none; border-radius:50%; width:28px; height:28px; color:#fff; font-size:16px; cursor:pointer;">+</button>
+          </div>
           <div><h3 id="p-nick" class="p-nick"></h3><p class="muted">ID: <span id="p-gid"></span></p></div>
         </div>
         <div class="grid">
