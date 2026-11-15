@@ -127,6 +127,8 @@ def publish_results(message, state):
     score_kt = state["score_kt"]
     score_t = state["score_t"]
     winner = "KT" if score_kt > score_t else "T"
+    print(f"[DEBUG SCORE] score_kt={score_kt}, score_t={score_t}, winner={winner}", flush=True)
+    print(f"[DEBUG STATS] stats={list(state['stats'].keys())}", flush=True)
 
     lines = [f"📊 <b>Результаты матча</b>\nСчёт: KT {score_kt} - {score_t} T\nПобедитель: {winner}\n"]
     for player, s in state["stats"].items():
