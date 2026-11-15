@@ -482,7 +482,7 @@
           : `<button class="btn ghost sm" data-join="${l.id}" type="button">${ICON("game")}Войти</button>`;
         const img = MAP_IMAGES[l.map] || "";
         return `
-        <div class="card row">
+        <div class="card row" data-lobby-id="${l.id}">
           ${img ? `<img src="${img}" alt="${esc(l.map)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:12px;">` : ""}
           <div class="grow">
             <h3>${esc(l.map)} · ${esc(l.mode)}</h3>
@@ -521,18 +521,11 @@
     });
   }
 
-  let debugInfo = "";
+  
   function openTeamModal(id) {
     const lobbies = getLobbies();
-    debugInfo = `ID: ${id} (${typeof id}) | Лобби: ${lobbies.map((x) => x.id).join(", ") || "нет"}`;
-    // Показываем отладку в списке (под лобби)
-    const listEl = document.getElementById("lobby-list");
-    if (listEl) {
-      const debugEl = document.createElement("div");
-      debugEl.style.cssText = "color:#ff4655; font-size:12px; margin-top:8px;";
-      debugEl.textContent = "DEBUG: " + debugInfo;
-      listEl.prepend(debugEl);
-    }
+    
+    
     const l = lobbies.find((x) => x.id === Number(id));
     if (!l) return toast("Лобби уже закрыто", "err");
     // Автоматически выбираем команду, где меньше игроков (или случайно, если поровну)
