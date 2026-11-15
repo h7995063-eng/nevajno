@@ -473,8 +473,13 @@
   const lobbyInfo = (l) => ({ lobby_id: l.id, map: l.map, mode: l.mode, players: lobbyPlayers(l).length, max_players: l.max_players });
 
   function loadLobbies() {
+    const all = readDb().lobbies;
+    const debug = `<div style="color:#ff4655; font-size:11px; margin-bottom:8px; padding:8px; background:rgba(255,0,0,0.1); border-radius:8px; word-break:break-all;">
+      <b>DEBUG:</b> Всего лобби: ${all.length}<br>
+      ${all.length === 0 ? "Нет лобби в базе" : all.map(l => `ID: ${l.id} | status: ${l.status} | map: ${l.map} | KT: ${l.teams?.KT?.length||0} | T: ${l.teams?.T?.length||0}`).join('<br>')}
+    </div>`;
     const lobbies = getLobbies();
-    $("#lobby-list").innerHTML = lobbies.length
+    $("#lobby-list").innerHTML = debug + (lobbies.length
       ? lobbies.map((l) => {
         const n = lobbyPlayers(l).length;
         const action = isMember(l)
