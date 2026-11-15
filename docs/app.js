@@ -1034,6 +1034,7 @@ const API_URL = NOTIFY_URL;
   }
 
   async function submitPunish() {
+    toast("DEBUG: submitPunish called, punish=" + JSON.stringify(punish), "ok");
     const err = $("#punish-error");
     err.classList.add("hidden");
     try {
