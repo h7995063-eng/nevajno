@@ -219,7 +219,6 @@ const API_URL = NOTIFY_URL;
     if (!/^[A-Za-z0-9_\-А-Яа-яЁё]{3,20}$/.test(nickname)) throw new Error("Ник: 3–20 символов, буквы, цифры, _ и -");
     if (!/^\d{4,12}$/.test(game_id)) throw new Error("ID CounterFlame: от 4 до 12 цифр");
 
-    // Регистрируем на сервере
     const res = await fetch(API_URL + "/api/auth", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
@@ -227,16 +226,6 @@ const API_URL = NOTIFY_URL;
     });
     const data = await res.json();
     if (!data.registered) throw new Error(data.error || "Ошибка регистрации");
-
-    // Сохраняем в localStorage (для кэша)
-    const db = readDb();
-    const existing = db.users.find((u) => u.tg_id === TG_ID);
-    if (existing) {
-      Object.assign(existing, data.user);
-    } else {
-      db.users.push(data.user);
-    }
-    saveDb(db);
     return withAdmin(data.user);
   }
 
