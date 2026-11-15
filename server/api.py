@@ -572,6 +572,13 @@ def api_match_submit():
         return jsonify(error="Пустой файл"), 400
 
     lobby_id = request.form.get("lobby_id", "?")
+    # Закрываем лобби после отправки скриншота (чтобы оно не висело)
+    try:
+        conn = db()
+        conn.execute("UPDATE lobbies SET status='closed' WHERE id=?", (int(lobby_id),))
+        conn.commit()
+    except Exception as e:
+        app.logger.warning(f"Failed to close lobby: {e}")
     map_name = request.form.get("map", "—")
     mode = request.form.get("mode", "—")
     owner = clean(request.form.get("owner", "Игрок"))
