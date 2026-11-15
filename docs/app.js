@@ -681,10 +681,22 @@ const API_URL = NOTIFY_URL;
     }
   }
 
-  function loadLeaderboard() {
-    const players = getLeaderboard();
+  async function loadLeaderboard() {
+    const el = $("#lb-list");
+    el.innerHTML = '<div class="loader"></div>';
+    let players = [];
+    try {
+      const res = await fetch(API_URL + "/api/leaderboard", {
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      });
+      const data = await res.json();
+      if (data.ok && data.players) players = data.players;
+    } catch (e) {
+      // fallback: локальный лидерборд
+      players = getLeaderboard();
+    }
     if (!players.length) {
-      $("#lb-list").innerHTML = '<div class="card empty">Рейтинг пока пуст.</div>';
+      el.innerHTML = '<div class="card empty">Рейтинг пока пуст.</div>';
       return;
     }
 
