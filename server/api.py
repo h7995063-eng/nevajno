@@ -334,6 +334,28 @@ def api_online():
 
 
 
+
+@app.post("/api/lobbies/<int:lobby_id>/start")
+def api_lobbies_start(lobby_id):
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    conn = db()
+    row = conn.execute("SELECT * FROM lobbies WHERE id=?", (lobby_id,)).fetchone()
+    if not row:
+        return jsonify(error="Лобби не найдено"), 404
+    if row["owner_tg_id"] != u["id"]:
+        return jsonify(error="Только хост может начать матч"), 403
+    if row["status"] != "open":
+        return jsonify(error="Матч уже начался"), 400
+    teams = json.loads(row["teams"]) if row["teams"] else {"KT": [], "T": []}
+    total = len(teams.get("KT", [])) + len(teams.get("T", []))
+    if total < 2:
+        return jsonify(error="Для старта нужно минимум 2 игрока"), 400
+    conn.execute("UPDATE lobbies SET status='playing', started_at=? WHERE id=?", (now(), lobby_id))
+    conn.commit()
+    return jsonify(ok=True)
+
 @app.post("/api/lobbies/<int:lobby_id>/leave")
 def api_lobbies_leave(lobby_id):
     u = tg_user()
