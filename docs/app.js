@@ -900,5 +900,25 @@ const API_URL = NOTIFY_URL;
   }
 
   $$(".logo-img").forEach((img) => { if (img.complete && img.naturalWidth === 0) logoFallback(img); });
+  // Загрузка аватарки
+  const btnUploadAvatar = document.getElementById("btn-upload-avatar");
+  if (btnUploadAvatar) {
+    btnUploadAvatar.addEventListener("click", () => {
+      document.getElementById("avatar-upload").click();
+    });
+    document.getElementById("avatar-upload").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const base64 = ev.target.result;
+        localStorage_set("avatar_" + TG_ID, base64);
+        $("#p-avatar").innerHTML = `<img src="${base64}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+        toast("Аватарка обновлена ✅", "ok");
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   boot();
 })();
