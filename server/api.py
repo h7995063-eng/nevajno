@@ -309,14 +309,10 @@ def api_points_get():
     u = tg_user()
     if not u or "id" not in u:
         return jsonify(error="Не авторизован"), 401
-    conn = get_conn()
-    try:
-        row = conn.execute("SELECT points FROM users WHERE tg_id=?", (u["id"],)).fetchone()
-        if not row:
-            return jsonify(error="Пользователь не найден"), 404
-        return jsonify(ok=True, points=row["points"])
-    finally:
-        conn.close()
+    row = db().execute("SELECT points FROM users WHERE tg_id=?", (u["id"],)).fetchone()
+    if not row:
+        return jsonify(error="Пользователь не найден"), 404
+    return jsonify(ok=True, points=row["points"])
 
 @app.get("/api/profile")
 @auth()
@@ -540,14 +536,11 @@ def api_points_update():
     points_delta = b.get("points_delta", 0)
     if not nicknames:
         return jsonify(error="Нет игроков"), 400
-    conn = get_conn()
-    try:
-        for nick in nicknames:
-            conn.execute("UPDATE users SET points = points + ? WHERE nickname = ?", (points_delta, nick))
-        conn.commit()
-        return jsonify(ok=True)
-    finally:
-        conn.close()
+    conn = db()
+    for nick in nicknames:
+        conn.execute("UPDATE users SET points = points + ? WHERE nickname = ?", (points_delta, nick))
+    conn.commit()
+    return jsonify(ok=True)
 
 
 
