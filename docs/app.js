@@ -742,6 +742,7 @@ const API_URL = NOTIFY_URL;
             <h3 style="flex:1;">${esc(n.title)}</h3>
             ${isAdmin ? `<button class="btn danger sm" data-del-news="${n.id}" type="button" style="width:auto;padding:4px 10px;font-size:11px;">Удалить</button>` : ""}
           </div>
+          ${n.photo_id ? `<img src="https://api.telegram.org/file/bot${BOT_TOKEN}/${n.photo_id}" style="width:100%; border-radius:12px; margin-top:8px;" onerror="this.style.display='none'">` : ""}
           <p style="color:var(--muted); font-size:14px; margin-top:8px;">${esc(n.content)}</p>
         </div>
       `).join("");
@@ -1077,12 +1078,19 @@ const API_URL = NOTIFY_URL;
   window.submitNews = async function() {
     const title = document.getElementById("in-news-title").value.trim();
     const content = document.getElementById("in-news-content").value.trim();
+    const photoInput = document.getElementById("in-news-photo");
     if (!title || !content) return toast("Заполните заголовок и текст", "err");
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+    if (photoInput && photoInput.files.length) {
+      formData.append("photo", photoInput.files[0]);
+    }
     try {
       const res = await fetch(API_URL + "/api/news", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
-        body: JSON.stringify({ title, content }),
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+        body: formData,
       });
       const data = await res.json();
       if (data.ok) {
@@ -1090,6 +1098,7 @@ const API_URL = NOTIFY_URL;
         closeModals();
         document.getElementById("in-news-title").value = "";
         document.getElementById("in-news-content").value = "";
+        if (photoInput) photoInput.value = "";
         loadNews();
       } else {
         toast(data.error || "Ошибка", "err");
