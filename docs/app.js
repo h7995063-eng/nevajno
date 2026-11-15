@@ -747,7 +747,13 @@ const API_URL = NOTIFY_URL;
       }
     } catch (e) { /* сервер недоступен, используем localStorage */ }
 
-    $("#p-avatar").textContent = me.nickname.charAt(0).toUpperCase();
+    // Показываем аватарку (если загружена)
+    const savedAvatar = localStorage_get("avatar_" + TG_ID);
+    if (savedAvatar) {
+      $("#p-avatar").innerHTML = `<img src="${savedAvatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+    } else {
+      $("#p-avatar").textContent = me.nickname.charAt(0).toUpperCase();
+    }
     $("#p-nick").textContent = me.nickname;
     $("#p-gid").textContent = me.game_id;
     $("#p-points").textContent = me.points.toLocaleString("ru-RU");
