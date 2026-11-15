@@ -101,28 +101,47 @@ def ask_next_player(message):
 
 def publish_results(message, state):
     lines = ["📊 <b>Результаты матча</b>\n"]
+    caption = state.get("caption", "")
+    import re
+    kt_players = []
+    t_players = []
+    match_kt = re.search(r"KT: (.+)", caption)
+    if match_kt:
+        kt_players = [p.strip() for p in match_kt.group(1).split(",") if p.strip()]
+    match_t = re.search(r"T: (.+)", caption)
+    if match_t:
+        t_players = [p.strip() for p in match_t.group(1).split(",") if p.strip()]
+
     for player, s in state["stats"].items():
-        lines.append(f"{player}: {s['kills']}/{s['deaths']}/{s['assists']} (КД {s['kd']})")
+        if player in kt_players:
+            is_winner = state.get("winner", "KT") == "KT"
+        else:
+            is_winner = state.get("winner", "KT") == "T"
+        points = 20 if is_winner else -15
+        points_text = f"+{points} поинтов за победу" if is_winner else f"{points} поинтов за поражение"
+        lines.append(f"{player}: {s['kills']}/{s['deaths']}/{s['assists']} (КД {s['kd']}) → {points_text}")
 
     text = "\n".join(lines)
-    # Отправляем админу (в админ-чат)
     bot.reply_to(message, text, parse_mode="HTML")
 
-    # Публикуем в паблик-чат (тема "Результаты матчей")
     try:
-        bot.send_message(
-            chat_id=-1004336512603,
-            message_thread_id=23,
-            text=text,
-            parse_mode="HTML",
-        )
+        if state.get("photo_file_id"):
+            bot.send_photo(
+                chat_id=-1004336512603,
+                message_thread_id=23,
+                photo=state["photo_file_id"],
+                caption=text,
+                parse_mode="HTML",
+            )
+        else:
+            bot.send_message(
+                chat_id=-1004336512603,
+                message_thread_id=23,
+                text=text,
+                parse_mode="HTML",
+            )
         bot.reply_to(message, "✅ Результат опубликован в паблик-чате (тема «Результаты матчей»).")
     except Exception as e:
         bot.reply_to(message, f"❌ Ошибка публикации в паблик: {e}")
 
     states.pop(message.from_user.id, None)
-
-
-if __name__ == "__main__":
-    print("Бот запущен")
-    bot.infinity_polling()
