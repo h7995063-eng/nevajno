@@ -423,8 +423,8 @@ const API_URL = NOTIFY_URL;
       updateHeader();
       const v = stack[stack.length - 1];
       if (v === "matches") loadLobbies();
-      if (v === "lobby" && roomId) renderRoom(false);
-    }, 5000));
+      // renderRoom убран из автообновления (вызывается только при входе в комнату и вручную)
+    }, 10000));
   }
 
   function updateHeader() {
