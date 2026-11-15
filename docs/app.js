@@ -395,19 +395,18 @@ const API_URL = NOTIFY_URL;
     show("s-banned");
   }
 
-  function boot() {
+  async function boot() {
     show("s-loading");
     $("#btn-retry").classList.add("hidden");
     $("#load-msg").textContent = "Загружаем данные";
     try {
       initDb();
-      wait(900).then(() => {
-        const user = await getUser();
-        if (!user) return show(localStorage_get("terms") === "1" ? "s-register" : "s-welcome");
-        if (user.is_banned) return showBan(user);
-        me = user;
-        enterApp();
-      });
+      await wait(900);
+      const user = await getUser();
+      if (!user) return show(localStorage_get("terms") === "1" ? "s-register" : "s-welcome");
+      if (user.is_banned) return showBan(user);
+      me = user;
+      enterApp();
     } catch (e) {
       $("#load-msg").textContent = e.message;
       $("#btn-retry").classList.remove("hidden");
