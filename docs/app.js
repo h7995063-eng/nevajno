@@ -521,10 +521,18 @@
     });
   }
 
+  let debugInfo = "";
   function openTeamModal(id) {
     const lobbies = getLobbies();
-    const debugMsg = `ID: ${id} (${typeof id}) | Лобби: ${lobbies.map((x) => x.id).join(", ") || "нет"}`;
-    toast(debugMsg, "err");
+    debugInfo = `ID: ${id} (${typeof id}) | Лобби: ${lobbies.map((x) => x.id).join(", ") || "нет"}`;
+    // Показываем отладку в списке (под лобби)
+    const listEl = document.getElementById("lobby-list");
+    if (listEl) {
+      const debugEl = document.createElement("div");
+      debugEl.style.cssText = "color:#ff4655; font-size:12px; margin-top:8px;";
+      debugEl.textContent = "DEBUG: " + debugInfo;
+      listEl.prepend(debugEl);
+    }
     const l = lobbies.find((x) => x.id === Number(id));
     if (!l) return toast("Лобби уже закрыто", "err");
     // Автоматически выбираем команду, где меньше игроков (или случайно, если поровну)
