@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=100">
+<link rel="stylesheet" href="style.css?v=101">
 </head>
 <body>
 
@@ -39,9 +39,9 @@
 
 <!-- 1. Загрузка -->
 <section class="screen active" id="s-loading">
-  <svg class="logo-xl"><use href="#i-logo"/></svg>
-  <h1 class="brand">CYBERSHOKE</h1>
-  <p class="brand-sub">CounterFlame</p>
+  <img class="logo-xl logo-img" src="assets/logo_full.svg?v=101" alt="CYBERSHOKE CounterFlame">
+  <h1 class="brand hidden">CYBERSHOKE</h1>
+  <p class="brand-sub hidden">CounterFlame</p>
   <div class="spinner"><i></i><i></i><i></i></div>
   <p id="load-msg" class="muted">Подключаемся к серверу</p>
   <button id="btn-retry" class="btn ghost hidden" type="button">Повторить</button>
@@ -51,7 +51,7 @@
 <section class="screen" id="s-welcome">
   <div class="panel narrow">
     <div class="screen-head"><button class="icon-btn" data-act="welcome-back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Добро пожаловать</h2></div>
-    <p class="lead">CYBERSHOKE CounterFlame — киберспортивное сообщество для игроков CS. Здесь собираются лобби, ведётся общий рейтинг и выдаются награды за активность.</p>
+    <p class="lead">CYBERSHOKE CounterFlame — киберспортивное сообщество для игроков CounterFlame. Здесь собираются лобби, ведётся общий рейтинг и выдаются награды за активность.</p>
     <ul class="feature-list">
       <li><svg><use href="#i-game"/></svg><span>Лобби для матчей 1v1, 2v2, 5v5 и DM</span></li>
       <li><svg><use href="#i-trophy"/></svg><span>Рейтинг ELO и общий лидерборд</span></li>
@@ -90,7 +90,7 @@
 <section class="screen" id="s-main">
   <div id="overlay" class="overlay"></div>
   <aside id="sidebar" class="sidebar">
-    <div class="side-logo"><svg><use href="#i-logo"/></svg><b>CYBERSHOKE</b></div>
+    <div class="side-logo"><img class="logo-img" src="assets/logo_mono.svg?v=101" alt=""><b>CYBERSHOKE</b></div>
     <nav>
       <button class="nav-item" data-view="matches"><svg><use href="#i-game"/></svg>Матчи</button>
       <button class="nav-item" data-view="leaderboard"><svg><use href="#i-trophy"/></svg>Лидерборд</button>
@@ -103,7 +103,7 @@
   <div class="content">
     <header class="topbar">
       <button id="btn-burger" class="icon-btn burger" aria-label="Меню"><svg><use href="#i-menu"/></svg></button>
-      <div class="top-logo"><svg><use href="#i-logo"/></svg><b>CYBERSHOKE</b></div>
+      <div class="top-logo"><img class="logo-img" src="assets/logo_mono.svg?v=101" alt=""><b>CYBERSHOKE</b></div>
       <div class="top-stats">
         <span class="chip gold" title="Баланс"><svg><use href="#i-coin"/></svg><b id="hdr-coins">0</b></span>
         <span class="chip blue" title="Онлайн"><svg><use href="#i-users"/></svg><b id="hdr-online">0</b></span>
@@ -188,7 +188,6 @@
   </div>
 </section>
 
-<script src="config.js?v=999"></script>
-<script src="app.js?v=100"></script>
+<script src="app.js?v=101"></script>
 </body>
 </html>

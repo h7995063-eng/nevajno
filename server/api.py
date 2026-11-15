@@ -1,4 +1,6 @@
 import os
+import threading
+import urllib.request
 import re
 import json
 import time
@@ -15,6 +17,11 @@ DB_PATH = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "cybershoke.db"))
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")  # пусто = dev-режим без проверки подписи Telegram
 ADMIN_IDS = {int(x) for x in os.environ.get("ADMIN_IDS", "6999358439").split(",") if x.strip().isdigit()}
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "shoke26")
+
+CHANNEL_ID = os.environ.get("CHANNEL_ID", "-1004336512603")
+TOPIC_ID = os.environ.get("TOPIC_ID", "")
+MINI_APP_URL = os.environ.get("MINI_APP_URL", "")
+LAST_NOTIFY = {}
 PERMANENT = 4102444800  # 2100-01-01
 ONLINE_TTL = 120
 LOBBY_TTL = 1800
@@ -69,6 +76,33 @@ def handle_error(e):
 
 def now():
     return int(time.time())
+
+
+def send_channel_message(text):
+    if not BOT_TOKEN or not CHANNEL_ID:
+        return
+    payload = {"chat_id": CHANNEL_ID, "text": text}
+    if TOPIC_ID.isdigit():
+        payload["message_thread_id"] = int(TOPIC_ID)
+    if MINI_APP_URL:
+        payload["reply_markup"] = {"inline_keyboard": [[{"text": "Открыть CYBERSHOKE", "url": MINI_APP_URL}]]}
+
+    def worker():
+        try:
+            req = urllib.request.Request(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+            )
+            urllib.request.urlopen(req, timeout=10).read()
+        except Exception as e:
+            app.logger.warning("Telegram notify failed: %s", e)
+
+    threading.Thread(target=worker, daemon=True).start()
+
+
+def clean(s, n=24):
+    return re.sub(r"[^\w\- ]", "", str(s or ""), flags=re.UNICODE).strip()[:n]
 
 
 def db():
@@ -376,6 +410,31 @@ def api_admin():
     db().commit()
     return jsonify(ok=True)
 
+
+
+@app.post("/api/notify")
+def api_notify():
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не удалось проверить Telegram-сессию"), 401
+    t = now()
+    if t - LAST_NOTIFY.get(u["id"], 0) < 5:
+        return jsonify(error="Слишком часто"), 429
+    LAST_NOTIFY[u["id"]] = t
+    b = request.get_json(silent=True) or {}
+    try:
+        slots = f"{int(b.get('players', 1))}/{int(b.get('max_players', 2))}"
+    except (TypeError, ValueError):
+        return jsonify(error="Неверные данные"), 400
+    map_name = b.get("map") if b.get("map") in MAPS else "—"
+    mode = b.get("mode") if b.get("mode") in MODES else "—"
+    owner = clean(b.get("owner")) or "Игрок"
+    if b.get("type") == "join":
+        text = f"Новый матч: {owner} vs {clean(b.get('joiner')) or 'Игрок'}\n{map_name} · {mode} · {slots}"
+    else:
+        text = f"Новое лобби: {owner}\n{map_name} · {mode} · {slots}"
+    send_channel_message(text)
+    return jsonify(ok=True)
 
 @app.get("/")
 def index():

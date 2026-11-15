@@ -8,6 +8,8 @@
   const ADMIN_PASSWORD = "shoke26";
   const PERMANENT = 4102444800;
   const LOBBY_TTL = 1800;
+  // Адрес бэкенда с /api/notify (например "https://api.example.com"). Пусто = уведомления в канал выключены.
+  const NOTIFY_URL = "";
   const MAPS = ["Mirage", "Inferno", "Dust II", "Nuke", "Ancient", "Anubis", "Overpass", "Vertigo"];
   const MODE_SIZE = { "1v1": 2, "2v2": 4, "5v5": 10, "DM": 16 };
   const MISSIONS = [
@@ -74,6 +76,40 @@
   function closeApp() {
     if (tg && tg.close) tg.close(); else toast("Закройте вкладку, чтобы выйти");
   }
+
+  function readInitData() {
+    try {
+      if (tg && tg.initData) return tg.initData;
+      return new URLSearchParams(location.hash.replace(/^#/, "")).get("tgWebAppData") || "";
+    } catch (e) { return ""; }
+  }
+
+  /** Уведомление в Telegram-канал через бэкенд. Любая ошибка молча игнорируется, приложение продолжает работать. */
+  function notifyChannel(payload) {
+    if (!NOTIFY_URL) return;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 6000);
+    const headers = { "Content-Type": "application/json", "Bypass-Tunnel-Reminder": "true" };
+    const initData = readInitData();
+    if (initData) headers["X-Init-Data"] = initData;
+    else headers["X-Dev-User"] = JSON.stringify({ id: TG_ID, username: "dev" });
+    fetch(NOTIFY_URL.replace(/\/+$/, "") + "/api/notify", {
+      method: "POST", headers, body: JSON.stringify(payload), signal: ctrl.signal, cache: "no-store",
+    }).catch(() => { /* канал недоступен */ }).finally(() => clearTimeout(timer));
+  }
+
+  /** Если файл логотипа не загрузился, подставляем встроенную SVG-иконку. */
+  function logoFallback(img) {
+    if (!img.parentNode) return;
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", img.className.replace("logo-img", "").trim());
+    svg.innerHTML = '<use href="#i-logo"/>';
+    if (img.classList.contains("logo-xl")) $$(".brand, .brand-sub").forEach((el) => el.classList.remove("hidden"));
+    img.replaceWith(svg);
+  }
+  document.addEventListener("error", (e) => {
+    if (e.target instanceof HTMLImageElement && e.target.classList.contains("logo-img")) logoFallback(e.target);
+  }, true);
 
   /* ================= Локальная «база данных» ================= */
   let memoryDb = null; // запасной вариант, если localStorage недоступен
@@ -346,7 +382,8 @@
 
   function submitLobby() {
     try {
-      createLobby($("#sel-map").value, $("#sel-mode").value);
+      const lobby = createLobby($("#sel-map").value, $("#sel-mode").value);
+      notifyChannel({ type: "create", lobby_id: lobby.id, owner: me.nickname, map: lobby.map, mode: lobby.mode, players: 1, max_players: lobby.max_players });
       closeModals();
       toast("Лобби создано");
       updateHeader();
@@ -357,6 +394,10 @@
   function doJoin(id) {
     try {
       const res = joinLobby(id);
+      if (res.lobby.players.length === 2) {
+        const owner = getAllUsers().find((u) => u.tg_id === res.lobby.owner_tg_id);
+        notifyChannel({ type: "join", lobby_id: res.lobby.id, owner: owner ? owner.nickname : "Игрок", joiner: me.nickname, map: res.lobby.map, mode: res.lobby.mode, players: 2, max_players: res.lobby.max_players });
+      }
       toast(res.started ? "Лобби заполнено, матч начался" : "Вы вошли в лобби");
       updateHeader();
       loadLobbies();
@@ -520,5 +561,6 @@
     try { tg.BackButton.onClick(() => ($("#s-register").classList.contains("active") ? show("s-welcome") : back())); } catch (e) { /* не поддерживается */ }
   }
 
+  $$(".logo-img").forEach((img) => { if (img.complete && img.naturalWidth === 0) logoFallback(img); });
   boot();
 })();
