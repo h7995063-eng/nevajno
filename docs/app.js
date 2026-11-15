@@ -528,6 +528,12 @@ const API_URL = NOTIFY_URL;
       openRoom(lobbyId);
     } catch (e) {
       toast(e.message, "err");
+      // Отладка на экран
+      const debugEl = document.createElement("div");
+      debugEl.style.cssText = "position:fixed; bottom:0; left:0; right:0; background:red; color:white; padding:10px; font-size:12px; z-index:9999;";
+      debugEl.textContent = "DEBUG: " + e.message;
+      document.body.appendChild(debugEl);
+      setTimeout(() => debugEl.remove(), 10000);
     }
   }
 
