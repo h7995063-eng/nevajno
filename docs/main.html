@@ -2,20 +2,19 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#0b0d12">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CYBERSHOKE CounterFlame</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=200">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="style.css?v=100">
 </head>
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
     <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 5a3 3 0 010 6M18 14c2 .6 3 2.2 3 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
     <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5v9M9.5 10c0-1 1-1.6 2.5-1.6s2.5.6 2.5 1.6-1 1.4-2.5 1.8-2.5.8-2.5 1.8 1 1.6 2.5 1.6 2.5-.6 2.5-1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
     <symbol id="i-game" viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="10.5" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5v4M6 12.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="15.5" cy="11.5" r="1.1" fill="currentColor"/><circle cx="18" cy="13.5" r="1.1" fill="currentColor"/></symbol>
@@ -32,88 +31,52 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
-    <symbol id="i-crown" viewBox="0 0 24 24"><path d="M4 18h16M4 18L3 8l5 4 4-7 4 7 5-4-1 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6.5A2.5 2.5 0 0013.5 4h-7A2.5 2.5 0 004 6.5v7A2.5 2.5 0 006.5 16H8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
-    <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4 18-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6L13 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
     <symbol id="i-logo" viewBox="0 0 32 32"><path d="M16 2l12 5v8c0 7.5-5 12.5-12 15C9 27.500 4 22.500 4 15V7l12-5z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 9c-3 2.500-4 5-2.500 7.500 1 1.500 1 3 .5 4.500 3 0 5.500-2 5.500-5 0-1.500-.7-2.500-1.500-3.500.2 1.200-.3 2-1 2.200C17.500 12.500 17 10.500 16 9z" fill="currentColor"/></symbol>
   </defs>
 </svg>
 
 <div id="toast" class="toast" role="status"></div>
 
+<!-- 1. Загрузка -->
 <section class="screen active" id="s-loading">
-  <img class="logo-xl logo-img" src="assets/logo_full.svg?v=200" alt="CYBERSHOKE CounterFlame">
-  <h1 class="brand hidden">CYBERSHOKE</h1>
-  <p class="brand-sub hidden">CounterFlame</p>
+  <img class="logo-xl logo-img" src="assets/logo_full.png?v=500" alt="CYBERSHOKE">
+  <h1 class="brand">CYBERSHOKE</h1>
+  <p class="brand-sub">CounterFlame</p>
   <div class="spinner"><i></i><i></i><i></i></div>
-  <p id="load-msg" class="muted">Загружаем данные</p>
+  <p id="load-msg" class="muted">Подключаемся к серверу</p>
   <button id="btn-retry" class="btn ghost hidden" type="button">Повторить</button>
 </section>
 
+<!-- 2. Приветствие -->
 <section class="screen" id="s-welcome">
   <div class="panel narrow">
-    <div class="hero">
-      <svg class="hero-ico"><use href="#i-logo"/></svg>
-      <h2>Добро пожаловать</h2>
-      <p class="muted">Играй с живыми людьми, расти в рейтинге и забирай награды</p>
-    </div>
+    <div class="screen-head"><button class="icon-btn" data-act="welcome-back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Добро пожаловать</h2></div>
+    <p class="lead">CYBERSHOKE CounterFlame — киберспортивное сообщество для игроков CS. Здесь собираются лобби, ведётся общий рейтинг и выдаются награды за активность.</p>
     <ul class="feature-list">
-      <li><span class="f-ico"><svg><use href="#i-game"/></svg></span><div><b>Быстрые лобби</b><span>1v1, 2v2, 5v5 и DM с примерным временем ожидания</span></div></li>
-      <li><span class="f-ico"><svg><use href="#i-map"/></svg></span><div><b>Голосование карт</b><span>Dust 2, Mirage, Inferno и Nuke — решают игроки</span></div></li>
-      <li><span class="f-ico"><svg><use href="#i-trophy"/></svg></span><div><b>Рейтинг ELO</b><span>Общий лидерборд и миссии с наградами</span></div></li>
-      <li><span class="f-ico"><svg><use href="#i-shield"/></svg></span><div><b>Честная игра</b><span>Бан и мут за нарушение правил</span></div></li>
+      <li><svg><use href="#i-game"/></svg><span>Лобби для матчей 1v1, 2v2, 5v5 и DM</span></li>
+      <li><svg><use href="#i-trophy"/></svg><span>Рейтинг ELO и общий лидерборд</span></li>
+      <li><svg><use href="#i-target"/></svg><span>Миссии с наградами в кибер-поинтах</span></li>
+      <li><svg><use href="#i-shield"/></svg><span>Модерация: бан и мут за нарушение правил</span></li>
     </ul>
-    <label class="check" for="chk-terms">
-      <input id="chk-terms" type="checkbox">
-      <i><svg><use href="#i-check"/></svg></i>
-      <span>Я принимаю правила сообщества и не использую читы</span>
-    </label>
-    <button id="btn-accept" class="btn primary wide" type="button" disabled>Продолжить<svg><use href="#i-back" style="transform:rotate(180deg);transform-origin:center"/></svg></button>
+    <p class="muted small">Нажимая кнопку, вы соглашаетесь соблюдать правила сообщества и не использовать читы.</p>
+    <button id="btn-accept" class="btn primary wide" type="button"><svg><use href="#i-check"/></svg>Принять условия</button>
   </div>
 </section>
 
+<!-- 3. Регистрация -->
 <section class="screen" id="s-register">
   <div class="panel narrow">
-    <div class="screen-head">
-      <button class="icon-btn" data-act="register-back" aria-label="Назад"><svg><use href="#i-back"/></svg></button>
-      <h2>Создание профиля</h2>
-      <span class="step-tag" id="reg-step-tag">1 / 2</span>
-    </div>
-    <div class="steps"><i class="on"></i><i id="step-bar-2"></i></div>
-
-    <div class="reg-preview">
-      <div id="reg-avatar" class="avatar">?</div>
-      <div>
-        <h3 id="reg-pv-nick">Твой ник</h3>
-        <p class="muted" id="reg-pv-id">ID CounterFlame не указан</p>
-      </div>
-    </div>
-
-    <div id="reg-step-1">
-      <label class="field"><span>Игровой ник</span>
-        <div class="input" id="wrap-nick"><svg><use href="#i-user"/></svg><input id="in-nick" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Например, Flame_77"><em id="nick-count">0/20</em></div>
-        <small id="nick-hint" class="hint">3–20 символов: буквы, цифры, _ и -</small>
-      </label>
-      <button id="btn-step-next" class="btn primary wide" type="button" disabled>Далее</button>
-    </div>
-
-    <div id="reg-step-2" class="hidden">
-      <label class="field"><span>ID в CounterFlame</span>
-        <div class="input" id="wrap-gid"><svg><use href="#i-target"/></svg><input id="in-gid" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="Только цифры"></div>
-        <small id="gid-hint" class="hint">От 4 до 12 цифр. Его можно найти в профиле игры</small>
-      </label>
-      <p id="reg-error" class="error hidden"></p>
-      <div class="two">
-        <button id="btn-step-prev" class="btn ghost" type="button">Назад</button>
-        <button id="btn-register" class="btn primary" type="button" disabled><svg><use href="#i-check"/></svg>Создать</button>
-      </div>
-    </div>
+    <div class="screen-head"><button class="icon-btn" data-act="register-back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Регистрация</h2></div>
+    <label class="field"><span>Ник</span>
+      <div class="input"><svg><use href="#i-user"/></svg><input id="in-nick" maxlength="20" autocomplete="off" placeholder="Например, Flame_77"></div></label>
+    <label class="field"><span>ID CounterFlame</span>
+      <div class="input"><svg><use href="#i-target"/></svg><input id="in-gid" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="Только цифры"></div></label>
+    <p id="reg-error" class="error hidden"></p>
+    <button id="btn-register" class="btn primary wide" type="button"><svg><use href="#i-check"/></svg>Создать профиль</button>
   </div>
 </section>
 
+<!-- Бан -->
 <section class="screen" id="s-banned">
   <div class="panel narrow ban-panel">
     <svg class="ban-icon"><use href="#i-ban"/></svg>
@@ -123,132 +86,98 @@
   </div>
 </section>
 
+<!-- 4. Дашборд -->
 <section class="screen" id="s-main">
-  <header class="topbar">
-    <div class="top-logo"><img class="logo-img" src="assets/logo_mono.svg?v=200" alt=""><b>CYBERSHOKE</b></div>
-    <div class="top-stats">
-      <span class="chip green" title="Онлайн"><i class="dot"></i><b id="hdr-online">0</b></span>
-      <span class="chip gold" title="Баланс"><svg><use href="#i-coin"/></svg><b id="hdr-coins">0</b></span>
-    </div>
-  </header>
+  <div id="overlay" class="overlay"></div>
+  <aside id="sidebar" class="sidebar">
+    <div class="side-logo"><img class="logo-img" src="assets/logo_mono_white.png?v=500" alt="CYBERSHOKE" style="height:32px;"><b>CYBERSHOKE</b></div>
+    <nav>
+      <button class="nav-item" data-view="matches"><svg><use href="#i-game"/></svg>Матчи</button>
+      <button class="nav-item" data-view="leaderboard"><svg><use href="#i-trophy"/></svg>Лидерборд</button>
+      <button class="nav-item" data-view="missions"><svg><use href="#i-target"/></svg>Миссии</button>
+      <button class="nav-item" data-view="profile"><svg><use href="#i-user"/></svg>Профиль</button>
+      <button class="nav-item hidden" id="nav-admin" data-view="admin"><svg><use href="#i-shield"/></svg>Админка</button>
+    </nav>
+  </aside>
 
-  <main id="main">
-    <div class="view" id="v-matches">
-      <div class="page-title">
-        <div><h2>Матчи</h2><p class="muted" id="matches-sub">Выбери лобби или создай своё</p></div>
-        <button id="btn-create-lobby" class="btn primary sm" type="button"><svg><use href="#i-plus"/></svg>Создать</button>
+  <div class="content">
+    <header class="topbar">
+      <button id="btn-burger" class="icon-btn burger" aria-label="Меню"><svg><use href="#i-menu"/></svg></button>
+      <div class="top-logo"><img class="logo-img" src="assets/logo_mono_white.png?v=500" alt="CYBERSHOKE" style="height:28px;"><b>CYBERSHOKE</b></div>
+      <div class="top-stats">
+        <span class="chip gold" title="Баланс"><svg><use href="#i-coin"/></svg><b id="hdr-coins">0</b></span>
+        <span class="chip blue" title="Онлайн"><svg><use href="#i-users"/></svg><b id="hdr-online">0</b></span>
       </div>
-      <div class="chips" id="mode-filter">
-        <button class="fchip active" data-filter="all" type="button">Все</button>
-        <button class="fchip" data-filter="1v1" type="button">1v1</button>
-        <button class="fchip" data-filter="2v2" type="button">2v2</button>
-        <button class="fchip" data-filter="5v5" type="button">5v5</button>
-        <button class="fchip" data-filter="DM" type="button">DM</button>
+    </header>
+
+    <main>
+      <div class="view" id="v-matches">
+        <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Матчи</h2>
+          <button id="btn-create-lobby" class="btn primary sm" type="button"><svg><use href="#i-plus"/></svg>Создать лобби</button></div>
+        <div id="lobby-list" class="list"></div>
       </div>
-      <div id="lobby-list" class="list"></div>
-    </div>
 
-    <div class="view" id="v-room">
-      <div class="screen-head">
-        <button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button>
-        <h2 id="room-title">Лобби</h2>
-        <span id="room-status" class="status-chip"></span>
+      <div class="view" id="v-leaderboard">
+        <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Лидерборд</h2></div>
+        <div id="lb-list" class="list"></div>
       </div>
-      <div id="room-body"></div>
-    </div>
 
-    <div class="view" id="v-leaderboard">
-      <div class="page-title"><div><h2>Рейтинг</h2><p class="muted">Лучшие игроки по ELO</p></div></div>
-      <div id="lb-list" class="list"></div>
-    </div>
+      <div class="view" id="v-missions">
+        <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Миссии</h2></div>
+        <div id="mission-list" class="list"></div>
+      </div>
 
-    <div class="view" id="v-missions">
-      <div class="page-title"><div><h2>Миссии</h2><p class="muted">Выполняй задания и получай коины</p></div></div>
-      <div id="mission-list" class="list"></div>
-    </div>
+      <div class="view" id="v-profile">
+        <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Профиль</h2></div>
+        <div id="mute-banner" class="banner hidden"><svg><use href="#i-mute"/></svg><span></span></div>
+        <div class="card profile-card">
+          <div id="p-avatar" class="avatar">?</div>
+          <div><h3 id="p-nick" class="p-nick"></h3><p class="muted">ID: <span id="p-gid"></span></p></div>
+        </div>
+        <div class="grid">
+          <div class="card stat"><svg class="c-blue"><use href="#i-target"/></svg><b id="p-points">0</b><span>Кибер-поинты</span></div>
+          <div class="card stat"><svg class="c-gold"><use href="#i-coin"/></svg><b id="p-coins">0</b><span>Коины</span></div>
+          <div class="card stat"><svg class="c-red"><use href="#i-game"/></svg><b id="p-kd">0</b><span>К/Д</span></div>
+          <div class="card stat"><svg class="c-blue"><use href="#i-trophy"/></svg><b id="p-avg">0</b><span>АВГ</span></div>
+        </div>
+        <button class="btn gold wide" data-view="subs" type="button"><svg><use href="#i-star"/></svg>Подписки</button>
+      </div>
 
-    <div class="view" id="v-profile">
-      <div class="page-title"><div><h2>Профиль</h2></div></div>
-      <div id="mute-banner" class="banner hidden"><svg><use href="#i-mute"/></svg><span></span></div>
-      <div class="card profile-card">
-        <div id="p-avatar" class="avatar big">?</div>
-        <div class="grow">
-          <h3 id="p-nick" class="p-nick"></h3>
-          <p class="muted">ID: <span id="p-gid"></span></p>
-          <span class="pill gold" id="p-rank">#—</span>
+      <div class="view" id="v-subs">
+        <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Подписки</h2></div>
+        <div id="subs-list" class="list"></div>
+      </div>
+
+      <div class="view" id="v-admin">
+        <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Админ-панель</h2></div>
+        <div id="admin-lock" class="card">
+          <label class="field"><span>Пароль администратора</span>
+            <div class="input"><svg><use href="#i-lock"/></svg><input id="in-admin-pass" type="password" autocomplete="off"></div></label>
+          <p id="admin-error" class="error hidden"></p>
+          <button id="btn-admin-login" class="btn primary wide" type="button"><svg><use href="#i-shield"/></svg>Войти</button>
+        </div>
+        <div id="admin-body" class="hidden">
+          <div class="input search"><svg><use href="#i-user"/></svg><input id="in-admin-search" placeholder="Поиск по нику или ID"></div>
+          <div id="admin-list" class="list"></div>
         </div>
       </div>
-      <div class="grid">
-        <div class="card stat"><svg class="c-gold"><use href="#i-bolt"/></svg><b id="p-elo">0</b><span>ELO</span></div>
-        <div class="card stat"><svg class="c-gold"><use href="#i-coin"/></svg><b id="p-coins">0</b><span>Коины</span></div>
-        <div class="card stat"><svg class="c-red"><use href="#i-game"/></svg><b id="p-kd">0</b><span>К/Д</span></div>
-        <div class="card stat"><svg class="c-blue"><use href="#i-target"/></svg><b id="p-avg">0</b><span>АВГ</span></div>
-      </div>
-      <div class="stack">
-        <button class="btn gold wide" data-view="subs" type="button"><svg><use href="#i-star"/></svg>Подписки</button>
-        <button class="btn ghost wide hidden" id="btn-open-admin" data-view="admin" type="button"><svg><use href="#i-shield"/></svg>Админ-панель</button>
-      </div>
-    </div>
+    </main>
+  </div>
 
-    <div class="view" id="v-subs">
-      <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Подписки</h2></div>
-      <div id="subs-list" class="list"></div>
-    </div>
-
-    <div class="view" id="v-admin">
-      <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Админ-панель</h2></div>
-      <div id="admin-lock" class="card">
-        <label class="field"><span>Пароль администратора</span>
-          <div class="input"><svg><use href="#i-lock"/></svg><input id="in-admin-pass" type="password" autocomplete="off"></div></label>
-        <p id="admin-error" class="error hidden"></p>
-        <button id="btn-admin-login" class="btn primary wide" type="button"><svg><use href="#i-shield"/></svg>Войти</button>
-      </div>
-      <div id="admin-body" class="hidden">
-        <div class="input search"><svg><use href="#i-user"/></svg><input id="in-admin-search" placeholder="Поиск по нику или ID"></div>
-        <div id="admin-list" class="list"></div>
-      </div>
-    </div>
-  </main>
-
-  <button id="lobby-pill" class="lobby-pill hidden" type="button">
-    <span class="pulse"></span>
-    <span class="grow" id="pill-text"></span>
-    <b>Открыть</b>
-  </button>
-
-  <nav class="tabbar" id="tabbar">
-    <button class="tab" data-view="matches" type="button"><svg><use href="#i-game"/></svg><span>Матчи</span></button>
-    <button class="tab" data-view="leaderboard" type="button"><svg><use href="#i-trophy"/></svg><span>Рейтинг</span></button>
-    <button class="tab" data-view="missions" type="button"><svg><use href="#i-target"/></svg><span>Миссии</span></button>
-    <button class="tab" data-view="profile" type="button"><svg><use href="#i-user"/></svg><span>Профиль</span></button>
-  </nav>
-
+  <!-- Модалка: создать лобби -->
   <div id="m-lobby" class="modal hidden">
-    <div class="sheet">
-      <div class="sheet-grip"></div>
-      <div class="screen-head"><h2>Новое лобби</h2><button class="icon-btn" data-act="close-modal" aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div>
-      <p class="muted">Выбери режим. Карту выберут игроки голосованием.</p>
-      <div id="mode-grid" class="mode-grid"></div>
+    <div class="panel modal-box">
+      <div class="screen-head"><button class="icon-btn" data-act="close-modal" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Новое лобби</h2></div>
+      <label class="field"><span>Карта</span><select id="sel-map" class="select"></select></label>
+      <label class="field"><span>Режим</span><select id="sel-mode" class="select"></select></label>
       <button id="btn-lobby-submit" class="btn primary wide" type="button"><svg><use href="#i-plus"/></svg>Создать лобби</button>
     </div>
   </div>
 
-  <div id="m-confirm" class="modal hidden">
-    <div class="sheet">
-      <div class="sheet-grip"></div>
-      <h2 id="confirm-title">Подтвердите</h2>
-      <p class="muted" id="confirm-text"></p>
-      <div class="two">
-        <button class="btn ghost" data-act="close-modal" type="button">Отмена</button>
-        <button class="btn danger" id="btn-confirm-ok" type="button">Подтвердить</button>
-      </div>
-    </div>
-  </div>
-
+  <!-- Модалка: бан / мут -->
   <div id="m-punish" class="modal hidden">
-    <div class="sheet">
-      <div class="sheet-grip"></div>
-      <div class="screen-head"><h2 id="punish-title"></h2><button class="icon-btn" data-act="close-modal" aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div>
+    <div class="panel modal-box">
+      <div class="screen-head"><button class="icon-btn" data-act="close-modal" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2 id="punish-title"></h2></div>
       <p id="punish-target" class="muted"></p>
       <label class="field"><span>Срок</span><select id="sel-time" class="select"></select></label>
       <label class="field"><span>Причина</span>
@@ -259,7 +188,7 @@
   </div>
 </section>
 
-<script src="config.js?v=200"></script>
-<script src="js/app_v3.js?v=300"></script>
+<script src="config.js?v=999"></script>
+<script src="app.js?v=100"></script>
 </body>
 </html>
