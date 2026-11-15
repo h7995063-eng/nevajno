@@ -22,6 +22,17 @@ MAPS = ["Mirage", "Inferno", "Dust II", "Nuke", "Ancient", "Anubis", "Overpass",
 MODES = {"1v1": 2, "2v2": 4, "5v5": 10, "DM": 16}
 
 app = Flask(__name__, static_folder=None)
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Init-Data, X-Dev-User, X-Admin-Password, Bypass-Tunnel-Reminder"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return response
+
+@app.route("/api/<path:_>", methods=["OPTIONS"])
+def cors_preflight(_):
+    return ("", 204)
 ONLINE = {}
 
 
