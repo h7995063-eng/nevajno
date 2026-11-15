@@ -13,6 +13,13 @@
   const SUPPORT_URL = "https://t.me/crymbog";
   const NOTIFY_URL = "https://potentially-vacancies-washing-prefix.trycloudflare.com";
   const MAPS = ["Mirage", "Inferno", "Dust II", "Nuke", "Ancient", "Anubis", "Overpass", "Vertigo"];
+  const MAP_IMAGES = {
+    "Mirage": "assets/maps/mirage.jpeg",
+    "Inferno": "assets/maps/inferno.jpg",
+    "Dust II": "assets/maps/dust2.webp",
+    "Vertigo": "assets/maps/vertigo.webp",
+    // Остальные пока без картинок
+  };
   const MODE_SIZE = { "1v1": 2, "2v2": 4, "5v5": 10, "DM": 16 };
   const MISSIONS = [
     { title: "Сыграй 3 матча", reward: 150, goal: 3 },
@@ -465,8 +472,10 @@
           : l.status === "playing" ? '<span class="pill gold">идёт матч</span>'
           : n >= l.max_players ? '<span class="pill">заполнено</span>'
           : `<button class="btn ghost sm" data-join="${l.id}" type="button">${ICON("game")}Войти</button>`;
+        const img = MAP_IMAGES[l.map] || "";
         return `
         <div class="card row">
+          ${img ? `<img src="${img}" alt="${esc(l.map)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:12px;">` : ""}
           <div class="grow">
             <h3>${esc(l.map)} · ${esc(l.mode)}</h3>
             <div class="meta">
@@ -534,7 +543,7 @@
     }
     const isHost = l.owner_tg_id === TG_ID;
     const cap = l.max_players / 2;
-    $("#room-title").textContent = `${l.map} · ${l.mode}`;
+    $("#room-title").innerHTML = `${MAP_IMAGES[l.map] ? `<img src="${MAP_IMAGES[l.map]}" style="width:80px;height:50px;object-fit:cover;border-radius:8px;vertical-align:middle;margin-right:8px;">` : ""}${esc(l.map)} · ${esc(l.mode)}`;
     const st = $("#room-status");
     st.textContent = l.status === "playing" ? "идёт матч" : "набор игроков";
     st.className = `pill ${l.status === "playing" ? "gold" : "blue"}`;
