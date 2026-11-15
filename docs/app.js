@@ -560,37 +560,36 @@ const API_URL = NOTIFY_URL;
   }
 
   
-  function openTeamModal(id) {
-    const lobbies = getLobbies();
-    
-    
+  async function openTeamModal(id) {
+    const lobbies = await getLobbies();
     const l = lobbies.find((x) => String(x.id) === String(id));
     if (!l) return toast("Лобби уже закрыто", "err");
-    joinTarget = l.id;  // <-- ВАЖНО: устанавливаем ID лобби для входа
-    // Автоматически выбираем команду, где меньше игроков (или случайно, если поровну)
-    const ktCount = l.teams.KT.length;
-    const tCount = l.teams.T.length;
+    joinTarget = l.id;
+    const ktCount = (l.teams?.KT || []).length;
+    const tCount = (l.teams?.T || []).length;
+    const cap = l.max_players / 2;
     let team;
-    if (ktCount < l.max_players / 2 && tCount < l.max_players / 2) {
+    if (ktCount < cap && tCount < cap) {
       team = ktCount <= tCount ? "KT" : "T";
-    } else if (ktCount < l.max_players / 2) {
+    } else if (ktCount < cap) {
       team = "KT";
-    } else if (tCount < l.max_players / 2) {
+    } else if (tCount < cap) {
       team = "T";
     } else {
       return toast("Лобби заполнено", "err");
     }
-    doJoin(team);
+    await doJoin(team);
   }
 
-  function doJoin(team) {
-    guard(() => {
-      const l = joinLobby(joinTarget, team);
-      if (lobbyPlayers(l).length === 2) notifyChannel({ type: "join", owner: nameOf(l.owner_tg_id), joiner: me.nickname, ...lobbyInfo(l) });
+  async function doJoin(team) {
+    try {
+      await joinLobby(joinTarget, team);
       closeModals();
       toast(`Вы вошли в команду ${team}`);
-      openRoom(l.id);
-    });
+      openRoom(joinTarget);
+    } catch (e) {
+      toast(e.message, "err");
+    }
   }
 
   /* ----- Комната лобби ----- */
