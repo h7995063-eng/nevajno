@@ -599,6 +599,12 @@ const API_URL = NOTIFY_URL;
         setTimeout(() => back(), 1000);
       } catch (e) {
         toast("Ошибка отправки: " + e.message, "err");
+        // Выводим отладку на экран
+        const debugEl = document.createElement("div");
+        debugEl.style.cssText = "position:fixed; bottom:0; left:0; right:0; background:red; color:white; padding:10px; font-size:12px; z-index:9999;";
+        debugEl.textContent = "DEBUG: " + e.message + " | URL: " + (NOTIFY_URL || "") + "/api/match/submit";
+        document.body.appendChild(debugEl);
+        setTimeout(() => debugEl.remove(), 10000);
       }
     });
   }
