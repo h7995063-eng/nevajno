@@ -654,14 +654,57 @@
   /* ----- Лидерборд, миссии, подписки ----- */
   function loadLeaderboard() {
     const players = getLeaderboard();
-    $("#lb-list").innerHTML = players.length
-      ? players.map((p, i) => `
-        <div class="card row">
-          <div class="rank ${i < 3 ? "top" + (i + 1) : ""}">${i + 1}</div>
-          <div class="grow"><h3>${esc(p.nickname)}</h3><div class="meta"><span>К/Д ${p.kd}</span></div></div>
-          <span class="pill gold">${p.points} Поинтов</span>
-        </div>`).join("")
-      : `<div class="card empty">Рейтинг пока пуст.</div>`;
+    if (!players.length) {
+      $("#lb-list").innerHTML = '<div class="card empty">Рейтинг пока пуст.</div>';
+      return;
+    }
+
+    const top3 = players.slice(0, 3);
+    const rest = players.slice(3);
+
+    // Строим подиум (2, 1, 3)
+    let podiumHtml = "";
+    if (top3.length >= 3) {
+      podiumHtml = `
+        <div class="podium">
+          <div class="podium-item pos-2">
+            <div class="avatar">${top3[1].nickname.charAt(0)}</div>
+            <div class="nick">${esc(top3[1].nickname)}</div>
+            <div class="points">${top3[1].points} CP</div>
+            <div class="podium-block">2</div>
+          </div>
+          <div class="podium-item pos-1">
+            <div class="avatar">
+              <svg class="crown"><use href="#i-crown"/></svg>
+              ${top3[0].nickname.charAt(0)}
+            </div>
+            <div class="nick">${esc(top3[0].nickname)}</div>
+            <div class="points">${top3[0].points} CP</div>
+            <div class="podium-block">1</div>
+          </div>
+          <div class="podium-item pos-3">
+            <div class="avatar">${top3[2].nickname.charAt(0)}</div>
+            <div class="nick">${esc(top3[2].nickname)}</div>
+            <div class="points">${top3[2].points} CP</div>
+            <div class="podium-block">3</div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Если игроков меньше 3 — просто список
+      podiumHtml = "";
+    }
+
+    // Остальной список
+    const restHtml = rest.map((p, i) => `
+      <div class="card row">
+        <div class="rank">#${i + 4}</div>
+        <div class="grow"><h3>${esc(p.nickname)}</h3><div class="meta"><span>К/Д ${p.kd}</span></div></div>
+        <span class="pill gold">${p.points} Поинтов</span>
+      </div>
+    `).join("");
+
+    $("#lb-list").innerHTML = podiumHtml + (restHtml ? `<div class="top-list" style="margin-top:16px;">${restHtml}</div>` : "");
   }
 
   function renderMissions() {
