@@ -59,18 +59,22 @@ const API_URL = "https://recommendations-archives-detected-rainbow.trycloudflare
     return `${Math.floor(m / 60)} ч назад`;
   }
 
+  const API_URL = String(window.API_URL || "").replace(/\/+$/, "");
+  const DEV_TG_ID = 6999358439;
+
   async function api(path, body, admin = false) {
-    const headers = { "Content-Type": "application/json", "Bypass-Tunnel-Reminder": "true" };
+    const headers = {
+      "Content-Type": "application/json",
+      "Bypass-Tunnel-Reminder": "true",
+    };
     if (tg && tg.initData) headers["X-Init-Data"] = tg.initData;
-    else headers["X-Dev-User"] = JSON.stringify({ id: 6999358439, username: "shoke", first_name: "Owner" });
+    else headers["X-Dev-User"] = JSON.stringify({ id: DEV_TG_ID, username: "dev" });
     if (admin) headers["X-Admin-Password"] = adminPass;
     let res;
     try {
-      res = await fetch(API_URL + path, { method: body ? "POST" : "GET", headers, body: body ? JSON.stringify(body) : undefined });
+      res = await fetch(API_URL + path, { method: body ? "POST" : "GET", headers, body: body ? JSON.stringify(body) : undefined, cache: "no-store" });
     } catch (e) {
-      console.error("FETCH ERROR:", e);
-      document.body.innerHTML += `<div style="position:fixed; bottom:0; left:0; right:0; background:red; color:white; padding:10px; font-size:12px; z-index:9999;">Ошибка сети: ${e.message}</div>`;
-      throw Object.assign(new Error("Нет связи с сервером"), { status: 0 });
+      throw Object.assign(new Error("Нет связи с сервером. Проверьте адрес туннеля в config.js"), { status: 0 });
     }
     let data = {};
     try { data = await res.json(); } catch (e) { /* пустой ответ */ }

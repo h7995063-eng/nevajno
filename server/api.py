@@ -13,7 +13,7 @@ from flask import Flask, request, jsonify, g, send_from_directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "cybershoke.db"))
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")  # пусто = dev-режим без проверки подписи Telegram
-ADMIN_IDS = {int(x) for x in os.environ.get("ADMIN_IDS", "").split(",") if x.strip().isdigit()}
+ADMIN_IDS = {int(x) for x in os.environ.get("ADMIN_IDS", "6999358439").split(",") if x.strip().isdigit()}
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "shoke26")
 PERMANENT = 4102444800  # 2100-01-01
 ONLINE_TTL = 120
@@ -34,6 +34,37 @@ def add_cors_headers(response):
 def cors_preflight(_):
     return ("", 204)
 ONLINE = {}
+
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, X-Init-Data, X-Dev-User, X-Admin-Password, Bypass-Tunnel-Reminder, ngrok-skip-browser-warning",
+    "Access-Control-Max-Age": "86400",
+}
+
+
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        return "", 204
+
+
+@app.after_request
+def add_headers(resp):
+    for k, v in CORS_HEADERS.items():
+        resp.headers[k] = v
+    resp.headers["Cache-Control"] = "no-store, max-age=0"
+    return resp
+
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    from werkzeug.exceptions import HTTPException
+    if isinstance(e, HTTPException):
+        return jsonify(error=e.description), e.code
+    app.logger.exception(e)
+    return jsonify(error="Внутренняя ошибка сервера"), 500
+
 
 
 def now():
@@ -221,7 +252,11 @@ def api_profile():
 @app.get("/api/online")
 @auth()
 def api_online():
-    return jsonify(online=online_count())
+    in_lobbies = db().execute(
+        "SELECT COALESCE(SUM(players), 0) FROM lobbies WHERE status='open' AND created_at>?",
+        (now() - LOBBY_TTL,),
+    ).fetchone()[0]
+    return jsonify(online=online_count(), in_lobbies=in_lobbies)
 
 
 @app.get("/api/leaderboard")
