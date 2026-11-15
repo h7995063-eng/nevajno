@@ -368,7 +368,6 @@
     $("#btn-retry").classList.add("hidden");
     $("#load-msg").textContent = "Загружаем данные";
     try {
-      initDb();
       wait(900).then(() => {
         try {
           const user = getUser();
