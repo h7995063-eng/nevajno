@@ -969,17 +969,34 @@ const API_URL = NOTIFY_URL;
     if (adminUnlocked) drawAdminList();
   }
 
-  function adminLogin() {
+  async function adminLogin() {
     const err = $("#admin-error");
     err.classList.add("hidden");
-    if ($("#in-admin-pass").value !== ADMIN_PASSWORD) {
-      err.textContent = "Неверный пароль";
+    const pass = $("#in-admin-pass").value;
+    try {
+      const res = await fetch(API_URL + "/api/admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }),
+          "X-Admin-Password": pass,
+        },
+        body: JSON.stringify({ action: "list" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        err.textContent = data.error || "Неверный пароль";
+        err.classList.remove("hidden");
+        return;
+      }
+      adminUnlocked = true;
+      window.ADMIN_PASSWORD = pass;
+      $("#in-admin-pass").value = "";
+      renderAdminState();
+    } catch (e) {
+      err.textContent = "Ошибка сервера";
       err.classList.remove("hidden");
-      return;
     }
-    adminUnlocked = true;
-    $("#in-admin-pass").value = "";
-    renderAdminState();
   }
 
   function drawAdminList() {
