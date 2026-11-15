@@ -1,12 +1,12 @@
 import os
-import threading
-import urllib.request
 import re
 import json
 import time
 import hmac
 import hashlib
 import sqlite3
+import threading
+import urllib.request
 from functools import wraps
 from urllib.parse import parse_qsl
 
@@ -14,33 +14,23 @@ from flask import Flask, request, jsonify, g, send_from_directory
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "cybershoke.db"))
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "")  # пусто = dev-режим без проверки подписи Telegram
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "9226738939:AAFO3UtMr_3Mg4l_JqqC1CT_Hsa8dWh6vWA")  # пусто = dev-режим без проверки подписи Telegram
 ADMIN_IDS = {int(x) for x in os.environ.get("ADMIN_IDS", "6999358439").split(",") if x.strip().isdigit()}
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "shoke26")
-
 CHANNEL_ID = os.environ.get("CHANNEL_ID", "-1004336512603")
-TOPIC_ID = os.environ.get("TOPIC_ID", "")
-MINI_APP_URL = os.environ.get("MINI_APP_URL", "")
-LAST_NOTIFY = {}
+TOPIC_ID = os.environ.get("TOPIC_ID", "")  # ID темы «Активные матчи»; пусто = без темы
+MINI_APP_URL = os.environ.get("MINI_APP_URL", "")  # https://t.me/<бот>/<приложение>
 PERMANENT = 4102444800  # 2100-01-01
 ONLINE_TTL = 120
 LOBBY_TTL = 1800
+PLAYING_TTL = 10800
+TEAMS = ("KT", "T")
 MAPS = ["Mirage", "Inferno", "Dust II", "Nuke", "Ancient", "Anubis", "Overpass", "Vertigo"]
 MODES = {"1v1": 2, "2v2": 4, "5v5": 10, "DM": 16}
 
 app = Flask(__name__, static_folder=None)
-
-@app.after_request
-def add_cors_headers(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Init-Data, X-Dev-User, X-Admin-Password, Bypass-Tunnel-Reminder"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    return response
-
-@app.route("/api/<path:_>", methods=["OPTIONS"])
-def cors_preflight(_):
-    return ("", 204)
 ONLINE = {}
+LAST_NOTIFY = {}
 
 CORS_HEADERS = {
     "Access-Control-Allow-Origin": "*",
@@ -73,12 +63,12 @@ def handle_error(e):
     return jsonify(error="Внутренняя ошибка сервера"), 500
 
 
-
 def now():
     return int(time.time())
 
 
 def send_channel_message(text):
+    """Отправка сообщения в канал/тему с кнопкой «Открыть CYBERSHOKE». Не блокирует запрос."""
     if not BOT_TOKEN or not CHANNEL_ID:
         return
     payload = {"chat_id": CHANNEL_ID, "text": text}
@@ -162,6 +152,17 @@ def init_db():
         started_at INTEGER NOT NULL
     );
     """)
+    for table, ddl in (
+        ("lobbies", "comment TEXT NOT NULL DEFAULT ''"),
+        ("lobbies", "code TEXT NOT NULL DEFAULT ''"),
+        ("lobbies", "started_at INTEGER NOT NULL DEFAULT 0"),
+        ("lobby_players", "team TEXT NOT NULL DEFAULT 'KT'"),
+    ):
+        try:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {ddl}")
+        except sqlite3.OperationalError:
+            pass
+    conn.execute("UPDATE lobbies SET status='playing', started_at=created_at WHERE status='started'")
     conn.commit()
     conn.close()
 
@@ -184,16 +185,12 @@ def validate_init_data(init_data):
 
 
 def tg_user():
-    # --- ТЕСТОВЫЙ РЕЖИМ: сначала пробуем X-Dev-User, потом X-Init-Data ---
-    dev_user = request.headers.get("X-Dev-User", "")
-    if dev_user:
-        try:
-            return json.loads(dev_user)
-        except Exception:
-            pass
     if BOT_TOKEN:
         return validate_init_data(request.headers.get("X-Init-Data", ""))
-    return None
+    try:
+        return json.loads(request.headers.get("X-Dev-User", "")) or None
+    except Exception:
+        return None
 
 
 def load_user(tg_id):
@@ -287,8 +284,8 @@ def api_profile():
 @auth()
 def api_online():
     in_lobbies = db().execute(
-        "SELECT COALESCE(SUM(players), 0) FROM lobbies WHERE status='open' AND created_at>?",
-        (now() - LOBBY_TTL,),
+        "SELECT COUNT(DISTINCT lp.tg_id) FROM lobby_players lp JOIN lobbies l ON l.id=lp.lobby_id "
+        "WHERE l.status IN ('open','playing')"
     ).fetchone()[0]
     return jsonify(online=online_count(), in_lobbies=in_lobbies)
 
@@ -302,27 +299,62 @@ def api_leaderboard():
     return jsonify(players=[dict(r) for r in rows])
 
 
-def lobby_dict(r):
+def is_member(lobby_id, uid):
+    return db().execute("SELECT 1 FROM lobby_players WHERE lobby_id=? AND tg_id=?", (lobby_id, uid)).fetchone() is not None
+
+
+def get_lobby(lid, statuses=("open", "playing")):
+    q = ",".join("?" * len(statuses))
+    return db().execute(f"SELECT * FROM lobbies WHERE id=? AND status IN ({q})", (lid, *statuses)).fetchone()
+
+
+def lobby_dict(r, uid):
     return {"id": r["id"], "map": r["map"], "mode": r["mode"], "players": r["players"],
-            "max_players": r["max_players"], "created_at": r["created_at"]}
+            "max_players": r["max_players"], "status": r["status"], "created_at": r["created_at"],
+            "mine": is_member(r["id"], uid)}
+
+
+def lobby_detail(r, uid):
+    """Полные данные лобби (комментарий, код, команды) — только для участников."""
+    rows = db().execute(
+        "SELECT lp.tg_id, lp.team, u.nickname FROM lobby_players lp JOIN users u ON u.tg_id=lp.tg_id "
+        "WHERE lp.lobby_id=? ORDER BY lp.rowid", (r["id"],)).fetchall()
+    teams = {"KT": [], "T": []}
+    for x in rows:
+        teams[x["team"]].append({"tg_id": x["tg_id"], "nickname": x["nickname"], "host": x["tg_id"] == r["owner_tg_id"]})
+    d = lobby_dict(r, uid)
+    d.update(teams=teams, comment=r["comment"] or "", code=r["code"] or "", is_host=r["owner_tg_id"] == uid)
+    return d
 
 
 @app.route("/api/lobbies", methods=["GET", "POST"])
 @auth()
 def api_lobbies():
     t = now()
-    db().execute("UPDATE lobbies SET status='closed' WHERE status='open' AND created_at<?", (t - LOBBY_TTL,))
+    uid = g.user["tg_id"]
+    db().execute(
+        "UPDATE lobbies SET status='closed' WHERE (status='open' AND created_at<?) OR (status='playing' AND started_at<?)",
+        (t - LOBBY_TTL, t - PLAYING_TTL))
     db().commit()
 
     if request.method == "GET":
+        lid = request.args.get("id", type=int)
+        if lid:  # «Обновить» состав лобби
+            r = get_lobby(lid)
+            if not r:
+                return jsonify(error="Лобби не найдено или закрыто"), 404
+            if not is_member(lid, uid):
+                return jsonify(error="Вы не участник этого лобби"), 403
+            return jsonify(lobby=lobby_detail(r, uid))
         rows = db().execute(
-            "SELECT * FROM lobbies WHERE status='open' ORDER BY created_at DESC LIMIT 50"
-        ).fetchall()
-        return jsonify(lobbies=[lobby_dict(r) for r in rows])
+            "SELECT * FROM lobbies WHERE status IN ('open','playing') ORDER BY created_at DESC LIMIT 50").fetchall()
+        return jsonify(lobbies=[lobby_dict(r, uid) for r in rows])
 
     body = request.get_json(silent=True) or {}
     action = body.get("action", "create")
-    if g.user["is_muted"]:
+    team = body.get("team") if body.get("team") in TEAMS else "KT"
+
+    if action in ("create", "join") and g.user["is_muted"]:
         return jsonify(error="Вы заглушены и не можете создавать или входить в лобби"), 403
 
     if action == "create":
@@ -331,30 +363,97 @@ def api_lobbies():
             return jsonify(error="Неверная карта или режим"), 400
         cur = db().execute(
             "INSERT INTO lobbies (owner_tg_id, map, mode, max_players, created_at) VALUES (?,?,?,?,?)",
-            (g.user["tg_id"], map_name, mode, MODES[mode], t),
-        )
-        db().execute("INSERT INTO lobby_players VALUES (?,?)", (cur.lastrowid, g.user["tg_id"]))
+            (uid, map_name, mode, MODES[mode], t))
+        db().execute("INSERT INTO lobby_players (lobby_id, tg_id, team) VALUES (?,?,?)", (cur.lastrowid, uid, team))
         db().commit()
+        send_channel_message(f"Новое лобби: {g.user['nickname']}\n{map_name} · {mode} · 1/{MODES[mode]}")
         return jsonify(ok=True, id=cur.lastrowid)
 
+    r = get_lobby(body.get("id"))
+    if not r:
+        return jsonify(error="Лобби не найдено или закрыто"), 404
+    is_host = r["owner_tg_id"] == uid
+
     if action == "join":
-        lobby = db().execute("SELECT * FROM lobbies WHERE id=? AND status='open'", (body.get("id"),)).fetchone()
-        if not lobby:
-            return jsonify(error="Лобби уже закрыто"), 404
-        if db().execute("SELECT 1 FROM lobby_players WHERE lobby_id=? AND tg_id=?",
-                        (lobby["id"], g.user["tg_id"])).fetchone():
+        if r["status"] != "open":
+            return jsonify(error="Матч уже начался"), 409
+        if is_member(r["id"], uid):
             return jsonify(error="Вы уже в этом лобби"), 409
-        players = lobby["players"] + 1
-        status = "started" if players >= lobby["max_players"] else "open"
-        db().execute("INSERT INTO lobby_players VALUES (?,?)", (lobby["id"], g.user["tg_id"]))
-        db().execute("UPDATE lobbies SET players=?, status=? WHERE id=?", (players, status, lobby["id"]))
-        if status == "started":
-            db().execute("INSERT INTO matches (lobby_id, map, mode, started_at) VALUES (?,?,?,?)",
-                         (lobby["id"], lobby["map"], lobby["mode"], t))
+        in_team = db().execute("SELECT COUNT(*) FROM lobby_players WHERE lobby_id=? AND team=?", (r["id"], team)).fetchone()[0]
+        if in_team >= r["max_players"] // 2:
+            return jsonify(error=f"Команда {team} заполнена"), 409
+        players = r["players"] + 1
+        db().execute("INSERT INTO lobby_players (lobby_id, tg_id, team) VALUES (?,?,?)", (r["id"], uid, team))
+        db().execute("UPDATE lobbies SET players=? WHERE id=?", (players, r["id"]))
         db().commit()
-        return jsonify(ok=True, started=status == "started")
+        if players == 2:
+            owner = db().execute("SELECT nickname FROM users WHERE tg_id=?", (r["owner_tg_id"],)).fetchone()
+            send_channel_message(
+                f"Новый матч: {owner['nickname'] if owner else 'Игрок'} vs {g.user['nickname']}\n"
+                f"{r['map']} · {r['mode']} · {players}/{r['max_players']}")
+        return jsonify(ok=True)
+
+    if action == "leave":
+        if not is_member(r["id"], uid):
+            return jsonify(error="Вы не участник этого лобби"), 403
+        if is_host:
+            db().execute("UPDATE lobbies SET status='closed' WHERE id=?", (r["id"],))
+        else:
+            db().execute("DELETE FROM lobby_players WHERE lobby_id=? AND tg_id=?", (r["id"], uid))
+            db().execute("UPDATE lobbies SET players=players-1 WHERE id=?", (r["id"],))
+        db().commit()
+        return jsonify(ok=True, closed=is_host)
+
+    if action in ("comment", "code", "start"):
+        if not is_host:
+            return jsonify(error="Это действие доступно только хосту"), 403
+        if action == "comment":
+            db().execute("UPDATE lobbies SET comment=? WHERE id=?", (str(body.get("comment", "")).strip()[:300], r["id"]))
+        elif action == "code":
+            code = str(body.get("code", "")).strip()
+            if not 1 <= len(code) <= 80:
+                return jsonify(error="Код: от 1 до 80 символов"), 400
+            db().execute("UPDATE lobbies SET code=? WHERE id=?", (code, r["id"]))
+        else:
+            if r["status"] != "open":
+                return jsonify(error="Матч уже начался"), 409
+            if r["players"] < 2:
+                return jsonify(error="Для старта нужно минимум 2 игрока"), 400
+            db().execute("UPDATE lobbies SET status='playing', started_at=? WHERE id=?", (t, r["id"]))
+            db().execute("INSERT INTO matches (lobby_id, map, mode, started_at) VALUES (?,?,?,?)", (r["id"], r["map"], r["mode"], t))
+            send_channel_message(f"Матч начался: {g.user['nickname']}\n{r['map']} · {r['mode']} · {r['players']}/{r['max_players']}")
+        db().commit()
+        return jsonify(ok=True)
 
     return jsonify(error="Неизвестное действие"), 400
+
+
+@app.post("/api/notify")
+def api_notify():
+    """Уведомление в канал для клиента, который хранит лобби локально."""
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не удалось проверить Telegram-сессию"), 401
+    t = now()
+    if t - LAST_NOTIFY.get(u["id"], 0) < 3:
+        return jsonify(error="Слишком часто"), 429
+    LAST_NOTIFY[u["id"]] = t
+    b = request.get_json(silent=True) or {}
+    try:
+        slots = f"{int(b.get('players', 1))}/{int(b.get('max_players', 2))}"
+    except (TypeError, ValueError):
+        return jsonify(error="Неверные данные"), 400
+    info = f"{b.get('map') if b.get('map') in MAPS else '—'} · {b.get('mode') if b.get('mode') in MODES else '—'} · {slots}"
+    owner = clean(b.get("owner")) or "Игрок"
+    kind = b.get("type")
+    if kind == "join":
+        text = f"Новый матч: {owner} vs {clean(b.get('joiner')) or 'Игрок'}\n{info}"
+    elif kind == "start":
+        text = f"Матч начался: {owner}\n{info}"
+    else:
+        text = f"Новое лобби: {owner}\n{info}"
+    send_channel_message(text)
+    return jsonify(ok=True)
 
 
 @app.post("/api/admin")
@@ -411,44 +510,21 @@ def api_admin():
     return jsonify(ok=True)
 
 
-
-@app.post("/api/notify")
-def api_notify():
-    u = tg_user()
-    if not u or "id" not in u:
-        return jsonify(error="Не удалось проверить Telegram-сессию"), 401
-    t = now()
-    if t - LAST_NOTIFY.get(u["id"], 0) < 5:
-        return jsonify(error="Слишком часто"), 429
-    LAST_NOTIFY[u["id"]] = t
-    b = request.get_json(silent=True) or {}
-    try:
-        slots = f"{int(b.get('players', 1))}/{int(b.get('max_players', 2))}"
-    except (TypeError, ValueError):
-        return jsonify(error="Неверные данные"), 400
-    map_name = b.get("map") if b.get("map") in MAPS else "—"
-    mode = b.get("mode") if b.get("mode") in MODES else "—"
-    owner = clean(b.get("owner")) or "Игрок"
-    if b.get("type") == "join":
-        text = f"Новый матч: {owner} vs {clean(b.get('joiner')) or 'Игрок'}\n{map_name} · {mode} · {slots}"
-    else:
-        text = f"Новое лобби: {owner}\n{map_name} · {mode} · {slots}"
-    send_channel_message(text)
-    return jsonify(ok=True)
-
 @app.get("/")
 def index():
     return send_from_directory(BASE_DIR, "index.html")
 
 
-@app.get("/style.css")
-def css():
-    return send_from_directory(BASE_DIR, "style.css")
+@app.get("/assets/<path:name>")
+def assets(name):
+    return send_from_directory(os.path.join(BASE_DIR, "assets"), name)
 
 
-@app.get("/app.js")
-def js():
-    return send_from_directory(BASE_DIR, "app.js")
+@app.get("/<path:name>")
+def static_files(name):
+    if name in ("style.css", "app.js"):
+        return send_from_directory(BASE_DIR, name)
+    return jsonify(error="Не найдено"), 404
 
 
 init_db()

@@ -8,7 +8,9 @@
   const ADMIN_PASSWORD = "shoke26";
   const PERMANENT = 4102444800;
   const LOBBY_TTL = 1800;
+  const PLAYING_TTL = 10800;
   // Адрес бэкенда с /api/notify (например "https://api.example.com"). Пусто = уведомления в канал выключены.
+  const SUPPORT_URL = "https://t.me/crymbog";
   const NOTIFY_URL = "";
   const MAPS = ["Mirage", "Inferno", "Dust II", "Nuke", "Ancient", "Anubis", "Overpass", "Vertigo"];
   const MODE_SIZE = { "1v1": 2, "2v2": 4, "5v5": 10, "DM": 16 };
@@ -19,9 +21,8 @@
     { title: "Создай своё лобби", reward: 50, goal: 1 },
   ];
   const PLANS = [
-    { name: "Basic", price: "199 ₽/мес", perks: ["Значок в профиле", "+10% кибер-поинтов"] },
-    { name: "Pro", price: "499 ₽/мес", perks: ["Всё из Basic", "Приоритет в лобби", "+25% кибер-поинтов"], featured: true },
-    { name: "Elite", price: "999 ₽/мес", perks: ["Всё из Pro", "Эксклюзивные турниры", "+50% кибер-поинтов"] },
+    { id: "premium", cls: "premium", name: "PREMIUM", price: "50 ★", perks: ["Золотой значок в профиле", "Приоритет в лобби", "+25% кибер-поинтов", "Эксклюзивные турниры"] },
+    { id: "lite", cls: "lite", name: "LITE", price: "25 ★", perks: ["Синий значок в профиле", "+10% кибер-поинтов"] },
   ];
   const TIMES = [
     { label: "15 минут", min: 15 }, { label: "1 час", min: 60 }, { label: "1 день", min: 1440 },
@@ -75,6 +76,14 @@
 
   function closeApp() {
     if (tg && tg.close) tg.close(); else toast("Закройте вкладку, чтобы выйти");
+  }
+
+  /** Открывает чат поддержки @crymbog (и покупку премиума). */
+  function openSupport() {
+    try {
+      if (tg && tg.openTelegramLink) return tg.openTelegramLink(SUPPORT_URL);
+    } catch (e) { /* откроем как обычную ссылку */ }
+    window.open(SUPPORT_URL, "_blank");
   }
 
   function readInitData() {
@@ -140,7 +149,11 @@
       if (u.is_muted && u.mute_until <= t) { u.is_muted = false; u.mute_until = 0; changed = true; }
     });
     db.lobbies.forEach((l) => {
+      if (!l.teams) { l.teams = { KT: (l.players || []).slice(), T: [] }; changed = true; }
+      if (l.status === "started") { l.status = "playing"; l.started_at = l.created_at; changed = true; }
+      if (l.comment === undefined) { l.comment = ""; l.code = ""; l.started_at = l.started_at || 0; changed = true; }
       if (l.status === "open" && l.created_at < t - LOBBY_TTL) { l.status = "closed"; changed = true; }
+      if (l.status === "playing" && l.started_at < t - PLAYING_TTL) { l.status = "closed"; changed = true; }
     });
     if (changed) saveDb(db);
     return db;
@@ -205,6 +218,9 @@
   function unmuteUser(tg_id) { updateUser(tg_id, { is_muted: false, mute_until: 0 }); }
 
   /* ----- Лобби ----- */
+  const TEAMS = ["KT", "T"];
+  const lobbyPlayers = (l) => l.teams.KT.concat(l.teams.T);
+
   function requireActiveUser(db) {
     const u = db.users.find((x) => x.tg_id === TG_ID);
     if (!u) throw new Error("Сначала пройдите регистрацию");
@@ -213,44 +229,99 @@
     return u;
   }
 
-  function createLobby(map, mode) {
+  function findLobby(db, id) {
+    const l = db.lobbies.find((x) => x.id === Number(id) && (x.status === "open" || x.status === "playing"));
+    if (!l) throw new Error("Лобби не найдено или уже закрыто");
+    return l;
+  }
+
+  function findHostLobby(db, id) {
+    const l = findLobby(db, id);
+    if (l.owner_tg_id !== TG_ID) throw new Error("Это действие доступно только хосту");
+    return l;
+  }
+
+  /** Создатель становится хостом и сразу входит в выбранную команду. */
+  function createLobby(map, mode, team) {
     const db = readDb();
     requireActiveUser(db);
     if (!MAPS.includes(map) || !MODE_SIZE[mode]) throw new Error("Неверная карта или режим");
     const lobby = {
       id: db.lobbies.reduce((m, l) => Math.max(m, l.id), 0) + 1,
       owner_tg_id: TG_ID, map, mode, max_players: MODE_SIZE[mode],
-      players: [TG_ID], status: "open", created_at: now(),
+      teams: { KT: [], T: [] }, comment: "", code: "",
+      status: "open", created_at: now(), started_at: 0,
     };
+    lobby.teams[TEAMS.includes(team) ? team : "KT"].push(TG_ID);
     db.lobbies.push(lobby);
     saveDb(db);
     return lobby;
   }
 
   function getLobbies() {
-    return readDb().lobbies.filter((l) => l.status === "open").sort((a, b) => b.created_at - a.created_at).slice(0, 50);
+    return readDb().lobbies.filter((l) => l.status === "open" || l.status === "playing").sort((a, b) => b.created_at - a.created_at).slice(0, 50);
   }
 
-  function joinLobby(id) {
+  /** Подробности лобби (комментарий, код) доступны только участникам. */
+  function getLobby(id) {
+    const l = findLobby(readDb(), id);
+    if (!lobbyPlayers(l).includes(TG_ID)) throw new Error("Вы не участник этого лобби");
+    return l;
+  }
+
+  function joinLobby(id, team) {
     const db = readDb();
     requireActiveUser(db);
-    const lobby = db.lobbies.find((l) => l.id === Number(id) && l.status === "open");
-    if (!lobby) throw new Error("Лобби уже закрыто");
-    if (lobby.players.includes(TG_ID)) throw new Error("Вы уже в этом лобби");
-    lobby.players.push(TG_ID);
-    let started = false;
-    if (lobby.players.length >= lobby.max_players) {
-      lobby.status = "started";
-      started = true;
-      db.matches.push({ id: db.matches.length + 1, lobby_id: lobby.id, map: lobby.map, mode: lobby.mode, started_at: now() });
-    }
+    const l = findLobby(db, id);
+    if (l.status !== "open") throw new Error("Матч уже начался");
+    if (lobbyPlayers(l).includes(TG_ID)) throw new Error("Вы уже в этом лобби");
+    if (!TEAMS.includes(team)) throw new Error("Выберите команду");
+    if (l.teams[team].length >= l.max_players / 2) throw new Error(`Команда ${team} заполнена`);
+    l.teams[team].push(TG_ID);
     saveDb(db);
-    return { lobby, started };
+    return l;
+  }
+
+  /** Возвращает true, если лобби закрылось (вышел хост). */
+  function leaveLobby(id) {
+    const db = readDb();
+    const l = findLobby(db, id);
+    if (!lobbyPlayers(l).includes(TG_ID)) throw new Error("Вы не участник этого лобби");
+    if (l.owner_tg_id === TG_ID) l.status = "closed";
+    else TEAMS.forEach((tm) => { l.teams[tm] = l.teams[tm].filter((x) => x !== TG_ID); });
+    saveDb(db);
+    return l.status === "closed";
+  }
+
+  function setLobbyComment(id, text) {
+    const db = readDb();
+    findHostLobby(db, id).comment = String(text || "").trim().slice(0, 300);
+    saveDb(db);
+  }
+
+  function sendLobbyCode(id, code) {
+    code = String(code || "").trim();
+    if (code.length < 1 || code.length > 80) throw new Error("Код: от 1 до 80 символов");
+    const db = readDb();
+    findHostLobby(db, id).code = code;
+    saveDb(db);
+  }
+
+  function startLobby(id) {
+    const db = readDb();
+    const l = findHostLobby(db, id);
+    if (l.status !== "open") throw new Error("Матч уже начался");
+    if (lobbyPlayers(l).length < 2) throw new Error("Для старта нужно минимум 2 игрока");
+    l.status = "playing";
+    l.started_at = now();
+    db.matches.push({ id: db.matches.length + 1, lobby_id: l.id, map: l.map, mode: l.mode, started_at: l.started_at });
+    saveDb(db);
+    return l;
   }
 
   function getOnlineCount() {
     const ids = new Set();
-    readDb().lobbies.filter((l) => l.status === "open").forEach((l) => l.players.forEach((p) => ids.add(p)));
+    readDb().lobbies.filter((l) => l.status === "open" || l.status === "playing").forEach((l) => lobbyPlayers(l).forEach((p) => ids.add(p)));
     return ids.size;
   }
 
@@ -272,8 +343,8 @@
 
   function showBan(u) {
     stopTimers();
-    const until = u.ban_until >= PERMANENT ? "навсегда" : `до ${fmtDate(u.ban_until)}`;
-    $("#ban-text").textContent = `Вы забанены ${until} по причине: ${u.ban_reason || "не указана"}`;
+    const term = u.ban_until >= PERMANENT ? "Срок: навсегда." : `Срок: до ${fmtDate(u.ban_until)}.`;
+    $("#ban-text").textContent = `Вы заблокированы на серверах CYBERSHOKE. Причина: ${u.ban_reason || "не указана"}. Оспорить бан можно в поддержке @crymbog.\n${term}`;
     show("s-banned");
   }
 
@@ -319,7 +390,12 @@
     stopTimers();
     stack = [];
     navigate("matches", true);
-    timers.push(setInterval(() => { updateHeader(); if (stack[stack.length - 1] === "matches") loadLobbies(); }, 15000));
+    timers.push(setInterval(() => {
+      updateHeader();
+      const v = stack[stack.length - 1];
+      if (v === "matches") loadLobbies();
+      if (v === "lobby" && roomId) renderRoom(false);
+    }, 5000));
   }
 
   function updateHeader() {
@@ -351,57 +427,135 @@
     $$(".view").forEach((v) => v.classList.toggle("active", v.id === `v-${view}`));
     $$(".nav-item").forEach((n) => n.classList.toggle("active", n.dataset.view === view));
     $("main").scrollTop = 0;
-    ({ matches: loadLobbies, leaderboard: loadLeaderboard, missions: renderMissions, profile: loadProfile, subs: renderSubs, admin: renderAdminState })[view]();
+    ({ matches: loadLobbies, leaderboard: loadLeaderboard, missions: renderMissions, profile: loadProfile, subs: renderSubs, admin: renderAdminState, lobby: () => renderRoom(true) })[view]();
   }
 
   function closeModals() { $$(".modal").forEach((m) => m.classList.add("hidden")); }
 
   /* ----- Матчи ----- */
+  let roomId = null;
+  let joinTarget = null;
+  const isMember = (l) => lobbyPlayers(l).includes(TG_ID);
+  const guard = (fn) => { try { fn(); } catch (e) { toast(e.message, "err"); } };
+  const nameOf = (id) => { const u = getAllUsers().find((x) => x.tg_id === id); return u ? u.nickname : "Игрок"; };
+  const lobbyInfo = (l) => ({ lobby_id: l.id, map: l.map, mode: l.mode, players: lobbyPlayers(l).length, max_players: l.max_players });
+
   function loadLobbies() {
     const lobbies = getLobbies();
     $("#lobby-list").innerHTML = lobbies.length
-      ? lobbies.map((l) => `
+      ? lobbies.map((l) => {
+        const n = lobbyPlayers(l).length;
+        const action = isMember(l)
+          ? `<button class="btn primary sm" data-open="${l.id}" type="button">${ICON("game")}Открыть</button>`
+          : l.status === "playing" ? '<span class="pill gold">идёт матч</span>'
+          : n >= l.max_players ? '<span class="pill">заполнено</span>'
+          : `<button class="btn ghost sm" data-join="${l.id}" type="button">${ICON("game")}Войти</button>`;
+        return `
         <div class="card row">
           <div class="grow">
             <h3>${esc(l.map)} · ${esc(l.mode)}</h3>
             <div class="meta">
-              <span>${ICON("users")}${l.players.length}/${l.max_players}</span>
+              <span>${ICON("users")}${n}/${l.max_players}</span>
+              <span>${ICON("crown")}${esc(nameOf(l.owner_tg_id))}</span>
               <span>${ICON("clock")}${ago(l.created_at)}</span>
             </div>
           </div>
-          <button class="btn ghost sm" data-join="${l.id}" type="button">${ICON("game")}Войти</button>
-        </div>`).join("")
+          ${action}
+        </div>`;
+      }).join("")
       : `<div class="card empty">Активных лобби нет. Создайте первое.</div>`;
   }
 
   function openLobbyModal() {
     $("#sel-map").innerHTML = MAPS.map((m) => `<option>${esc(m)}</option>`).join("");
     $("#sel-mode").innerHTML = Object.keys(MODE_SIZE).map((m) => `<option>${esc(m)}</option>`).join("");
+    $("#sel-team").innerHTML = TEAMS.map((m) => `<option>${esc(m)}</option>`).join("");
     $("#m-lobby").classList.remove("hidden");
   }
 
   function submitLobby() {
-    try {
-      const lobby = createLobby($("#sel-map").value, $("#sel-mode").value);
-      notifyChannel({ type: "create", lobby_id: lobby.id, owner: me.nickname, map: lobby.map, mode: lobby.mode, players: 1, max_players: lobby.max_players });
+    guard(() => {
+      const l = createLobby($("#sel-map").value, $("#sel-mode").value, $("#sel-team").value);
+      notifyChannel({ type: "create", owner: me.nickname, ...lobbyInfo(l) });
       closeModals();
-      toast("Лобби создано");
-      updateHeader();
-      loadLobbies();
-    } catch (e) { toast(e.message, "err"); }
+      toast("Лобби создано. Вы хост");
+      openRoom(l.id);
+    });
   }
 
-  function doJoin(id) {
-    try {
-      const res = joinLobby(id);
-      if (res.lobby.players.length === 2) {
-        const owner = getAllUsers().find((u) => u.tg_id === res.lobby.owner_tg_id);
-        notifyChannel({ type: "join", lobby_id: res.lobby.id, owner: owner ? owner.nickname : "Игрок", joiner: me.nickname, map: res.lobby.map, mode: res.lobby.mode, players: 2, max_players: res.lobby.max_players });
+  function openTeamModal(id) {
+    const l = getLobbies().find((x) => x.id === Number(id));
+    if (!l) return toast("Лобби уже закрыто", "err");
+    joinTarget = l.id;
+    $("#team-info").textContent = `${l.map} · ${l.mode}`;
+    TEAMS.forEach((tm) => {
+      const btn = $(`#btn-team-${tm}`);
+      btn.querySelector("span").textContent = `${l.teams[tm].length}/${l.max_players / 2}`;
+      btn.disabled = l.teams[tm].length >= l.max_players / 2;
+    });
+    $("#m-team").classList.remove("hidden");
+  }
+
+  function doJoin(team) {
+    guard(() => {
+      const l = joinLobby(joinTarget, team);
+      if (lobbyPlayers(l).length === 2) notifyChannel({ type: "join", owner: nameOf(l.owner_tg_id), joiner: me.nickname, ...lobbyInfo(l) });
+      closeModals();
+      toast(`Вы вошли в команду ${team}`);
+      openRoom(l.id);
+    });
+  }
+
+  /* ----- Комната лобби ----- */
+  function openRoom(id) { roomId = Number(id); navigate("lobby"); }
+
+  function renderRoom(full) {
+    let l;
+    try { l = getLobby(roomId); } catch (e) {
+      toast(e.message, "err");
+      roomId = null;
+      if (stack.length > 1) back(); else navigate("matches", true);
+      return;
+    }
+    const isHost = l.owner_tg_id === TG_ID;
+    const cap = l.max_players / 2;
+    $("#room-title").textContent = `${l.map} · ${l.mode}`;
+    const st = $("#room-status");
+    st.textContent = l.status === "playing" ? "идёт матч" : "набор игроков";
+    st.className = `pill ${l.status === "playing" ? "gold" : "blue"}`;
+    TEAMS.forEach((tm) => {
+      $(`#count-${tm}`).textContent = `${l.teams[tm].length}/${cap}`;
+      $(`#room-${tm}`).innerHTML = l.teams[tm].length
+        ? l.teams[tm].map((id) => `<li>${ICON(id === l.owner_tg_id ? "crown" : "user")}<span>${esc(nameOf(id))}</span></li>`).join("")
+        : '<li class="muted">Пока никого</li>';
+    });
+    $$(".host-only").forEach((el) => el.classList.toggle("hidden", !isHost));
+    $$(".guest-only").forEach((el) => el.classList.toggle("hidden", isHost));
+    if (full) { $("#in-comment").value = l.comment; $("#in-code").value = l.code; }
+    $("#room-comment-view").textContent = l.comment || "Комментария нет";
+    $("#room-code-view").innerHTML = l.code ? `Код для CounterFlame: <b>${esc(l.code)}</b>` : '<span class="muted">Хост ещё не отправил код</span>';
+    $("#btn-room-start").disabled = l.status !== "open";
+    $("#leave-label").textContent = isHost ? "Закрыть лобби" : "Покинуть";
+  }
+
+  function roomAction(act) {
+    if (act === "room-refresh") { renderRoom(false); return toast("Состав обновлён"); }
+    guard(() => {
+      if (act === "room-comment") { setLobbyComment(roomId, $("#in-comment").value); toast("Комментарий сохранён"); }
+      if (act === "room-code") { sendLobbyCode(roomId, $("#in-code").value); toast("Код отправлен участникам"); }
+      if (act === "room-start") {
+        const l = startLobby(roomId);
+        notifyChannel({ type: "start", owner: me.nickname, ...lobbyInfo(l) });
+        toast("Матч начался");
       }
-      toast(res.started ? "Лобби заполнено, матч начался" : "Вы вошли в лобби");
-      updateHeader();
-      loadLobbies();
-    } catch (e) { toast(e.message, "err"); }
+      if (act === "room-leave") {
+        const closed = leaveLobby(roomId);
+        toast(closed ? "Лобби закрыто" : "Вы вышли из лобби");
+        roomId = null;
+        return back();
+      }
+      renderRoom(false);
+    });
   }
 
   /* ----- Лидерборд, миссии, подписки ----- */
@@ -430,11 +584,11 @@
 
   function renderSubs() {
     $("#subs-list").innerHTML = PLANS.map((p) => `
-      <div class="card plan ${p.featured ? "featured" : ""}">
+      <div class="card plan ${p.cls}">
         <div class="row" style="padding:0"><h3 class="grow">${esc(p.name)}</h3><span class="price">${esc(p.price)}</span></div>
         <ul>${p.perks.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
-        <button class="btn ${p.featured ? "gold" : "ghost"} wide" data-sub="${esc(p.name)}" type="button">${ICON("star")}Оформить</button>
-      </div>`).join("");
+        <button class="btn ${p.cls === "premium" ? "gold" : "lite"} wide" data-sub="${esc(p.id)}" type="button">${ICON("star")}Купить</button>
+      </div>`).join("") + '<p class="muted small">Оплата в Telegram Stars: после нажатия откроется чат с @crymbog.</p>';
   }
 
   /* ----- Профиль ----- */
@@ -448,7 +602,7 @@
     $("#p-avg").textContent = Number(me.avg).toFixed(1);
     const banner = $("#mute-banner");
     banner.classList.toggle("hidden", !me.is_muted);
-    if (me.is_muted) $("span", banner).textContent = `Вы заглушены ${me.mute_until >= PERMANENT ? "навсегда" : "до " + fmtDate(me.mute_until)}`;
+    if (me.is_muted) $("span", banner).textContent = `${me.mute_until >= PERMANENT ? "Вы заглушены навсегда" : "Вы заглушены до " + fmtDate(me.mute_until)}. Оспорить мут можно в поддержке @crymbog.`;
   }
 
   /* ----- Админка ----- */
@@ -532,15 +686,20 @@
   document.addEventListener("click", (ev) => {
     const el = ev.target.closest("button");
     if (!el) return;
-    if (el.dataset.join) return doJoin(el.dataset.join);
+    if (el.dataset.join) return openTeamModal(el.dataset.join);
+    if (el.dataset.open) return openRoom(el.dataset.open);
+    if (el.dataset.team) return doJoin(el.dataset.team);
     if (el.dataset.adm) return adminAction(el.dataset.adm, el.dataset.id);
-    if (el.dataset.sub) return toast("Оплата подписок скоро появится");
+    if (el.dataset.sub) return openSupport();
     if (el.dataset.view) return navigate(el.dataset.view, el.classList.contains("nav-item"));
     switch (el.dataset.act) {
       case "back": return back();
       case "close-modal": return closeModals();
       case "welcome-back": return closeApp();
       case "register-back": return show("s-welcome");
+      case "support": return openSupport();
+      case "room-refresh": case "room-comment": case "room-code": case "room-start": case "room-leave":
+        return roomAction(el.dataset.act);
     }
   });
 
