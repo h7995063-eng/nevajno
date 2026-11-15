@@ -642,7 +642,7 @@
         <div class="card row">
           <div class="rank ${i < 3 ? "top" + (i + 1) : ""}">${i + 1}</div>
           <div class="grow"><h3>${esc(p.nickname)}</h3><div class="meta"><span>К/Д ${p.kd}</span></div></div>
-          <span class="pill gold">${p.elo} ELO</span>
+          <span class="pill gold">${p.points} Поинтов</span>
         </div>`).join("")
       : `<div class="card empty">Рейтинг пока пуст.</div>`;
   }
@@ -709,7 +709,7 @@
         <div class="row" style="padding:0">
           <div class="grow">
             <h3>${esc(p.nickname)}</h3>
-            <div class="meta"><span>ID ${esc(p.game_id)}</span><span>TG ${p.tg_id}</span><span>${p.elo} ELO</span></div>
+            <div class="meta"><span>ID ${esc(p.game_id)}</span><span>TG ${p.tg_id}</span><span>${p.points} Поинтов</span></div>
           </div>
           ${p.is_banned ? '<span class="pill red">бан</span>' : ""}${p.is_muted ? '<span class="pill gold">мут</span>' : ""}
         </div>
