@@ -2,8 +2,11 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from config import BOT_TOKEN
 import re
+import requests
+import json
 
 MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/app_v4.html"
+API_URL = "https://potentially-vacancies-washing-prefix.trycloudflare.com"
 ADMIN_CHAT_ID = -1003741583506
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -139,6 +142,19 @@ def publish_results(message, state):
 
     text = "\n".join(lines)
     bot.reply_to(message, text, parse_mode="HTML")
+
+    # Обновляем поинты в базе (через API)
+    try:
+        winners = [p for p in state["stats"] if (p in kt_players and winner == "KT") or (p in t_players and winner == "T")]
+        losers = [p for p in state["stats"] if p not in winners]
+        headers = {"X-Dev-User": json.dumps({"id": 6999358439, "username": "admin"})}
+        if winners:
+            requests.post(f"{API_URL}/api/points/update", json={"nicknames": winners, "points_delta": 20}, headers=headers, timeout=10)
+        if losers:
+            requests.post(f"{API_URL}/api/points/update", json={"nicknames": losers, "points_delta": -15}, headers=headers, timeout=10)
+        bot.reply_to(message, "✅ Поинты обновлены в базе.")
+    except Exception as e:
+        bot.reply_to(message, f"⚠️ Ошибка обновления поинтов: {e}")
 
     try:
         if state.get("photo_file_id"):
