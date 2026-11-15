@@ -1008,6 +1008,7 @@ const API_URL = NOTIFY_URL;
     const p = getAllUsers().find((x) => x.tg_id === Number(id));
     if (!p) return;
     if (action === "ban" || action === "mute") {
+      toast("DEBUG: adminAction " + action + " for " + p.nickname, "ok");
       punish = { action, id: p.tg_id, nickname: p.nickname };
       $("#punish-title").textContent = action === "ban" ? "Бан игрока" : "Мут игрока";
       $("#punish-target").textContent = `${p.nickname} · ID ${p.game_id}`;
@@ -1035,6 +1036,7 @@ const API_URL = NOTIFY_URL;
 
   async function submitPunish() {
     toast("DEBUG: submitPunish called, punish=" + JSON.stringify(punish), "ok");
+    if (!punish) return toast("Ошибка: punish не установлен", "err");
     const err = $("#punish-error");
     err.classList.add("hidden");
     try {
