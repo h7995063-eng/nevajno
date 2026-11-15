@@ -851,19 +851,26 @@ const API_URL = NOTIFY_URL;
     const top3 = players.slice(0, 3);
     const rest = players.slice(3);
 
-    // Подиум (2, 1, 3)
+    // Функция для аватарки (с фото из localStorage или буквой)
+    const getAvatar = (nick) => {
+      const saved = localStorage_get("avatar_" + nick);
+      if (saved) return `<img src="${saved}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      return nick.charAt(0).toUpperCase();
+    };
+
+    // Функция для бейджика
+    const getBadge = (badge) => {
+      if (!badge) return "";
+      return `<img src="assets/badges/${badge}.png" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;margin-left:4px;" onerror="this.style.display='none'">`;
+    };
+
     let podiumHtml = "";
     if (top3.length >= 3) {
-      const getAvatar = (nick) => {
-        const saved = localStorage_get("avatar_" + nick);
-        if (saved) return `<img src="${saved}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-        return nick.charAt(0).toUpperCase();
-      };
       podiumHtml = `
         <div class="podium">
           <div class="podium-item pos-2">
             <div class="avatar">${getAvatar(top3[1].nickname)}</div>
-            <div class="nick">${esc(top3[1].nickname)}</div>
+            <div class="nick">${esc(top3[1].nickname)} ${getBadge(top3[1].badge)}</div>
             <div class="points">${top3[1].points} CP</div>
             <div class="podium-block">2</div>
           </div>
@@ -872,13 +879,13 @@ const API_URL = NOTIFY_URL;
               <svg class="crown" viewBox="0 0 24 24" fill="#f0b358"><path d="M2 18h20v2H2zM2 8l5 5 5-8 5 8 5-5v8H2z"/></svg>
               ${getAvatar(top3[0].nickname)}
             </div>
-            <div class="nick">${esc(top3[0].nickname)}</div>
+            <div class="nick">${esc(top3[0].nickname)} ${getBadge(top3[0].badge)}</div>
             <div class="points">${top3[0].points} CP</div>
             <div class="podium-block">1</div>
           </div>
           <div class="podium-item pos-3">
             <div class="avatar">${getAvatar(top3[2].nickname)}</div>
-            <div class="nick">${esc(top3[2].nickname)}</div>
+            <div class="nick">${esc(top3[2].nickname)} ${getBadge(top3[2].badge)}</div>
             <div class="points">${top3[2].points} CP</div>
             <div class="podium-block">3</div>
           </div>
@@ -886,11 +893,11 @@ const API_URL = NOTIFY_URL;
       `;
     }
 
-    // Остальной список (с 4 места)
     const restHtml = rest.map((p, i) => `
-      <div class="card row" style="margin-bottom:8px;">
+      <div class="card row" style="margin-bottom:8px; align-items:center;">
         <div class="rank" style="font-family:'Orbitron'; font-weight:900; color:var(--muted); width:32px;">#${i + 4}</div>
-        <div class="grow"><h3 style="margin:0;">${esc(p.nickname)}</h3></div>
+        <div class="avatar-small">${getAvatar(p.nickname)}</div>
+        <div class="grow"><h3 style="margin:0;">${esc(p.nickname)} ${getBadge(p.badge)}</h3></div>
         <span class="pill gold">${p.points} CP</span>
       </div>
     `).join("");

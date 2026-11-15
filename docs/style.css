@@ -428,3 +428,41 @@ main { flex: 1; overflow-y: auto; padding: 20px 18px calc(28px + var(--safe-bott
 body {
   background: linear-gradient(135deg, #0f1620 0%, #1a1a2e 50%, #0f1a20 100%) !important;
 }
+
+/* Аватарка в лидерборде (коронка над аватаркой) */
+.podium-item.pos-1 {
+  position: relative;
+}
+
+.podium-item.pos-1 .crown {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 0 8px rgba(240, 179, 88, 0.9));
+  animation: crownFloat 2s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes crownFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-4px); }
+}
+
+/* Маленькая аватарка в общем списке */
+.avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff4655, #00d9ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  color: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+}
