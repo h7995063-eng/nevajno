@@ -8,7 +8,6 @@ ADMIN_CHAT_ID = -1003741583506
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# Хранилище состояний (в памяти): user_id -> данные
 states = {}
 
 
@@ -30,7 +29,6 @@ def cmd_start(message):
 
 @bot.message_handler(content_types=["text"])
 def handle_text(message):
-    # Работаем только в админ-чате
     if message.chat.id != ADMIN_CHAT_ID:
         return
 
@@ -54,13 +52,18 @@ def handle_text(message):
             "current": 0,
             "stats": {},
             "caption": caption,
+            "photo_file_id": message.reply_to_message.photo[-1].file_id,
+            "stage": "stats",
         }
         ask_next_player(message)
         return
 
-    # Сценарий 2: админ вводит статистику (уже в процессе опроса)
-    if user_id in states:
-        state = states[user_id]
+    # Сценарий 2: админ вводит статистику
+    state = states.get(user_id)
+    if not state:
+        return
+
+    if state["stage"] == "stats":
         parts = text.split()
         if len(parts) != 3:
             bot.reply_to(message, "Ошибка: введите три числа через пробел (Киллы, Смерти, Ассисты).")
@@ -78,6 +81,14 @@ def handle_text(message):
         ask_next_player(message)
         return
 
+    if state["stage"] == "winner":
+        if text.upper() not in ("KT", "T"):
+            bot.reply_to(message, "Ошибка: напишите KT или T.")
+            return
+        state["winner"] = text.upper()
+        publish_results(message, state)
+        return
+
 
 def ask_next_player(message):
     user_id = message.from_user.id
@@ -87,7 +98,12 @@ def ask_next_player(message):
 
     idx = state["current"]
     if idx >= len(state["players"]):
-        publish_results(message, state)
+        state["stage"] = "winner"
+        bot.reply_to(
+            message,
+            "Все игроки опрошены. Кто победил? Напишите <b>KT</b> или <b>T</b>.",
+            parse_mode="HTML",
+        )
         return
 
     player = state["players"][idx]
@@ -102,7 +118,6 @@ def ask_next_player(message):
 def publish_results(message, state):
     lines = ["📊 <b>Результаты матча</b>\n"]
     caption = state.get("caption", "")
-    import re
     kt_players = []
     t_players = []
     match_kt = re.search(r"KT: (.+)", caption)
@@ -112,11 +127,12 @@ def publish_results(message, state):
     if match_t:
         t_players = [p.strip() for p in match_t.group(1).split(",") if p.strip()]
 
+    winner = state.get("winner", "KT")
     for player, s in state["stats"].items():
         if player in kt_players:
-            is_winner = state.get("winner", "KT") == "KT"
+            is_winner = winner == "KT"
         else:
-            is_winner = state.get("winner", "KT") == "T"
+            is_winner = winner == "T"
         points = 20 if is_winner else -15
         points_text = f"+{points} поинтов за победу" if is_winner else f"{points} поинтов за поражение"
         lines.append(f"{player}: {s['kills']}/{s['deaths']}/{s['assists']} (КД {s['kd']}) → {points_text}")
