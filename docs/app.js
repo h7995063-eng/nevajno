@@ -754,9 +754,7 @@ const API_URL = NOTIFY_URL;
       if (act === "room-comment") { setLobbyComment(roomId, $("#in-comment").value); toast("Комментарий сохранён"); }
       if (act === "room-code") { sendLobbyCode(roomId, $("#in-code").value); toast("Код отправлен участникам"); }
       if (act === "room-start") {
-        const l = startLobby(roomId);
-        notifyChannel({ type: "start", owner: me.nickname, ...lobbyInfo(l) });
-        toast("Матч начался");
+        confirmMatch();
       }
       if (act === "room-leave") {
         const closed = leaveLobby(roomId);
@@ -1155,6 +1153,34 @@ const API_URL = NOTIFY_URL;
         toast(data.error || "Ошибка", "err");
       }
     } catch (e) { toast("Ошибка сервера", "err"); }
+  };
+
+  window.confirmYes = async function() {
+    playSound("confirm");
+    confirmedPlayers[TG_ID] = true;
+    // Обновляем отображение (кто подтвердил)
+    const el = document.getElementById("confirm-players");
+    if (el) el.innerHTML = Object.keys(confirmedPlayers).map((id) => `<span style="color:#2bd97c;">✅ ${nameOf(Number(id))}</span>`).join(" ");
+    // Если все подтвердили — стартуем матч
+    try {
+      const res = await fetch(API_URL + "/api/lobbies", {
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      });
+      const data = await res.json();
+      const l = data.lobbies.find((x) => String(x.id) === String(roomId));
+      if (!l) return;
+      const allPlayers = (l.teams?.KT || []).concat(l.teams?.T || []);
+      const allConfirmed = allPlayers.every((id) => confirmedPlayers[id]);
+      if (allConfirmed) {
+        await startLobby(roomId);
+        document.getElementById("m-confirm").classList.add("hidden");
+        clearInterval(confirmTimer);
+        toast("Матч начался!", "ok");
+        renderRoom(true);
+      } else {
+        toast("Ожидаем остальных...", "ok");
+      }
+    } catch (e) { toast("Ошибка: " + e.message, "err"); }
   };
 
   boot();

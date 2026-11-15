@@ -274,5 +274,17 @@
     </div>
   </div>
 
+
+  <div id="m-confirm" class="modal hidden">
+    <div class="panel modal-box" style="max-width: 400px; text-align: center;">
+      <h2 style="color: #2bd97c; margin-bottom: 8px;">ВАШ МАТЧ ГОТОВ!</h2>
+      <p id="confirm-map" class="muted" style="margin-bottom: 16px;"></p>
+      <div style="font-size: 48px; font-family: Orbitron; font-weight: 900; color: #ff4655;" id="confirm-timer">30 сек</div>
+      <p class="muted" style="margin: 16px 0;">Подтвердите начало матча</p>
+      <div id="confirm-players" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px;"></div>
+      <button id="btn-confirm-yes" class="btn primary wide" type="button" onclick="confirmYes()">ПОДТВЕРДИТЬ</button>
+    </div>
+  </div>
+
 </body>
 </html>
