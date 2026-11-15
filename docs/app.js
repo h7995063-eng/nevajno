@@ -651,7 +651,7 @@ const API_URL = NOTIFY_URL;
     }
   }
 
-  function renderRoom(full) {
+  async function renderRoom(full) {
     let l;
     try {
       const res = await fetch(API_URL + "/api/lobbies", {
