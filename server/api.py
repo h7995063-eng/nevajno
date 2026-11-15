@@ -330,6 +330,95 @@ def api_online():
     return jsonify(online=online_count(), in_lobbies=in_lobbies)
 
 
+
+
+
+
+@app.post("/api/lobbies/<int:lobby_id>/leave")
+def api_lobbies_leave(lobby_id):
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    conn = db()
+    row = conn.execute("SELECT * FROM lobbies WHERE id=?", (lobby_id,)).fetchone()
+    if not row:
+        return jsonify(error="Лобби не найдено"), 404
+    teams = json.loads(row["teams"]) if row["teams"] else {"KT": [], "T": []}
+    for tm in ("KT", "T"):
+        if u["id"] in teams.get(tm, []):
+            teams[tm].remove(u["id"])
+    if row["owner_tg_id"] == u["id"]:
+        conn.execute("UPDATE lobbies SET status='closed' WHERE id=?", (lobby_id,))
+    else:
+        conn.execute("UPDATE lobbies SET teams=? WHERE id=?", (json.dumps(teams), lobby_id))
+    conn.commit()
+    return jsonify(ok=True)
+
+@app.post("/api/lobbies/<int:lobby_id>/join")
+def api_lobbies_join(lobby_id):
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    b = request.get_json(silent=True) or {}
+    team = b.get("team", "KT")
+    conn = db()
+    row = conn.execute("SELECT * FROM lobbies WHERE id=?", (lobby_id,)).fetchone()
+    if not row:
+        return jsonify(error="Лобби не найдено"), 404
+    if row["status"] != "open":
+        return jsonify(error="Лобби закрыто"), 400
+    teams = json.loads(row["teams"]) if row["teams"] else {"KT": [], "T": []}
+    if u["id"] in teams.get("KT", []) or u["id"] in teams.get("T", []):
+        return jsonify(error="Вы уже в лобби"), 400
+    if len(teams.get(team, [])) >= row["max_players"] // 2:
+        return jsonify(error="Команда заполнена"), 400
+    teams.setdefault(team, []).append(u["id"])
+    conn.execute("UPDATE lobbies SET teams=? WHERE id=?", (json.dumps(teams), lobby_id))
+    conn.commit()
+    return jsonify(ok=True)
+
+@app.post("/api/lobbies")
+def api_lobbies_post():
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    b = request.get_json(silent=True) or {}
+    map_name = b.get("map")
+    mode = b.get("mode")
+    team = b.get("team", "KT")
+    if map_name not in MAPS or mode not in MODES:
+        return jsonify(error="Неверная карта или режим"), 400
+    max_players = MODES[mode]
+    teams = {"KT": [], "T": []}
+    teams[team if team in teams else "KT"].append(u["id"])
+    conn = db()
+    cur = conn.execute(
+        "INSERT INTO lobbies (owner_tg_id, map, mode, max_players, teams, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (u["id"], map_name, mode, max_players, json.dumps(teams), now())
+    )
+    conn.commit()
+    return jsonify(ok=True, lobby_id=cur.lastrowid)
+
+@app.get("/api/lobbies")
+def api_lobbies_get():
+    rows = db().execute("SELECT * FROM lobbies WHERE status IN ('open', 'playing') ORDER BY created_at DESC LIMIT 50").fetchall()
+    lobbies = []
+    for r in rows:
+        teams = json.loads(r["teams"]) if r["teams"] else {"KT": [], "T": []}
+        lobbies.append({
+            "id": r["id"],
+            "owner_tg_id": r["owner_tg_id"],
+            "map": r["map"],
+            "mode": r["mode"],
+            "max_players": r["max_players"],
+            "teams": teams,
+            "comment": r["comment"],
+            "code": r["code"],
+            "status": r["status"],
+            "created_at": r["created_at"],
+        })
+    return jsonify(ok=True, lobbies=lobbies)
+
 @app.get("/api/leaderboard")
 @auth()
 def api_leaderboard():
