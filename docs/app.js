@@ -743,7 +743,6 @@ const API_URL = NOTIFY_URL;
             ${isAdmin ? `<button class="btn danger sm" data-del-news="${n.id}" type="button" style="width:auto;padding:4px 10px;font-size:11px;">Удалить</button>` : ""}
           </div>
           <p style="color:var(--muted); font-size:14px; margin-top:8px;">${esc(n.content)}</p>
-          <p style="color:var(--muted); font-size:11px; margin-top:8px;">Автор: ${esc(n.author)}</p>
         </div>
       `).join("");
     } catch (e) {
