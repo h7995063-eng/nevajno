@@ -20,7 +20,7 @@
     "Vertigo": "assets/maps/vertigo.webp",
     // Остальные пока без картинок
   };
-  const MODE_SIZE = { "1v1": 2, "5v5": 10, "DM": 16 };
+  const MODE_SIZE = { "1v1": 2, "5v5": 10, "DM": 10 };
   const MODE_INFO = {
     "1v1": "Дуэль до 13 раундов",
     "5v5": "Премьер, до 13 раундов",
