@@ -1041,7 +1041,7 @@ const API_URL = NOTIFY_URL;
         headers: {
           "Content-Type": "application/json",
           "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }),
-          "X-Admin-Password": window.ADMIN_PASSWORD || "",
+          "X-Admin-Password": window.ADMIN_PASSWORD || "shoke26",
         },
         body: JSON.stringify({ action: action === "unban" ? "unban" : "unmute", tg_id: p.tg_id }),
       });
@@ -1068,7 +1068,7 @@ const API_URL = NOTIFY_URL;
         headers: {
           "Content-Type": "application/json",
           "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }),
-          "X-Admin-Password": window.ADMIN_PASSWORD || "",
+          "X-Admin-Password": window.ADMIN_PASSWORD || "shoke26",
         },
         body: JSON.stringify({ action: punish.action, tg_id: punish.id, minutes, reason }),
       });
