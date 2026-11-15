@@ -783,29 +783,49 @@ def api_news_get():
 
 @app.post("/api/notify")
 def api_notify():
-    """Уведомление в канал для клиента, который хранит лобби локально."""
     u = tg_user()
     if not u or "id" not in u:
-        return jsonify(error="Не удалось проверить Telegram-сессию"), 401
-    t = now()
-    if t - LAST_NOTIFY.get(u["id"], 0) < 3:
-        return jsonify(error="Слишком часто"), 429
-    LAST_NOTIFY[u["id"]] = t
+        return jsonify(error="Не авторизован"), 401
     b = request.get_json(silent=True) or {}
-    try:
-        slots = f"{int(b.get('players', 1))}/{int(b.get('max_players', 2))}"
-    except (TypeError, ValueError):
-        return jsonify(error="Неверные данные"), 400
-    info = f"{b.get('map') if b.get('map') in MAPS else '—'} · {b.get('mode') if b.get('mode') in MODES else '—'} · {slots}"
+    lobby_id = b.get("lobby_id")
+    map_name = b.get("map", "—")
+    mode = b.get("mode", "—")
+    players = b.get("players", 1)
+    max_players = b.get("max_players", 2)
     owner = clean(b.get("owner")) or "Игрок"
-    kind = b.get("type")
-    if kind == "join":
-        text = f"Новый матч: {owner} vs {clean(b.get('joiner')) or 'Игрок'}\n{info}"
-    elif kind == "start":
-        text = f"Матч начался: {owner}\n{info}"
+    joiner = b.get("joiner")
+    notify_type = b.get("type", "create")
+
+    text = (
+        f"🎮 Лобби #{lobby_id}\n"
+        f"Карта: {map_name} · {mode}\n"
+        f"Хост: {owner}\n"
+        f"Игроки: {players}/{max_players}"
+    )
+    if joiner:
+        text += f"\nЗашёл: {clean(joiner)}"
+
+    import requests
+    conn = db()
+    row = conn.execute("SELECT channel_message_id FROM lobbies WHERE id=?", (lobby_id,)).fetchone()
+    msg_id = row["channel_message_id"] if row and row["channel_message_id"] else 0
+
+    if notify_type == "create" or not msg_id:
+        data = {"chat_id": CHANNEL_ID, "text": text}
+        if TOPIC_ID.isdigit():
+            data["message_thread_id"] = int(TOPIC_ID)
+        resp = requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", data=data, timeout=10)
+        if resp.ok:
+            new_msg_id = resp.json()["result"]["message_id"]
+            conn.execute("UPDATE lobbies SET channel_message_id=? WHERE id=?", (new_msg_id, lobby_id))
+            conn.commit()
     else:
-        text = f"Новое лобби: {owner}\n{info}"
-    send_channel_message(text)
+        requests.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText",
+            data={"chat_id": CHANNEL_ID, "message_id": msg_id, "text": text},
+            timeout=10
+        )
+    conn.close()
     return jsonify(ok=True)
 
 
