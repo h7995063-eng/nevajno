@@ -242,6 +242,7 @@ def public_user(row):
         "kd": row["kd"], "avg": row["avg"],
         "is_muted": bool(row["is_muted"]), "mute_until": row["mute_until"],
         "is_admin": row["tg_id"] in ADMIN_IDS,
+        "badge": row["badge"] if "badge" in row.keys() else "",
     }
 
 
