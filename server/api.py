@@ -711,10 +711,31 @@ def api_news_post():
     conn.commit()
     return jsonify(ok=True)
 
+
+@app.get("/api/news/photo/<file_id>")
+def api_news_photo(file_id):
+    import requests
+    from flask import Response
+    try:
+        # Получаем путь к файлу через Telegram API
+        r = requests.get(f"https://api.telegram.org/bot{BOT_TOKEN}/getFile?file_id={file_id}", timeout=10)
+        data = r.json()
+        if not data.get("ok"):
+            return jsonify(error="Файл не найден"), 404
+        file_path = data["result"]["file_path"]
+        # Скачиваем файл
+        file_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
+        file_resp = requests.get(file_url, timeout=15)
+        if not file_resp.ok:
+            return jsonify(error="Ошибка скачивания"), 500
+        return Response(file_resp.content, mimetype=file_resp.headers.get("Content-Type", "image/jpeg"))
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+
 @app.get("/api/news")
 def api_news_get():
     rows = db().execute("SELECT * FROM news ORDER BY created_at DESC LIMIT 50").fetchall()
-    news = [{"id": r["id"], "title": r["title"], "content": r["content"], "author": r["author"], "created_at": r["created_at"]} for r in rows]
+    news = [{"id": r["id"], "title": r["title"], "content": r["content"], "author": r["author"], "photo_id": r["photo_id"] if "photo_id" in r.keys() else "", "created_at": r["created_at"]} for r in rows]
     return jsonify(ok=True, news=news)
 
 @app.post("/api/notify")
