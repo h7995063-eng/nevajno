@@ -530,6 +530,7 @@
     
     const l = lobbies.find((x) => String(x.id) === String(id));
     if (!l) return toast("Лобби уже закрыто", "err");
+    joinTarget = l.id;  // <-- ВАЖНО: устанавливаем ID лобби для входа
     // Автоматически выбираем команду, где меньше игроков (или случайно, если поровну)
     const ktCount = l.teams.KT.length;
     const tCount = l.teams.T.length;
