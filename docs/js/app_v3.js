@@ -370,14 +370,18 @@
     try {
       initDb();
       wait(900).then(() => {
-        const user = getUser();
-        if (!user) return show(localStorage_get("terms") === "1" ? "s-register" : "s-welcome");
-        if (user.is_banned) return showBan(user);
-        me = user;
-        enterApp();
+        try {
+          const user = getUser();
+          if (!user) return show(localStorage_get("terms") === "1" ? "s-register" : "s-welcome");
+          if (user.is_banned) return showBan(user);
+          me = user;
+          enterApp();
+        } catch (e) {
+          $("#load-msg").textContent = "Ошибка: " + e.message;
+        }
       });
     } catch (e) {
-      $("#load-msg").textContent = e.message;
+      $("#load-msg").textContent = "Ошибка initDb: " + e.message;
       $("#btn-retry").classList.remove("hidden");
     }
   }
