@@ -518,15 +518,17 @@ const API_URL = NOTIFY_URL;
     $("#m-lobby").classList.remove("hidden");
   }
 
-  function submitLobby() {
-    guard(() => {
+  async function submitLobby() {
+    try {
       const team = Math.random() < 0.5 ? "KT" : "T";
-      const l = createLobby($("#sel-map").value, $("#sel-mode").value, team);
-      notifyChannel({ type: "create", owner: me.nickname, ...lobbyInfo(l) });
+      const lobbyId = await createLobby($("#sel-map").value, $("#sel-mode").value, team);
+      notifyChannel({ type: "create", owner: me.nickname, lobby_id: lobbyId, map: $("#sel-map").value, mode: $("#sel-mode").value, players: 1, max_players: MODE_SIZE[$("#sel-mode").value] });
       closeModals();
       toast(`Лобби создано. Вы хост, ваша команда: ${team}`);
-      openRoom(l.id);
-    });
+      openRoom(lobbyId);
+    } catch (e) {
+      toast(e.message, "err");
+    }
   }
 
   
