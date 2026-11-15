@@ -460,7 +460,7 @@ const API_URL = NOTIFY_URL;
     $$(".view").forEach((v) => v.classList.toggle("active", v.id === `v-${view}`));
     $$(".nav-item").forEach((n) => n.classList.toggle("active", n.dataset.view === view));
     $("main").scrollTop = 0;
-    ({ matches: loadLobbies, leaderboard: loadLeaderboard, missions: renderMissions, profile: loadProfile, subs: renderSubs, admin: renderAdminState, lobby: () => renderRoom(true) })[view]();
+    ({ matches: loadLobbies, leaderboard: loadLeaderboard, missions: renderMissions, profile: loadProfile, subs: renderSubs, admin: renderAdminState, news: loadNews, lobby: () => renderRoom(true) })[view]();
   }
 
   function closeModals() { $$(".modal").forEach((m) => m.classList.add("hidden")); }
@@ -653,6 +653,31 @@ const API_URL = NOTIFY_URL;
   }
 
   /* ----- Лидерборд, миссии, подписки ----- */
+
+  async function loadNews() {
+    const el = $("#news-list");
+    el.innerHTML = '<div class="loader"></div>';
+    try {
+      const res = await fetch(API_URL + "/api/news", {
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      });
+      const data = await res.json();
+      if (!data.ok || !data.news.length) {
+        el.innerHTML = '<div class="card empty">Пока нет новостей.</div>';
+        return;
+      }
+      el.innerHTML = data.news.map((n) => `
+        <div class="card" style="margin-bottom:12px;">
+          <h3>${esc(n.title)}</h3>
+          <p style="color:var(--muted); font-size:14px; margin-top:8px;">${esc(n.content)}</p>
+          <p style="color:var(--muted); font-size:11px; margin-top:8px;">Автор: ${esc(n.author)}</p>
+        </div>
+      `).join("");
+    } catch (e) {
+      el.innerHTML = '<div class="card empty">Ошибка загрузки новостей.</div>';
+    }
+  }
+
   function loadLeaderboard() {
     const players = getLeaderboard();
     if (!players.length) {
@@ -918,6 +943,34 @@ const API_URL = NOTIFY_URL;
         toast("Аватарка обновлена ✅", "ok");
       };
       reader.readAsDataURL(file);
+    });
+  }
+
+
+  // Создание новости (только админ)
+  const btnNewsSubmit = document.getElementById("btn-news-submit");
+  if (btnNewsSubmit) {
+    btnNewsSubmit.addEventListener("click", async () => {
+      const title = $("#in-news-title").value.trim();
+      const content = $("#in-news-content").value.trim();
+      if (!title || !content) return toast("Заполните заголовок и текст", "err");
+      try {
+        const res = await fetch(API_URL + "/api/news", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+          body: JSON.stringify({ title, content }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast("Новость опубликована ✅", "ok");
+          closeModals();
+          $("#in-news-title").value = "";
+          $("#in-news-content").value = "";
+          loadNews();
+        } else {
+          toast(data.error || "Ошибка", "err");
+        }
+      } catch (e) { toast("Ошибка сервера", "err"); }
     });
   }
 
