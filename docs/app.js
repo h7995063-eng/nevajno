@@ -300,7 +300,9 @@
   function joinLobby(id, team) {
     const db = readDb();
     requireActiveUser(db);
-    const l = findLobby(db, id);
+    // Ищем лобби по id (число или строка)
+    const l = db.lobbies.find((x) => String(x.id) === String(id) && (x.status === "open" || x.status === "playing"));
+    if (!l) throw new Error("Лобби не найдено или уже закрыто");
     if (l.status !== "open") throw new Error("Матч уже начался");
     if (lobbyPlayers(l).includes(TG_ID)) throw new Error("Вы уже в этом лобби");
     if (!TEAMS.includes(team)) throw new Error("Выберите команду");
@@ -526,7 +528,7 @@
     const lobbies = getLobbies();
     
     
-    const l = lobbies.find((x) => x.id === Number(id));
+    const l = lobbies.find((x) => String(x.id) === String(id));
     if (!l) return toast("Лобби уже закрыто", "err");
     // Автоматически выбираем команду, где меньше игроков (или случайно, если поровну)
     const ktCount = l.teams.KT.length;
