@@ -39,6 +39,7 @@ def handle_text(message):
     # Сценарий 1: ответ на фото (скриншот) — начинаем опрос
     if message.reply_to_message and message.reply_to_message.photo:
         caption = message.reply_to_message.caption or ""
+        print(f"[DEBUG CAPTION] {caption}", flush=True)
         players = []
         match = re.search(r"Игроки: ([^\n]+)", caption)
         if match:
