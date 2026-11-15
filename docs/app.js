@@ -611,6 +611,7 @@ const API_URL = NOTIFY_URL;
       const l = data.lobbies.find((x) => String(x.id) === String(joinTarget));
       if (l) {
         const players = (l.teams?.KT?.length || 0) + (l.teams?.T?.length || 0);
+        toast("DEBUG: joinTarget=" + joinTarget + " | players=" + players + " | joiner=" + me.nickname, "ok");
         notifyChannel({ type: "join", lobby_id: l.id, map: l.map, mode: l.mode, players, max_players: l.max_players, owner: nameOf(l.owner_tg_id), joiner: me.nickname });
       }
       closeModals();
