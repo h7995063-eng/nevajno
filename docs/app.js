@@ -101,7 +101,18 @@ const API_URL = NOTIFY_URL;
     return id || TEST_TG_ID;
   }
   const DEV_ID = resolveDevId();
-  const TG_ID = Number((readTgUser() || {}).id) || DEV_ID;
+  const TG_ID = (() => {
+    // 1. Пробуем взять tg_id из URL (?tg_id=...)
+    try {
+      const urlId = new URLSearchParams(location.search).get("tg_id");
+      if (urlId && /^\d+$/.test(urlId)) return Number(urlId);
+    } catch (e) { /* нет URL */ }
+    // 2. Пробуем из initData
+    const tgUser = readTgUser();
+    if (tgUser && tgUser.id) return Number(tgUser.id);
+    // 3. Fallback: DEV_ID
+    return DEV_ID;
+  })();
 
   function closeApp() {
     if (tg && tg.close) tg.close(); else toast("Закройте вкладку, чтобы выйти");
@@ -481,7 +492,7 @@ const API_URL = NOTIFY_URL;
         el.innerHTML = '<div class="card empty">Активных лобби нет. Создайте первое.</div>';
         return;
       }
-      el.innerHTML = `<div style="color:#ff4655; font-size:11px; margin-bottom:8px; padding:8px; background:rgba(255,0,0,0.1); border-radius:8px;">DEBUG: TG_ID = ${TG_ID}</div>` + data.lobbies.map((l) => {
+      el.innerHTML = data.lobbies.map((l) => {
         const n = (l.teams?.KT?.length || 0) + (l.teams?.T?.length || 0);
         const isMember = (l.teams?.KT || []).includes(TG_ID) || (l.teams?.T || []).includes(TG_ID);
         const isHost = l.owner_tg_id === TG_ID;
