@@ -522,9 +522,9 @@
   }
 
   function openTeamModal(id) {
-    console.log("[DEBUG] openTeamModal called with id:", id, "type:", typeof id);
     const lobbies = getLobbies();
-    console.log("[DEBUG] getLobbies() returned:", lobbies.map((x) => x.id));
+    const debugMsg = `ID: ${id} (${typeof id}) | Лобби: ${lobbies.map((x) => x.id).join(", ") || "нет"}`;
+    toast(debugMsg, "err");
     const l = lobbies.find((x) => x.id === Number(id));
     if (!l) return toast("Лобби уже закрыто", "err");
     // Автоматически выбираем команду, где меньше игроков (или случайно, если поровну)
