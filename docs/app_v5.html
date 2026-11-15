@@ -249,11 +249,24 @@
 <script src="app.js?v=200"></script>
 
   <div id="m-news" class="modal hidden">
-    <div class="panel modal-box">
-      <div class="screen-head"><button class="icon-btn" data-act="close-modal" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Новая новость</h2></div>
-      <label class="field"><span>Заголовок</span><input id="in-news-title" class="input" type="text" placeholder="Заголовок новости"></label>
-      <label class="field"><span>Текст</span><textarea id="in-news-content" class="input" rows="5" placeholder="Текст новости"></textarea></label>
-      <button id="btn-news-submit" class="btn primary wide" type="button">Опубликовать</button>
+    <div class="panel modal-box" style="max-width: 500px;">
+      <div class="screen-head" style="margin-bottom: 16px;">
+        <button class="icon-btn" data-act="close-modal" aria-label="Назад"><svg><use href="#i-back"/></svg></button>
+        <h2>Новая новость</h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <label class="field">
+          <span style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Заголовок</span>
+          <input id="in-news-title" class="input" type="text" placeholder="Например: Обновление 1.0" style="margin-top: 6px;">
+        </label>
+        <label class="field">
+          <span style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Текст</span>
+          <textarea id="in-news-content" class="input" rows="6" placeholder="Напишите текст новости..." style="margin-top: 6px; resize: vertical;"></textarea>
+        </label>
+        <button id="btn-news-submit" class="btn primary wide" type="button" style="margin-top: 8px;">
+          <svg><use href="#i-send"/></svg>Опубликовать
+        </button>
+      </div>
     </div>
   </div>
 
