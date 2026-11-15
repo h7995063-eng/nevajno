@@ -1,4 +1,4 @@
-const API_URL = "https://lucas-victory-editions-mills.trycloudflare.com";
+const API_URL = "https://api.trycloudflare.com";
 (() => {
   "use strict";
 
