@@ -413,8 +413,18 @@ main { flex: 1; overflow-y: auto; padding: 20px 18px calc(28px + var(--safe-bott
   50% { transform: translateX(-50%) translateY(-4px); }
 }
 
-/* Полупрозрачный тёмный фон (без картинки) */
+
+
+/* Светлый градиентный фон */
 #s-main {
-  background: rgba(10, 14, 20, 0.85) !important;
-  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg,
+    rgba(20, 30, 50, 0.85) 0%,
+    rgba(40, 30, 70, 0.75) 50%,
+    rgba(20, 40, 60, 0.85) 100%) !important;
+  backdrop-filter: blur(12px);
+}
+
+/* Общий фон приложения (светлее) */
+body {
+  background: linear-gradient(135deg, #0f1620 0%, #1a1a2e 50%, #0f1a20 100%) !important;
 }
