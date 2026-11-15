@@ -39,7 +39,7 @@ def handle_text(message):
     if message.reply_to_message and message.reply_to_message.photo:
         caption = message.reply_to_message.caption or ""
         players = []
-        match = re.search(r"Игроки: (.+)", caption)
+        match = re.search(r"Игроки: ([^\n]+)", caption)
         if match:
             players = [p.strip() for p in match.group(1).split(",") if p.strip()]
 
@@ -120,10 +120,10 @@ def publish_results(message, state):
     caption = state.get("caption", "")
     kt_players = []
     t_players = []
-    match_kt = re.search(r"KT: (.+)", caption)
+    match_kt = re.search(r"KT: ([^\n]+)", caption)
     if match_kt:
         kt_players = [p.strip() for p in match_kt.group(1).split(",") if p.strip()]
-    match_t = re.search(r"T: (.+)", caption)
+    match_t = re.search(r"T: ([^\n]+)", caption)
     if match_t:
         t_players = [p.strip() for p in match_t.group(1).split(",") if p.strip()]
 
