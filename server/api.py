@@ -675,16 +675,13 @@ def api_news_post():
     content = b.get("content", "").strip()
     if not title or not content:
         return jsonify(error="Заполните заголовок и текст"), 400
-    conn = get_conn()
-    try:
-        conn.execute(
-            "INSERT INTO news (title, content, author, created_at) VALUES (?, ?, ?, ?)",
-            (title, content, u.get("username", "admin"), now())
-        )
-        conn.commit()
-        return jsonify(ok=True)
-    finally:
-        conn.close()
+    conn = db()
+    conn.execute(
+        "INSERT INTO news (title, content, author, created_at) VALUES (?, ?, ?, ?)",
+        (title, content, u.get("username", "admin"), now())
+    )
+    conn.commit()
+    return jsonify(ok=True)
 
 @app.get("/api/news")
 def api_news_get():
