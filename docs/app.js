@@ -1079,6 +1079,7 @@ const API_URL = NOTIFY_URL;
     const title = document.getElementById("in-news-title").value.trim();
     const content = document.getElementById("in-news-content").value.trim();
     const photoInput = document.getElementById("in-news-photo");
+    toast("DEBUG: title=" + title + " | content=" + content, "ok");
     if (!title || !content) return toast("Заполните заголовок и текст", "err");
     const formData = new FormData();
     formData.append("title", title);
