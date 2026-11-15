@@ -144,7 +144,8 @@
           <button class="btn ghost" data-act="room-refresh" type="button"><svg><use href="#i-refresh"/></svg>Обновить</button>
           <button id="btn-room-start" class="btn primary host-only" data-act="room-start" type="button"><svg><use href="#i-game"/></svg>Начать матч</button>
           <button class="btn danger" data-act="room-leave" type="button"><svg><use href="#i-close"/></svg><span id="leave-label">Покинуть</span></button>
-          <button class="btn ghost" data-act="room-submit" type="button"><svg><use href="#i-send"/></svg>Отправить результаты</button>
+          <input type="file" id="result-screenshot" accept="image/*" style="display:none;">
+          <button class="btn ghost" type="button" onclick="document.getElementById('result-screenshot').click()"><svg><use href="#i-send"/></svg>Отправить результаты</button>
         </div>
       </div>
 

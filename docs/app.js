@@ -533,27 +533,35 @@
   /* ----- Комната лобби ----- */
   function openRoom(id) { roomId = Number(id); navigate("lobby"); }
 
-  function submitMatchResult() {
-    guard(() => {
+  async function submitMatchResult() {
+    guard(async () => {
       const l = getLobby(roomId);
-      if (l.status !== "playing" && l.status !== "open") throw new Error("Матч ещё не начался");
-      const score_a = prompt("Счёт KT (например, 13):");
-      if (score_a === null) return;
-      const score_b = prompt("Счёт T (например, 10):");
-      if (score_b === null) return;
-      const winner = Number(score_a) > Number(score_b) ? "KT" : "T";
-      const payload = {
-        lobby_id: l.id,
-        map: l.map,
-        mode: l.mode,
-        score_kt: Number(score_a),
-        score_t: Number(score_b),
-        winner: winner,
-        owner: me.nickname,
-        players: lobbyPlayers(l).map((id) => nameOf(id)),
-      };
-      notifyChannel({ type: "result", ...payload });
-      toast("Результат отправлен на проверку ✅", "ok");
+      const fileInput = document.getElementById("result-screenshot");
+      if (!fileInput.files.length) {
+        toast("Выберите скриншот матча", "err");
+        return;
+      }
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append("screenshot", file);
+      formData.append("lobby_id", l.id);
+      formData.append("map", l.map);
+      formData.append("mode", l.mode);
+      formData.append("owner", me.nickname);
+      formData.append("players", JSON.stringify(lobbyPlayers(l).map((id) => nameOf(id))));
+
+      try {
+        const res = await fetch((NOTIFY_URL || "") + "/api/match/submit", {
+          method: "POST",
+          headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+          body: formData,
+        });
+        if (!res.ok) throw new Error("Ошибка отправки");
+        toast("Скриншот отправлен админу ✅", "ok");
+        fileInput.value = "";
+      } catch (e) {
+        toast("Ошибка отправки: " + e.message, "err");
+      }
     });
   }
 
