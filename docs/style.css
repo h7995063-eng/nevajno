@@ -1,7 +1,9 @@
 :root {
   --bg: #0a0e14;
   --red: #ff4655;
-  --blue: #00d9ff;
+  --blue: #6080ff;
+  --lite: #6080ff;
+  --premium: #f0b358;
   --gold: #f0b358;
   --glass: rgba(255, 255, 255, 0.05);
   --glass-strong: rgba(255, 255, 255, 0.09);
@@ -18,8 +20,10 @@ body {
   font-family: "Rajdhani", system-ui, sans-serif;
   font-size: 17px; font-weight: 500; color: var(--text); background: var(--bg);
   background-image:
-    radial-gradient(60vw 60vw at 85% -10%, rgba(255, 70, 85, 0.16), transparent 60%),
-    radial-gradient(55vw 55vw at -10% 105%, rgba(0, 217, 255, 0.13), transparent 60%);
+    radial-gradient(70vw 55vw at 92% -8%, rgba(255, 70, 85, 0.30), transparent 62%),
+    radial-gradient(65vw 65vw at -12% 105%, rgba(96, 128, 255, 0.32), transparent 60%),
+    radial-gradient(45vw 35vw at 55% 112%, rgba(240, 179, 88, 0.14), transparent 60%),
+    linear-gradient(160deg, #0a1430 0%, #0a0e14 55%, #14080d 100%);
   background-attachment: fixed; overflow: hidden;
 }
 h1, h2, h3, .brand, .nav-item, .btn, b { font-family: "Orbitron", "Rajdhani", sans-serif; }
@@ -40,6 +44,7 @@ input, select { font: inherit; color: inherit; }
 .glass, .panel, .card {
   background: var(--glass); border: 1px solid var(--line); border-radius: 18px;
   -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 .panel { padding: 22px; width: 100%; display: flex; flex-direction: column; gap: 16px; }
 .narrow { max-width: 440px; margin: auto; }
@@ -47,7 +52,8 @@ input, select { font: inherit; color: inherit; }
 .lead { font-size: 19px; line-height: 1.4; }
 
 /* Loading */
-.logo-xl { width: 92px; height: 92px; color: var(--red); filter: drop-shadow(0 0 18px rgba(255, 70, 85, 0.55)); }
+.logo-xl { width: 150px; height: auto; max-height: 150px; object-fit: contain; color: var(--red); filter: drop-shadow(0 0 18px rgba(255, 70, 85, 0.55)); }
+svg.logo-xl { width: 92px; height: 92px; }
 .brand { font-size: 30px; font-weight: 900; letter-spacing: 0.08em; }
 .brand-sub { font-family: "Orbitron"; color: var(--blue); letter-spacing: 0.4em; margin-top: -8px; }
 .spinner { position: relative; width: 64px; height: 64px; margin: 14px 0; }
@@ -104,12 +110,12 @@ input, select { font: inherit; color: inherit; }
   border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 22px; }
 .side-logo, .top-logo { display: flex; align-items: center; gap: 10px; color: var(--red); }
 .side-logo b, .top-logo b { color: var(--text); font-size: 14px; letter-spacing: 0.08em; }
-.side-logo svg, .top-logo svg { width: 28px; height: 28px; }
+.side-logo svg, .top-logo svg, .side-logo img, .top-logo img { width: 28px; height: 28px; object-fit: contain; }
 .sidebar nav { display: grid; gap: 6px; }
 .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; font-size: 12px;
   font-weight: 700; letter-spacing: 0.06em; color: var(--muted); text-align: left; border: 1px solid transparent; }
 .nav-item:hover { background: var(--glass); color: var(--text); }
-.nav-item.active { background: rgba(0, 217, 255, 0.1); border-color: rgba(0, 217, 255, 0.35); color: var(--blue); }
+.nav-item.active { background: rgba(96, 128, 255, 0.1); border-color: rgba(96, 128, 255, 0.35); color: var(--blue); }
 .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
 .content { height: 100%; margin-left: var(--side); display: flex; flex-direction: column; }
 .topbar { display: flex; align-items: center; gap: 12px; padding: calc(12px + var(--safe-top)) 18px 12px;
@@ -119,7 +125,7 @@ input, select { font: inherit; color: inherit; }
 .chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--glass); }
 .chip b { font-size: 13px; }
 .chip.gold { color: var(--gold); border-color: rgba(240, 179, 88, 0.4); }
-.chip.blue { color: var(--blue); border-color: rgba(0, 217, 255, 0.4); }
+.chip.blue { color: var(--blue); border-color: rgba(96, 128, 255, 0.4); }
 main { flex: 1; overflow-y: auto; padding: 20px 18px calc(28px + var(--safe-bottom)); }
 .view { display: none; max-width: 760px; margin: 0 auto; }
 .view.active { display: block; }
@@ -163,9 +169,9 @@ main { flex: 1; overflow-y: auto; padding: 20px 18px calc(28px + var(--safe-bott
 .admin-row { flex-direction: column; align-items: stretch; gap: 0; }
 
 /* Modal / toast */
-.modal { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px;
+.modal { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px;
   background: rgba(0, 0, 0, 0.65); }
-.modal-box { max-width: 420px; background: #111821; }
+.modal-box { max-width: 420px; background: rgba(255, 255, 255, 0.05); }
 .toast { position: fixed; left: 50%; bottom: calc(24px + var(--safe-bottom)); transform: translate(-50%, 30px); z-index: 100;
   padding: 12px 18px; border-radius: 12px; background: rgba(20, 26, 36, 0.95); border: 1px solid var(--line);
   opacity: 0; pointer-events: none; transition: all 0.25s; max-width: 90vw; text-align: center; }
@@ -184,3 +190,41 @@ main { flex: 1; overflow-y: auto; padding: 20px 18px calc(28px + var(--safe-bott
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ---- Цвета CYBERSHOKE: PREMIUM #f0b358, LITE #6080ff, акцент #ff4655 ---- */
+.topbar { border-bottom: 1px solid; border-image: linear-gradient(90deg, rgba(255, 70, 85, 0.7), rgba(96, 128, 255, 0.7), rgba(240, 179, 88, 0.7)) 1; }
+.btn.lite { background: linear-gradient(135deg, #6080ff, #3d57c7); border-color: transparent; box-shadow: 0 6px 22px rgba(96, 128, 255, 0.3); }
+.btn.gold { box-shadow: 0 6px 22px rgba(240, 179, 88, 0.25); }
+.btn.wide + .btn.wide { margin-top: 10px; }
+.pill.blue { color: var(--lite); border-color: var(--lite); }
+.plan.premium { background: linear-gradient(135deg, rgba(240, 179, 88, 0.26), rgba(255, 70, 85, 0.08) 55%, rgba(255, 255, 255, 0.04)); border-color: rgba(240, 179, 88, 0.6); }
+.plan.lite { background: linear-gradient(135deg, rgba(96, 128, 255, 0.26), rgba(255, 255, 255, 0.04) 60%); border-color: rgba(96, 128, 255, 0.6); }
+.plan.premium h3, .plan.premium .price { color: var(--premium); }
+.plan.lite h3, .plan.lite .price { color: var(--lite); }
+
+/* ---- Лобби ---- */
+.teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+.team h3 { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; }
+.team ul { list-style: none; display: grid; gap: 8px; }
+.team li { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.team li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.team.kt { border-color: rgba(96, 128, 255, 0.5); background: linear-gradient(160deg, rgba(96, 128, 255, 0.2), rgba(255, 255, 255, 0.04)); }
+.team.kt h3, .team.kt li svg { color: var(--lite); }
+.team.t { border-color: rgba(240, 179, 88, 0.5); background: linear-gradient(160deg, rgba(240, 179, 88, 0.2), rgba(255, 255, 255, 0.04)); }
+.team.t h3, .team.t li svg { color: var(--premium); }
+.room-card { display: grid; gap: 10px; margin-bottom: 12px; }
+.textarea { width: 100%; padding: 12px 14px; resize: vertical; border-radius: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--line); outline: 0; }
+.textarea:focus { border-color: var(--blue); }
+.comment { white-space: pre-wrap; word-break: break-word; margin-top: 4px; }
+.code-view { font-size: 18px; padding: 4px 0; word-break: break-all; }
+.code-view b { color: var(--premium); letter-spacing: 0.06em; }
+.actions-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.actions-row .btn { flex: 1 1 140px; }
+#ban-text { white-space: pre-line; }
+.banner { flex-wrap: wrap; }
+.banner .btn { margin-left: auto; }
+
+/* Поддержка: отдельная кнопка в самом низу меню */
+.side-support { margin-top: auto; padding-bottom: calc(12px + var(--safe-bottom)); border-color: rgba(96, 128, 255, 0.45); color: var(--lite); background: linear-gradient(135deg, rgba(96, 128, 255, 0.18), rgba(255, 255, 255, 0.04)); }
+.side-support:hover { color: var(--text); }
+.logo-img { object-fit: contain; }
