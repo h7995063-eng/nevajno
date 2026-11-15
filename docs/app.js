@@ -475,7 +475,11 @@ const API_URL = NOTIFY_URL;
 
   function loadLobbies() {
     const lobbies = getLobbies();
-    $("#lobby-list").innerHTML = lobbies.length
+    // Отладка: показываем команды в лобби
+    const debugHtml = `<div style="color:#ff4655; font-size:11px; margin-bottom:8px; padding:8px; background:rgba(255,0,0,0.1); border-radius:8px;">
+      DEBUG: ${lobbies.map(l => `ID:${l.id} owner:${l.owner_tg_id} KT:[${l.teams.KT.join(",")}] T:[${l.teams.T.join(",")}]`).join("<br>")}
+    </div>`;
+    $("#lobby-list").innerHTML = debugHtml + (lobbies.length
       ? lobbies.map((l) => {
         const n = lobbyPlayers(l).length;
         const action = isMember(l)
