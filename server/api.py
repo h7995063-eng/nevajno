@@ -571,13 +571,9 @@ def api_news_post():
 
 @app.get("/api/news")
 def api_news_get():
-    conn = get_conn()
-    try:
-        rows = conn.execute("SELECT * FROM news ORDER BY created_at DESC LIMIT 50").fetchall()
-        news = [{"id": r["id"], "title": r["title"], "content": r["content"], "author": r["author"], "created_at": r["created_at"]} for r in rows]
-        return jsonify(ok=True, news=news)
-    finally:
-        conn.close()
+    rows = db().execute("SELECT * FROM news ORDER BY created_at DESC LIMIT 50").fetchall()
+    news = [{"id": r["id"], "title": r["title"], "content": r["content"], "author": r["author"], "created_at": r["created_at"]} for r in rows]
+    return jsonify(ok=True, news=news)
 
 @app.post("/api/notify")
 def api_notify():
