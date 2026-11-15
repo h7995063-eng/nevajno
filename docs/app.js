@@ -742,7 +742,7 @@ const API_URL = NOTIFY_URL;
             <h3 style="flex:1;">${esc(n.title)}</h3>
             ${isAdmin ? `<button class="btn danger sm" data-del-news="${n.id}" type="button" style="width:auto;padding:4px 10px;font-size:11px;">Удалить</button>` : ""}
           </div>
-          ${n.photo_id ? `<img src="https://api.telegram.org/file/bot${BOT_TOKEN}/${n.photo_id}" style="width:100%; border-radius:12px; margin-top:8px;" onerror="this.style.display='none'">` : ""}
+          ${n.photo_id ? `<img src="${API_URL}/api/news/photo/${n.photo_id}" style="width:100%; border-radius:12px; margin-top:8px;" onerror="this.style.display='none'">` : ""}
           <p style="color:var(--muted); font-size:14px; margin-top:8px;">${esc(n.content)}</p>
         </div>
       `).join("");
