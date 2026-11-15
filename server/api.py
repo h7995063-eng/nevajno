@@ -449,7 +449,7 @@ def api_lobbies_get():
 @auth()
 def api_leaderboard():
     rows = db().execute(
-        "SELECT nickname, points, kd FROM users WHERE is_banned=0 ORDER BY points DESC, id ASC LIMIT 50"
+        "SELECT nickname, points, kd, badge FROM users WHERE is_banned=0 ORDER BY points DESC, id ASC LIMIT 50"
     ).fetchall()
     return jsonify(ok=True, players=[dict(r) for r in rows])
 
@@ -835,6 +835,26 @@ def api_notify():
     conn.close()
     return jsonify(ok=True)
 
+
+
+@app.post("/api/admin/badge")
+def api_admin_badge():
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    if u["id"] not in ADMIN_IDS:
+        return jsonify(error="Только для админов"), 403
+    b = request.get_json(silent=True) or {}
+    nickname = b.get("nickname", "").strip()
+    badge = b.get("badge", "").strip().lower()
+    if not nickname:
+        return jsonify(error="Укажите ник"), 400
+    if badge not in ("", "hltv", "cybershoke"):
+        return jsonify(error="Неверный бейдж (hltv / cybershoke / пусто)"), 400
+    conn = db()
+    conn.execute("UPDATE users SET badge=? WHERE nickname=?", (badge, nickname))
+    conn.commit()
+    return jsonify(ok=True)
 
 @app.post("/api/admin")
 @auth()
