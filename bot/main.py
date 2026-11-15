@@ -3,7 +3,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from config import BOT_TOKEN
 import re
 
-MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/app_v3.html"
+MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/app_v4.html"
 ADMIN_CHAT_ID = -1003741583506
 
 bot = telebot.TeleBot(BOT_TOKEN)
