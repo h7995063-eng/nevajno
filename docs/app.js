@@ -496,7 +496,7 @@ const API_URL = NOTIFY_URL;
       });
       const data = await res.json();
       if (!data.ok || !data.lobbies.length) {
-        el.innerHTML = '<div class="card empty">Активных лобби нет. Создайте первое.</div>';
+        el.innerHTML = '<div style="text-align:center; padding:60px 20px; color:rgba(139,152,168,0.5); font-size:15px;">Пока нет активных лобби</div>';
         return;
       }
       el.innerHTML = data.lobbies.map((l) => {
@@ -530,7 +530,7 @@ const API_URL = NOTIFY_URL;
         </div>`;
       }).join("");
     } catch (e) {
-      el.innerHTML = '<div class="card empty">Ошибка загрузки лобби</div>';
+      el.innerHTML = '<div style="text-align:center; padding:60px 20px; color:rgba(255,70,85,0.6); font-size:15px;">Ошибка загрузки лобби</div>';
     }
   }
 
@@ -811,7 +811,7 @@ const API_URL = NOTIFY_URL;
       });
       const data = await res.json();
       if (!data.ok || !data.news.length) {
-        el.innerHTML = '<div class="card empty">Пока нет новостей.</div>';
+        el.innerHTML = '<div style="text-align:center; padding:60px 20px; color:rgba(139,152,168,0.5); font-size:15px;">Пока нет новостей</div>';
         return;
       }
       const isAdmin = me && me.is_admin;
@@ -826,7 +826,7 @@ const API_URL = NOTIFY_URL;
         </div>
       `).join("");
     } catch (e) {
-      el.innerHTML = '<div class="card empty">Ошибка загрузки новостей.</div>';
+      el.innerHTML = '<div style="text-align:center; padding:60px 20px; color:rgba(255,70,85,0.6); font-size:15px;">Ошибка загрузки новостей</div>';
     }
   }
 
@@ -844,7 +844,7 @@ const API_URL = NOTIFY_URL;
       players = [];
     }
     if (!players.length) {
-      el.innerHTML = '<div class="card empty">Рейтинг пока пуст.</div>';
+      el.innerHTML = '<div style="text-align:center; padding:60px 20px; color:rgba(139,152,168,0.5); font-size:15px;">Рейтинг пока пуст</div>';
       return;
     }
 
@@ -994,7 +994,7 @@ const API_URL = NOTIFY_URL;
           <button class="btn ghost" data-adm="unban" data-id="${p.tg_id}" type="button">${ICON("check")}Разбан</button>
           <button class="btn ghost" data-adm="unmute" data-id="${p.tg_id}" type="button">${ICON("check")}Размут</button>
         </div>
-      </div>`).join("") : `<div class="card empty">Игроки не найдены.</div>`;
+      </div>`).join("") : `<div style="text-align:center; padding:40px 20px; color:rgba(139,152,168,0.5); font-size:14px;">Игроки не найдены</div>`;
   }
 
   function adminAction(action, id) {
