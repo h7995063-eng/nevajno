@@ -271,24 +271,26 @@ const API_URL = NOTIFY_URL;
   }
 
   /** Создатель становится хостом и сразу входит в выбранную команду. */
-  function createLobby(map, mode, team) {
-    const db = readDb();
-    requireActiveUser(db);
-    if (!MAPS.includes(map) || !MODE_SIZE[mode]) throw new Error("Неверная карта или режим");
-    const lobby = {
-      id: db.lobbies.reduce((m, l) => Math.max(m, l.id), 0) + 1,
-      owner_tg_id: TG_ID, map, mode, max_players: MODE_SIZE[mode],
-      teams: { KT: [], T: [] }, comment: "", code: "",
-      status: "open", created_at: now(), started_at: 0,
-    };
-    lobby.teams[TEAMS.includes(team) ? team : "KT"].push(TG_ID);
-    db.lobbies.push(lobby);
-    saveDb(db);
-    return lobby;
+  async function createLobby(map, mode, team) {
+    const res = await fetch(API_URL + "/api/lobbies", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      body: JSON.stringify({ map, mode, team }),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "Ошибка создания лобби");
+    return data.lobby_id;
   }
 
-  function getLobbies() {
-    return readDb().lobbies.filter((l) => l.status === "open" || l.status === "playing").sort((a, b) => b.created_at - a.created_at).slice(0, 50);
+  async function getLobbies() {
+    try {
+      const res = await fetch(API_URL + "/api/lobbies", {
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      });
+      const data = await res.json();
+      if (data.ok && data.lobbies) return data.lobbies;
+    } catch (e) { /* сервер недоступен */ }
+    return [];
   }
 
   /** Подробности лобби (комментарий, код) доступны только участникам. */
@@ -298,32 +300,26 @@ const API_URL = NOTIFY_URL;
     return l;
   }
 
-  function joinLobby(id, team) {
-    const db = readDb();
-    requireActiveUser(db);
-    // Ищем лобби по id (число или строка)
-    const l = db.lobbies.find((x) => String(x.id) === String(id) && (x.status === "open" || x.status === "playing"));
-    if (!l) throw new Error("Лобби не найдено или уже закрыто");
-    if (l.status !== "open") throw new Error("Матч уже начался");
-    if (lobbyPlayers(l).includes(TG_ID)) throw new Error("Вы уже в этом лобби");
-    if (!TEAMS.includes(team)) throw new Error("Выберите команду");
-    if (l.teams[team].length >= l.max_players / 2) throw new Error(`Команда ${team} заполнена`);
-    l.teams[team].push(TG_ID);
-    saveDb(db);
-    return l;
+  async function joinLobby(id, team) {
+    const res = await fetch(API_URL + `/api/lobbies/${id}/join`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      body: JSON.stringify({ team }),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "Ошибка входа");
+    return data;
   }
 
   /** Возвращает true, если лобби закрылось (вышел хост). */
-  function leaveLobby(id) {
-    const db = readDb();
-    const l = findLobby(db, id);
-    if (!lobbyPlayers(l).includes(TG_ID)) throw new Error("Вы не участник этого лобби");
-    // Если лобби заполнено (все игроки на месте), выйти нельзя
-    if (lobbyPlayers(l).length >= l.max_players) throw new Error("Лобби заполнено, выйти нельзя");
-    if (l.owner_tg_id === TG_ID) l.status = "closed";
-    else TEAMS.forEach((tm) => { l.teams[tm] = l.teams[tm].filter((x) => x !== TG_ID); });
-    saveDb(db);
-    return l.status === "closed";
+  async function leaveLobby(id) {
+    const res = await fetch(API_URL + `/api/lobbies/${id}/leave`, {
+      method: "POST",
+      headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "Ошибка выхода");
+    return data;
   }
 
   function setLobbyComment(id, text) {
