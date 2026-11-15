@@ -151,6 +151,7 @@ def publish_results(message, state):
         if match_t:
             t_players = [p.strip() for p in match_t.group(1).split(",") if p.strip()]
 
+        print(f"[DEBUG TEAMS] kt_players={kt_players}, t_players={t_players}, all_players={all_players}", flush=True)
         winners = []
         losers = []
         for p in all_players:
