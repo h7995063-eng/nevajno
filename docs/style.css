@@ -412,3 +412,9 @@ main { flex: 1; overflow-y: auto; padding: 20px 18px calc(28px + var(--safe-bott
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(-4px); }
 }
+
+/* Полупрозрачный тёмный фон (без картинки) */
+#s-main {
+  background: rgba(10, 14, 20, 0.85) !important;
+  backdrop-filter: blur(10px);
+}
