@@ -561,9 +561,13 @@ const API_URL = NOTIFY_URL;
 
   
   async function openTeamModal(id) {
-    const lobbies = await getLobbies();
-    const l = lobbies.find((x) => String(x.id) === String(id));
-    if (!l) return toast("Лобби уже закрыто", "err");
+    try {
+      const lobbies = await getLobbies();
+      const l = lobbies.find((x) => String(x.id) === String(id));
+      if (!l) {
+        toast("Лобби не найдено в списке (ID: " + id + ")", "err");
+        return;
+      }
     joinTarget = l.id;
     const ktCount = (l.teams?.KT || []).length;
     const tCount = (l.teams?.T || []).length;
@@ -579,6 +583,14 @@ const API_URL = NOTIFY_URL;
       return toast("Лобби заполнено", "err");
     }
     await doJoin(team);
+    } catch (e) {
+      toast("Ошибка: " + e.message, "err");
+      const debugEl = document.createElement("div");
+      debugEl.style.cssText = "position:fixed; bottom:0; left:0; right:0; background:red; color:white; padding:10px; font-size:12px; z-index:9999;";
+      debugEl.textContent = "DEBUG openTeamModal: " + e.message;
+      document.body.appendChild(debugEl);
+      setTimeout(() => debugEl.remove(), 10000);
+    }
   }
 
   async function doJoin(team) {
