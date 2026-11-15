@@ -6,7 +6,7 @@ import requests
 import json
 
 MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/app_v4.html"
-API_URL = "https://potentially-vacancies-washing-prefix.trycloudflare.com"
+API_URL = "https://instructors-built-mate-drain.trycloudflare.com"
 ADMIN_CHAT_ID = -1003741583506
 
 bot = telebot.TeleBot(BOT_TOKEN)
