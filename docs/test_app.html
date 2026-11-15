@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TEST APP.JS</title>
+<style>
+body { background: #0a0e14; color: #fff; font-family: sans-serif; padding: 20px; }
+h1 { color: #ff4655; }
+#log { background: #151c28; padding: 12px; border-radius: 8px; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+</style>
+</head>
+<body>
+<h1>TEST APP.JS</h1>
+<div id="log">Загрузка...</div>
+<script>
+const log = (msg) => {
+  document.getElementById("log").textContent += "\n" + msg;
+};
+window.onerror = (msg, url, line) => {
+  log("ERROR: " + msg + " at " + url + ":" + line);
+};
+log("Страница загружена");
+log("URL: " + window.location.href);
+log("Telegram: " + (window.Telegram ? "YES" : "NO"));
+log("localStorage: " + (typeof localStorage !== "undefined" ? "YES" : "NO"));
+
+// Пробуем загрузить app.js
+const script = document.createElement("script");
+script.src = "app.js?v=999";
+script.onload = () => log("✅ app.js загружен");
+script.onerror = () => log("❌ ОШИБКА загрузки app.js");
+document.body.appendChild(script);
+</script>
+</body>
+</html>
