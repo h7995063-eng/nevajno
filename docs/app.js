@@ -213,22 +213,31 @@ const API_URL = NOTIFY_URL;
     return withAdmin(readDb().users.find((u) => u.tg_id === TG_ID) || null);
   }
 
-  function registerUser(nickname, game_id) {
-    const db = readDb();
-    const existing = db.users.find((u) => u.tg_id === TG_ID);
-    if (existing) return withAdmin(existing);
+  async function registerUser(nickname, game_id) {
     nickname = String(nickname || "").trim();
     game_id = String(game_id || "").trim();
     if (!/^[A-Za-z0-9_\-А-Яа-яЁё]{3,20}$/.test(nickname)) throw new Error("Ник: 3–20 символов, буквы, цифры, _ и -");
     if (!/^\d{4,12}$/.test(game_id)) throw new Error("ID CounterFlame: от 4 до 12 цифр");
-    if (db.users.some((u) => u.game_id === game_id)) throw new Error("Этот ID CounterFlame уже зарегистрирован");
-    const user = {
-      tg_id: TG_ID, nickname, game_id, elo: 1000, coins: 0, points: 0, kd: 0, avg: 0,
-      is_banned: false, ban_reason: "", ban_until: 0, is_muted: false, mute_until: 0, created_at: now(),
-    };
-    db.users.push(user);
+
+    // Регистрируем на сервере
+    const res = await fetch(API_URL + "/api/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      body: JSON.stringify({ nickname, game_id }),
+    });
+    const data = await res.json();
+    if (!data.registered) throw new Error(data.error || "Ошибка регистрации");
+
+    // Сохраняем в localStorage (для кэша)
+    const db = readDb();
+    const existing = db.users.find((u) => u.tg_id === TG_ID);
+    if (existing) {
+      Object.assign(existing, data.user);
+    } else {
+      db.users.push(data.user);
+    }
     saveDb(db);
-    return withAdmin(user);
+    return withAdmin(data.user);
   }
 
   function getAllUsers() {
@@ -410,11 +419,11 @@ const API_URL = NOTIFY_URL;
   function localStorage_get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function localStorage_set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* игнор */ } }
 
-  function register() {
+  async function register() {
     const err = $("#reg-error");
     err.classList.add("hidden");
     try {
-      me = registerUser($("#in-nick").value, $("#in-gid").value);
+      me = await registerUser($("#in-nick").value, $("#in-gid").value);
       if (me.is_banned) return showBan(me);
       enterApp();
     } catch (e) {
