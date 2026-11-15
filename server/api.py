@@ -287,6 +287,21 @@ def api_auth():
     return jsonify(registered=True, banned=False, user=public_user(load_user(g.tg["id"])))
 
 
+
+@app.get("/api/points/get")
+def api_points_get():
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    conn = get_conn()
+    try:
+        row = conn.execute("SELECT points FROM users WHERE tg_id=?", (u["id"],)).fetchone()
+        if not row:
+            return jsonify(error="Пользователь не найден"), 404
+        return jsonify(ok=True, points=row["points"])
+    finally:
+        conn.close()
+
 @app.get("/api/profile")
 @auth()
 def api_profile():
@@ -497,6 +512,26 @@ def api_match_submit():
 
     send_to_admin()
     return jsonify(ok=True)
+
+
+@app.post("/api/points/update")
+def api_points_update():
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    b = request.get_json(silent=True) or {}
+    nicknames = b.get("nicknames", [])
+    points_delta = b.get("points_delta", 0)
+    if not nicknames:
+        return jsonify(error="Нет игроков"), 400
+    conn = get_conn()
+    try:
+        for nick in nicknames:
+            conn.execute("UPDATE users SET points = points + ? WHERE nickname = ?", (points_delta, nick))
+        conn.commit()
+        return jsonify(ok=True)
+    finally:
+        conn.close()
 
 @app.post("/api/notify")
 def api_notify():
