@@ -795,7 +795,18 @@
   $("#overlay").addEventListener("click", () => toggleMenu(false));
   $("#btn-create-lobby").addEventListener("click", openLobbyModal);
   $("#btn-lobby-submit").addEventListener("click", submitLobby);
-  $("#btn-submit-result").addEventListener("click", submitMatchResult);
+  $("#btn-submit-result").addEventListener("click", () => {
+    const fileInput = document.getElementById("result-screenshot");
+    if (!fileInput) return toast("Ошибка: поле для файла не найдено", "err");
+    fileInput.click();
+  });
+
+  // Когда файл выбран — отправляем
+  document.addEventListener("change", (e) => {
+    if (e.target && e.target.id === "result-screenshot" && e.target.files.length) {
+      submitMatchResult();
+    }
+  });
   $("#btn-admin-login").addEventListener("click", adminLogin);
   $("#in-admin-pass").addEventListener("keydown", (e) => { if (e.key === "Enter") adminLogin(); });
   $("#in-admin-search").addEventListener("input", drawAdminList);
