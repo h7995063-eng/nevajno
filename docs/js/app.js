@@ -60,7 +60,7 @@ const API_URL = "https://famous-things-fall.loca.lt";
   }
 
   async function api(path, body, admin = false) {
-    const headers = { "Content-Type": "application/json" };
+    const headers = { "Content-Type": "application/json", "Bypass-Tunnel-Reminder": "true" };
     if (tg && tg.initData) headers["X-Init-Data"] = tg.initData;
     else headers["X-Dev-User"] = JSON.stringify({ id: 6999358439, username: "shoke", first_name: "Owner" });
     if (admin) headers["X-Admin-Password"] = adminPass;
