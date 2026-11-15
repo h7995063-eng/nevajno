@@ -469,18 +469,21 @@ const API_URL = NOTIFY_URL;
   const nameOf = (id) => { const u = getAllUsers().find((x) => x.tg_id === id); return u ? u.nickname : "Игрок"; };
   const lobbyInfo = (l) => ({ lobby_id: l.id, map: l.map, mode: l.mode, players: lobbyPlayers(l).length, max_players: l.max_players });
 
-  function loadLobbies() {
-    const lobbies = getLobbies();
-    // Отладка: показываем команды в лобби
-    const debugHtml = `<div style="color:#ff4655; font-size:11px; margin-bottom:8px; padding:8px; background:rgba(255,0,0,0.1); border-radius:8px;">
-      DEBUG: ${lobbies.map(l => `ID:${l.id} owner:${l.owner_tg_id} KT:[${l.teams.KT.join(",")}] T:[${l.teams.T.join(",")}]`).join("<br>")}
-    </div>`;
-    $("#lobby-list").innerHTML = debugHtml + (lobbies.length
-      ? lobbies.map((l) => {
-        const n = lobbyPlayers(l).length;
-        const action = isMember(l)
-          ? `<button class="btn primary sm" data-open="${l.id}" type="button">${ICON("game")}Открыть</button>`
-          : l.status === "playing" ? '<span class="pill gold">идёт матч</span>'
+  async function loadLobbies() {
+    const el = $("#lobby-list");
+    el.innerHTML = '<div class="loader"></div>';
+    try {
+      const res = await fetch(API_URL + "/api/lobbies", {
+        headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      });
+      const data = await res.json();
+      if (!data.ok || !data.lobbies.length) {
+        el.innerHTML = '<div class="card empty">Активных лобби нет. Создайте первое.</div>';
+        return;
+      }
+      el.innerHTML = data.lobbies.map((l) => {
+        const n = (l.teams?.KT?.length || 0) + (l.teams?.T?.length || 0);
+        const action = l.status === "playing" ? '<span class="pill gold">идёт матч</span>'
           : n >= l.max_players ? '<span class="pill">заполнено</span>'
           : `<button class="btn ghost sm" data-join="${l.id}" type="button">${ICON("game")}Войти</button>`;
         const img = MAP_IMAGES[l.map] || "";
@@ -491,15 +494,17 @@ const API_URL = NOTIFY_URL;
             <h3>${esc(l.map)} · ${esc(l.mode)}</h3>
             <div class="meta">
               <span>${ICON("users")}${n}/${l.max_players}</span>
-              <span>${ICON("crown")}${esc(nameOf(l.owner_tg_id))}</span>
               <span>${ICON("clock")}${ago(l.created_at)}</span>
             </div>
           </div>
           ${action}
         </div>`;
-      }).join("")
-      : `<div class="card empty">Активных лобби нет. Создайте первое.</div>`;
+      }).join("");
+    } catch (e) {
+      el.innerHTML = '<div class="card empty">Ошибка загрузки лобби</div>';
+    }
   }
+
 
   function openLobbyModal() {
     $("#sel-map").innerHTML = MAPS.map((m) => `<option>${esc(m)}</option>`).join("");
