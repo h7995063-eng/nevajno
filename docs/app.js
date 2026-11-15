@@ -309,6 +309,8 @@
     const db = readDb();
     const l = findLobby(db, id);
     if (!lobbyPlayers(l).includes(TG_ID)) throw new Error("Вы не участник этого лобби");
+    // Если лобби заполнено (все игроки на месте), выйти нельзя
+    if (lobbyPlayers(l).length >= l.max_players) throw new Error("Лобби заполнено, выйти нельзя");
     if (l.owner_tg_id === TG_ID) l.status = "closed";
     else TEAMS.forEach((tm) => { l.teams[tm] = l.teams[tm].filter((x) => x !== TG_ID); });
     saveDb(db);
@@ -559,6 +561,12 @@
         if (!res.ok) throw new Error("Ошибка отправки");
         toast("Скриншот отправлен админу ✅", "ok");
         fileInput.value = "";
+        // Удаляем лобби после отправки
+        const db = readDb();
+        db.lobbies = db.lobbies.filter((x) => x.id !== roomId);
+        saveDb(db);
+        roomId = null;
+        setTimeout(() => back(), 1000);
       } catch (e) {
         toast("Ошибка отправки: " + e.message, "err");
       }
@@ -769,6 +777,7 @@
   $("#overlay").addEventListener("click", () => toggleMenu(false));
   $("#btn-create-lobby").addEventListener("click", openLobbyModal);
   $("#btn-lobby-submit").addEventListener("click", submitLobby);
+  $("#btn-submit-result").addEventListener("click", submitMatchResult);
   $("#btn-admin-login").addEventListener("click", adminLogin);
   $("#in-admin-pass").addEventListener("keydown", (e) => { if (e.key === "Enter") adminLogin(); });
   $("#in-admin-search").addEventListener("input", drawAdminList);
