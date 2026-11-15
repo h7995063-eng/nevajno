@@ -497,6 +497,8 @@ def api_match_submit():
     except json.JSONDecodeError:
         teams = {}
 
+    app.logger.warning(f"DEBUG: players={players}, teams={teams}")
+
     caption = (
         f"🎮 Новый результат на проверку!\n"
         f"Лобби: #{lobby_id}\n"
