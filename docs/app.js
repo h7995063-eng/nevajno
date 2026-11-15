@@ -483,9 +483,20 @@ const API_URL = NOTIFY_URL;
       }
       el.innerHTML = data.lobbies.map((l) => {
         const n = (l.teams?.KT?.length || 0) + (l.teams?.T?.length || 0);
-        const action = l.status === "playing" ? '<span class="pill gold">идёт матч</span>'
-          : n >= l.max_players ? '<span class="pill">заполнено</span>'
-          : `<button class="btn ghost sm" data-join="${l.id}" type="button">${ICON("game")}Войти</button>`;
+        const isMember = (l.teams?.KT || []).includes(TG_ID) || (l.teams?.T || []).includes(TG_ID);
+        const isHost = l.owner_tg_id === TG_ID;
+        let action = "";
+        if (isHost) {
+          action = `<button class="btn primary sm" data-open="${l.id}" type="button">${ICON("game")}Открыть</button>`;
+        } else if (isMember) {
+          action = `<button class="btn ghost sm" data-open="${l.id}" type="button">${ICON("game")}Открыть</button>`;
+        } else if (l.status === "playing") {
+          action = '<span class="pill gold">идёт матч</span>';
+        } else if (n >= l.max_players) {
+          action = '<span class="pill">заполнено</span>';
+        } else {
+          action = `<button class="btn ghost sm" data-join="${l.id}" type="button">${ICON("game")}Войти</button>`;
+        }
         const img = MAP_IMAGES[l.map] || "";
         return `
         <div class="card row" data-lobby-id="${l.id}">
@@ -505,7 +516,7 @@ const API_URL = NOTIFY_URL;
     }
   }
 
-
+  
   function openLobbyModal() {
     $("#sel-map").innerHTML = MAPS.map((m) => `<option>${esc(m)}</option>`).join("");
     $("#sel-mode").innerHTML = Object.keys(MODE_SIZE).map((m) => `<option>${esc(m)}</option>`).join("");
