@@ -447,43 +447,48 @@ def api_match_submit():
     u = tg_user()
     if not u or "id" not in u:
         return jsonify(error="Не авторизован"), 401
-    b = request.get_json(silent=True) or {}
-    lobby_id = b.get("lobby_id")
-    map_name = b.get("map", "—")
-    mode = b.get("mode", "—")
-    score_kt = b.get("score_kt", 0)
-    score_t = b.get("score_t", 0)
-    winner = b.get("winner", "?")
-    owner = clean(b.get("owner", "Игрок"))
-    players = b.get("players", [])
 
-    text = (
+    if 'screenshot' not in request.files:
+        return jsonify(error="Нет скриншота"), 400
+
+    file = request.files['screenshot']
+    if not file or file.filename == '':
+        return jsonify(error="Пустой файл"), 400
+
+    lobby_id = request.form.get("lobby_id", "?")
+    map_name = request.form.get("map", "—")
+    mode = request.form.get("mode", "—")
+    owner = clean(request.form.get("owner", "Игрок"))
+    players_raw = request.form.get("players", "[]")
+    try:
+        players = json.loads(players_raw)
+    except json.JSONDecodeError:
+        players = []
+
+    caption = (
         f"🎮 Новый результат на проверку!\n"
         f"Лобби: #{lobby_id}\n"
         f"Карта: {map_name} · {mode}\n"
-        f"Счёт: KT {score_kt} - {score_t} T\n"
-        f"Победитель: {winner}\n"
         f"Хост: {owner}\n"
         f"Игроки: {', '.join(players)}\n\n"
-        f"Введите статистику каждого игрока (Киллы, Смерти, Ассисты, Урон) в ответном сообщении."
+        f"Введите статистику каждого игрока (Киллы, Смерти, Ассисты) в ответном сообщении."
     )
 
-    payload = {"chat_id": ADMIN_CHAT_ID, "text": text}
-    if ADMIN_TOPIC_ID.isdigit():
-        payload["message_thread_id"] = int(ADMIN_TOPIC_ID)
-
-    def worker():
+    def send_to_admin():
         try:
-            req = urllib.request.Request(
-                f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-            )
-            urllib.request.urlopen(req, timeout=10).read()
+            import requests
+            url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
+            files = {'photo': (file.filename, file.read(), file.mimetype)}
+            data = {'chat_id': ADMIN_CHAT_ID, 'caption': caption}
+            if ADMIN_TOPIC_ID.isdigit():
+                data['message_thread_id'] = int(ADMIN_TOPIC_ID)
+            resp = requests.post(url, data=data, files=files, timeout=15)
+            if not resp.ok:
+                app.logger.error(f"Admin sendPhoto failed: {resp.text}")
         except Exception as e:
-            app.logger.warning("Admin notify failed: %s", e)
+            app.logger.warning(f"Admin notify failed: {e}")
 
-    threading.Thread(target=worker, daemon=True).start()
+    send_to_admin()
     return jsonify(ok=True)
 
 @app.post("/api/notify")
