@@ -11,7 +11,7 @@
   const PLAYING_TTL = 10800;
   // Адрес бэкенда с /api/notify (например "https://api.example.com"). Пусто = уведомления в канал выключены.
   const SUPPORT_URL = "https://t.me/crymbog";
-  const NOTIFY_URL = "";
+  const NOTIFY_URL = "https://potentially-vacancies-washing-prefix.trycloudflare.com";
   const MAPS = ["Mirage", "Inferno", "Dust II", "Nuke", "Ancient", "Anubis", "Overpass", "Vertigo"];
   const MODE_SIZE = { "1v1": 2, "2v2": 4, "5v5": 10, "DM": 16 };
   const MISSIONS = [
