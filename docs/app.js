@@ -209,8 +209,17 @@ const API_URL = NOTIFY_URL;
   function withAdmin(u) { return u ? { ...u, is_admin: ADMIN_IDS.includes(u.tg_id) } : null; }
 
   /* ----- Пользователи ----- */
-  function getUser() {
-    return withAdmin(readDb().users.find((u) => u.tg_id === TG_ID) || null);
+  async function getUser() {
+    try {
+      const res = await fetch(API_URL + "/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (data.registered && data.user) return withAdmin(data.user);
+    } catch (e) { /* сервер недоступен */ }
+    return null;
   }
 
   async function registerUser(nickname, game_id) {
@@ -393,7 +402,7 @@ const API_URL = NOTIFY_URL;
     try {
       initDb();
       wait(900).then(() => {
-        const user = getUser();
+        const user = await getUser();
         if (!user) return show(localStorage_get("terms") === "1" ? "s-register" : "s-welcome");
         if (user.is_banned) return showBan(user);
         me = user;
@@ -436,8 +445,8 @@ const API_URL = NOTIFY_URL;
     }, 10000));
   }
 
-  function updateHeader() {
-    const fresh = getUser();
+  async function updateHeader() {
+    const fresh = await getUser();
     if (fresh) me = fresh;
     $("#hdr-coins").textContent = me.coins.toLocaleString("ru-RU");
     $("#hdr-online").textContent = getOnlineCount();
