@@ -617,6 +617,23 @@ def api_match_submit():
     return jsonify(ok=True)
 
 
+
+@app.post("/api/stats/update")
+def api_stats_update():
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    b = request.get_json(silent=True) or {}
+    nickname = b.get("nickname")
+    kd = b.get("kd", 0)
+    avg = b.get("avg", 0)
+    if not nickname:
+        return jsonify(error="Нет ника"), 400
+    conn = db()
+    conn.execute("UPDATE users SET kd=?, avg=? WHERE nickname=?", (kd, avg, nickname))
+    conn.commit()
+    return jsonify(ok=True)
+
 @app.post("/api/points/update")
 def api_points_update():
     u = tg_user()
