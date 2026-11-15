@@ -481,7 +481,7 @@ const API_URL = NOTIFY_URL;
         el.innerHTML = '<div class="card empty">Активных лобби нет. Создайте первое.</div>';
         return;
       }
-      el.innerHTML = data.lobbies.map((l) => {
+      el.innerHTML = `<div style="color:#ff4655; font-size:11px; margin-bottom:8px; padding:8px; background:rgba(255,0,0,0.1); border-radius:8px;">DEBUG: TG_ID = ${TG_ID}</div>` + data.lobbies.map((l) => {
         const n = (l.teams?.KT?.length || 0) + (l.teams?.T?.length || 0);
         const isMember = (l.teams?.KT || []).includes(TG_ID) || (l.teams?.T || []).includes(TG_ID);
         const isHost = l.owner_tg_id === TG_ID;
