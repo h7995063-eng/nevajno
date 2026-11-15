@@ -663,6 +663,19 @@ def api_points_update():
 
 
 
+
+@app.delete("/api/news/<int:news_id>")
+def api_news_delete(news_id):
+    u = tg_user()
+    if not u or "id" not in u:
+        return jsonify(error="Не авторизован"), 401
+    if u["id"] not in ADMIN_IDS:
+        return jsonify(error="Только для админов"), 403
+    conn = db()
+    conn.execute("DELETE FROM news WHERE id=?", (news_id,))
+    conn.commit()
+    return jsonify(ok=True)
+
 @app.post("/api/news")
 def api_news_post():
     u = tg_user()
