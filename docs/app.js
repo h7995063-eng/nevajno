@@ -354,16 +354,14 @@ const API_URL = NOTIFY_URL;
     saveDb(db);
   }
 
-  function startLobby(id) {
-    const db = readDb();
-    const l = findHostLobby(db, id);
-    if (l.status !== "open") throw new Error("Матч уже начался");
-    if (lobbyPlayers(l).length < 2) throw new Error("Для старта нужно минимум 2 игрока");
-    l.status = "playing";
-    l.started_at = now();
-    db.matches.push({ id: db.matches.length + 1, lobby_id: l.id, map: l.map, mode: l.mode, started_at: l.started_at });
-    saveDb(db);
-    return l;
+  async function startLobby(id) {
+    const res = await fetch(API_URL + `/api/lobbies/${id}/start`, {
+      method: "POST",
+      headers: { "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "Ошибка старта");
+    return data;
   }
 
   function getOnlineCount() {
@@ -480,6 +478,9 @@ const API_URL = NOTIFY_URL;
 
   /* ----- Матчи ----- */
   let roomId = null;
+  let confirmTimer = null;
+  let confirmDeadline = 0;
+  let confirmedPlayers = {};
   let joinTarget = null;
   const isMember = (l) => lobbyPlayers(l).includes(TG_ID);
   const guard = (fn) => { try { fn(); } catch (e) { toast(e.message, "err"); } };
@@ -657,6 +658,55 @@ const API_URL = NOTIFY_URL;
       setTimeout(() => back(), 1000);
     } catch (e) {
       toast("Ошибка: " + e.message, "err");
+    }
+  }
+
+  function playSound(type) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      if (type === "confirm") {
+        osc.frequency.value = 880;
+        gain.gain.value = 0.1;
+        osc.start();
+        osc.stop(ctx.currentTime + 0.1);
+      } else if (type === "ready") {
+        osc.frequency.value = 440;
+        gain.gain.value = 0.1;
+        osc.start();
+        osc.stop(ctx.currentTime + 0.2);
+      }
+    } catch (e) { /* звук не поддерживается */ }
+  }
+
+  async function confirmMatch() {
+    // Открываем модалку подтверждения
+    const modal = document.getElementById("m-confirm");
+    if (!modal) return toast("Модалка подтверждения не найдена", "err");
+    modal.classList.remove("hidden");
+    playSound("ready");
+    // Запускаем таймер 30 сек
+    confirmDeadline = Date.now() + 30000;
+    confirmedPlayers = {};
+    updateConfirmTimer();
+    if (confirmTimer) clearInterval(confirmTimer);
+    confirmTimer = setInterval(updateConfirmTimer, 1000);
+  }
+
+  function updateConfirmTimer() {
+    const left = Math.max(0, Math.floor((confirmDeadline - Date.now()) / 1000));
+    const el = document.getElementById("confirm-timer");
+    if (el) el.textContent = left + " сек";
+    if (left <= 0) {
+      clearInterval(confirmTimer);
+      confirmTimer = null;
+      // Время вышло — закрываем модалку и показываем warn
+      const modal = document.getElementById("m-confirm");
+      if (modal) modal.classList.add("hidden");
+      toast("Время подтверждения истекло", "err");
     }
   }
 
