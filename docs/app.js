@@ -758,8 +758,7 @@ const API_URL = NOTIFY_URL;
       const data = await res.json();
       if (data.ok && data.players) players = data.players;
     } catch (e) {
-      // fallback: локальный лидерборд
-      players = getLeaderboard();
+      players = [];
     }
     if (!players.length) {
       el.innerHTML = '<div class="card empty">Рейтинг пока пуст.</div>';
@@ -769,49 +768,51 @@ const API_URL = NOTIFY_URL;
     const top3 = players.slice(0, 3);
     const rest = players.slice(3);
 
-    // Строим подиум (2, 1, 3)
+    // Подиум (2, 1, 3)
     let podiumHtml = "";
     if (top3.length >= 3) {
+      const getAvatar = (nick) => {
+        const saved = localStorage_get("avatar_" + nick);
+        if (saved) return `<img src="${saved}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        return nick.charAt(0).toUpperCase();
+      };
       podiumHtml = `
         <div class="podium">
           <div class="podium-item pos-2">
-            <div class="avatar">${top3[1].nickname.charAt(0)}</div>
+            <div class="avatar">${getAvatar(top3[1].nickname)}</div>
             <div class="nick">${esc(top3[1].nickname)}</div>
             <div class="points">${top3[1].points} CP</div>
             <div class="podium-block">2</div>
           </div>
           <div class="podium-item pos-1">
             <div class="avatar">
-              <svg class="crown"><use href="#i-crown"/></svg>
-              ${top3[0].nickname.charAt(0)}
+              <svg class="crown" viewBox="0 0 24 24" fill="#f0b358"><path d="M2 18h20v2H2zM2 8l5 5 5-8 5 8 5-5v8H2z"/></svg>
+              ${getAvatar(top3[0].nickname)}
             </div>
             <div class="nick">${esc(top3[0].nickname)}</div>
             <div class="points">${top3[0].points} CP</div>
             <div class="podium-block">1</div>
           </div>
           <div class="podium-item pos-3">
-            <div class="avatar">${top3[2].nickname.charAt(0)}</div>
+            <div class="avatar">${getAvatar(top3[2].nickname)}</div>
             <div class="nick">${esc(top3[2].nickname)}</div>
             <div class="points">${top3[2].points} CP</div>
             <div class="podium-block">3</div>
           </div>
         </div>
       `;
-    } else {
-      // Если игроков меньше 3 — просто список
-      podiumHtml = "";
     }
 
-    // Остальной список
+    // Остальной список (с 4 места)
     const restHtml = rest.map((p, i) => `
-      <div class="card row">
-        <div class="rank">#${i + 4}</div>
-        <div class="grow"><h3>${esc(p.nickname)}</h3><div class="meta"><span>К/Д ${p.kd}</span></div></div>
-        <span class="pill gold">${p.points} Поинтов</span>
+      <div class="card row" style="margin-bottom:8px;">
+        <div class="rank" style="font-family:'Orbitron'; font-weight:900; color:var(--muted); width:32px;">#${i + 4}</div>
+        <div class="grow"><h3 style="margin:0;">${esc(p.nickname)}</h3></div>
+        <span class="pill gold">${p.points} CP</span>
       </div>
     `).join("");
 
-    $("#lb-list").innerHTML = podiumHtml + (restHtml ? `<div class="top-list" style="margin-top:16px;">${restHtml}</div>` : "");
+    el.innerHTML = podiumHtml + (restHtml ? `<div style="margin-top:16px;">${restHtml}</div>` : "");
   }
 
   function renderMissions() {

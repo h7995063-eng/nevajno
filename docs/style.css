@@ -285,3 +285,116 @@ main { flex: 1; overflow-y: auto; padding: 20px 18px calc(28px + var(--safe-bott
   -webkit-backdrop-filter: none !important;
   background: rgba(20, 28, 40, 0.95) !important;
 }
+
+/* Подиум лидерборда */
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  margin: 24px 0;
+  padding-top: 20px;
+}
+
+.podium-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100px;
+}
+
+.podium-item .avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff4655, #00d9ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron';
+  font-weight: 900;
+  font-size: 24px;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.podium-item .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.podium-item .crown {
+  position: absolute;
+  top: -18px;
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 0 6px rgba(240, 179, 88, 0.8));
+  animation: crownFloat 2s ease-in-out infinite;
+}
+
+@keyframes crownFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.podium-item .nick {
+  font-family: 'Orbitron';
+  font-weight: 700;
+  font-size: 13px;
+  margin-top: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.podium-item .points {
+  font-size: 11px;
+  color: var(--accent-2);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.podium-block {
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 8px;
+  font-family: 'Orbitron';
+  font-size: 28px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pos-1 .podium-block {
+  height: 100px;
+  background: linear-gradient(180deg, rgba(240, 179, 88, 0.4), rgba(240, 179, 88, 0.1));
+  border-color: rgba(240, 179, 88, 0.5);
+  color: rgba(240, 179, 88, 0.8);
+}
+
+.pos-2 .podium-block {
+  height: 75px;
+  background: linear-gradient(180deg, rgba(192, 192, 192, 0.3), rgba(192, 192, 192, 0.05));
+}
+
+.pos-3 .podium-block {
+  height: 55px;
+  background: linear-gradient(180deg, rgba(205, 127, 50, 0.3), rgba(205, 127, 50, 0.05));
+}
+
+.pos-1 .avatar {
+  width: 72px;
+  height: 72px;
+  border-color: #f0b358;
+  box-shadow: 0 0 20px rgba(240, 179, 88, 0.5);
+}
