@@ -7,7 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=100">
+<link rel="stylesheet" href="style.css?v=103">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
@@ -31,6 +32,10 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 11-2.4-5.7M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0116 0v2M4 14h3v5H5a1 1 0 01-1-1v-4zM20 14h-3v5h2a1 1 0 001-1v-4zM17 19c0 1.5-2 2-5 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3.5 8l4.5 4 4-6 4 6 4.5-4-1.8 10H5.3L3.5 8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4 18-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-logo" viewBox="0 0 32 32"><path d="M16 2l12 5v8c0 7.5-5 12.5-12 15C9 27.500 4 22.500 4 15V7l12-5z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 9c-3 2.500-4 5-2.500 7.500 1 1.500 1 3 .5 4.500 3 0 5.500-2 5.500-5 0-1.500-.7-2.500-1.500-3.500.2 1.200-.3 2-1 2.200C17.500 12.500 17 10.500 16 9z" fill="currentColor"/></symbol>
   </defs>
 </svg>
@@ -39,9 +44,9 @@
 
 <!-- 1. Загрузка -->
 <section class="screen active" id="s-loading">
-  <img class="logo-xl logo-img" src="assets/logo_full.png?v=500" alt="CYBERSHOKE">
-  <h1 class="brand">CYBERSHOKE</h1>
-  <p class="brand-sub">CounterFlame</p>
+  <img class="logo-xl logo-img" src="assets/logo_full.png?v=103" alt="CYBERSHOKE CounterFlame">
+  <h1 class="brand hidden">CYBERSHOKE</h1>
+  <p class="brand-sub hidden">CounterFlame</p>
   <div class="spinner"><i></i><i></i><i></i></div>
   <p id="load-msg" class="muted">Подключаемся к серверу</p>
   <button id="btn-retry" class="btn ghost hidden" type="button">Повторить</button>
@@ -51,7 +56,7 @@
 <section class="screen" id="s-welcome">
   <div class="panel narrow">
     <div class="screen-head"><button class="icon-btn" data-act="welcome-back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Добро пожаловать</h2></div>
-    <p class="lead">CYBERSHOKE CounterFlame — киберспортивное сообщество для игроков CS. Здесь собираются лобби, ведётся общий рейтинг и выдаются награды за активность.</p>
+    <p class="lead">CYBERSHOKE CounterFlame — киберспортивное сообщество для игроков CounterFlame. Здесь собираются лобби, ведётся общий рейтинг и выдаются награды за активность.</p>
     <ul class="feature-list">
       <li><svg><use href="#i-game"/></svg><span>Лобби для матчей 1v1, 2v2, 5v5 и DM</span></li>
       <li><svg><use href="#i-trophy"/></svg><span>Рейтинг ELO и общий лидерборд</span></li>
@@ -82,6 +87,7 @@
     <svg class="ban-icon"><use href="#i-ban"/></svg>
     <h2>Доступ закрыт</h2>
     <p id="ban-text" class="lead"></p>
+    <button class="btn lite wide" data-act="support" type="button"><svg><use href="#i-headset"/></svg>Поддержка @crymbog</button>
     <button id="btn-ban-close" class="btn ghost wide" type="button"><svg><use href="#i-back"/></svg>Закрыть</button>
   </div>
 </section>
@@ -90,7 +96,7 @@
 <section class="screen" id="s-main">
   <div id="overlay" class="overlay"></div>
   <aside id="sidebar" class="sidebar">
-    <div class="side-logo"><img class="logo-img" src="assets/logo_mono_white.png?v=500" alt="CYBERSHOKE" style="height:32px;"><b>CYBERSHOKE</b></div>
+    <div class="side-logo"><img class="logo-img" src="assets/logo_mono_white.png?v=103" alt=""><b>CYBERSHOKE</b></div>
     <nav>
       <button class="nav-item" data-view="matches"><svg><use href="#i-game"/></svg>Матчи</button>
       <button class="nav-item" data-view="leaderboard"><svg><use href="#i-trophy"/></svg>Лидерборд</button>
@@ -98,12 +104,13 @@
       <button class="nav-item" data-view="profile"><svg><use href="#i-user"/></svg>Профиль</button>
       <button class="nav-item hidden" id="nav-admin" data-view="admin"><svg><use href="#i-shield"/></svg>Админка</button>
     </nav>
+    <button class="nav-item side-support" data-act="support" type="button"><svg><use href="#i-headset"/></svg>Поддержка</button>
   </aside>
 
   <div class="content">
     <header class="topbar">
       <button id="btn-burger" class="icon-btn burger" aria-label="Меню"><svg><use href="#i-menu"/></svg></button>
-      <div class="top-logo"><img class="logo-img" src="assets/logo_mono_white.png?v=500" alt="CYBERSHOKE" style="height:28px;"><b>CYBERSHOKE</b></div>
+      <div class="top-logo"><img class="logo-img" src="assets/logo_mono_white.png?v=103" alt=""><b>CYBERSHOKE</b></div>
       <div class="top-stats">
         <span class="chip gold" title="Баланс"><svg><use href="#i-coin"/></svg><b id="hdr-coins">0</b></span>
         <span class="chip blue" title="Онлайн"><svg><use href="#i-users"/></svg><b id="hdr-online">0</b></span>
@@ -115,6 +122,29 @@
         <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Матчи</h2>
           <button id="btn-create-lobby" class="btn primary sm" type="button"><svg><use href="#i-plus"/></svg>Создать лобби</button></div>
         <div id="lobby-list" class="list"></div>
+      </div>
+
+      <div class="view" id="v-lobby">
+        <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2 id="room-title">Лобби</h2><span id="room-status" class="pill"></span></div>
+        <div class="teams">
+          <div class="card team kt"><h3>KT <span id="count-KT"></span></h3><ul id="room-KT"></ul></div>
+          <div class="card team t"><h3>T <span id="count-T"></span></h3><ul id="room-T"></ul></div>
+        </div>
+        <div class="card room-card">
+          <label class="field host-only"><span>Комментарий (видят только участники)</span><textarea id="in-comment" class="textarea" maxlength="300" rows="3" placeholder="Например: сбор в 20:00, голосовой чат обязателен"></textarea></label>
+          <button class="btn ghost sm host-only" data-act="room-comment" type="button"><svg><use href="#i-check"/></svg>Сохранить комментарий</button>
+          <div class="guest-only"><span class="muted">Комментарий хоста</span><p id="room-comment-view" class="comment"></p></div>
+        </div>
+        <div class="card room-card">
+          <div id="room-code-view" class="code-view"></div>
+          <div class="input host-only"><svg><use href="#i-lock"/></svg><input id="in-code" maxlength="80" autocomplete="off" placeholder="Код для CounterFlame"></div>
+          <button class="btn gold wide host-only" data-act="room-code" type="button"><svg><use href="#i-send"/></svg>Отправить код</button>
+        </div>
+        <div class="actions-row">
+          <button class="btn ghost" data-act="room-refresh" type="button"><svg><use href="#i-refresh"/></svg>Обновить</button>
+          <button id="btn-room-start" class="btn primary host-only" data-act="room-start" type="button"><svg><use href="#i-game"/></svg>Начать матч</button>
+          <button class="btn danger" data-act="room-leave" type="button"><svg><use href="#i-close"/></svg><span id="leave-label">Покинуть</span></button>
+        </div>
       </div>
 
       <div class="view" id="v-leaderboard">
@@ -129,7 +159,7 @@
 
       <div class="view" id="v-profile">
         <div class="screen-head"><button class="icon-btn" data-act="back" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Профиль</h2></div>
-        <div id="mute-banner" class="banner hidden"><svg><use href="#i-mute"/></svg><span></span></div>
+        <div id="mute-banner" class="banner hidden"><svg><use href="#i-mute"/></svg><span></span><button class="btn ghost sm" data-act="support" type="button"><svg><use href="#i-headset"/></svg>Поддержка</button></div>
         <div class="card profile-card">
           <div id="p-avatar" class="avatar">?</div>
           <div><h3 id="p-nick" class="p-nick"></h3><p class="muted">ID: <span id="p-gid"></span></p></div>
@@ -141,6 +171,7 @@
           <div class="card stat"><svg class="c-blue"><use href="#i-trophy"/></svg><b id="p-avg">0</b><span>АВГ</span></div>
         </div>
         <button class="btn gold wide" data-view="subs" type="button"><svg><use href="#i-star"/></svg>Подписки</button>
+        <button class="btn ghost wide" data-act="support" type="button"><svg><use href="#i-headset"/></svg>Поддержка</button>
       </div>
 
       <div class="view" id="v-subs">
@@ -170,7 +201,18 @@
       <div class="screen-head"><button class="icon-btn" data-act="close-modal" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Новое лобби</h2></div>
       <label class="field"><span>Карта</span><select id="sel-map" class="select"></select></label>
       <label class="field"><span>Режим</span><select id="sel-mode" class="select"></select></label>
+      <label class="field"><span>Ваша команда</span><select id="sel-team" class="select"></select></label>
       <button id="btn-lobby-submit" class="btn primary wide" type="button"><svg><use href="#i-plus"/></svg>Создать лобби</button>
+    </div>
+  </div>
+
+  <!-- Модалка: выбор команды -->
+  <div id="m-team" class="modal hidden">
+    <div class="panel modal-box">
+      <div class="screen-head"><button class="icon-btn" data-act="close-modal" aria-label="Назад"><svg><use href="#i-back"/></svg></button><h2>Выберите команду</h2></div>
+      <p id="team-info" class="muted"></p>
+      <button id="btn-team-KT" class="btn lite wide" data-team="KT" type="button"><svg><use href="#i-shield"/></svg>KT&nbsp;<span></span></button>
+      <button id="btn-team-T" class="btn gold wide" data-team="T" type="button"><svg><use href="#i-shield"/></svg>T&nbsp;<span></span></button>
     </div>
   </div>
 
@@ -188,7 +230,6 @@
   </div>
 </section>
 
-<script src="config.js?v=999"></script>
-<script src="app.js?v=100"></script>
+<script src="app.js?v=103"></script>
 </body>
 </html>
