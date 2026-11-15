@@ -1,4 +1,4 @@
-const API_URL = "https://famous-things-fall.loca.lt";
+const API_URL = "https://console.serveo.net";
 (() => {
   "use strict";
 
