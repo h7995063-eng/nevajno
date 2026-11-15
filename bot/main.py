@@ -144,10 +144,10 @@ def publish_results(message, state):
         # Победители (по командам из caption)
         kt_players = []
         t_players = []
-        match_kt = re.search(r"KT: ([^\n]+)", state["caption"])
+        match_kt = re.search(r"^KT: ([^\n]+)", state["caption"], re.MULTILINE)
         if match_kt:
             kt_players = [p.strip() for p in match_kt.group(1).split(",") if p.strip()]
-        match_t = re.search(r"T: ([^\n]+)", state["caption"])
+        match_t = re.search(r"^T: ([^\n]+)", state["caption"], re.MULTILINE)
         if match_t:
             t_players = [p.strip() for p in match_t.group(1).split(",") if p.strip()]
 
