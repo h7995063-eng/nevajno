@@ -683,15 +683,30 @@ def api_news_post():
         return jsonify(error="Не авторизован"), 401
     if u["id"] not in ADMIN_IDS:
         return jsonify(error="Только для админов"), 403
-    b = request.get_json(silent=True) or {}
-    title = b.get("title", "").strip()
-    content = b.get("content", "").strip()
+
+    title = request.form.get("title", "").strip()
+    content = request.form.get("content", "").strip()
     if not title or not content:
         return jsonify(error="Заполните заголовок и текст"), 400
+
+    photo_id = ""
+    if 'photo' in request.files:
+        file = request.files['photo']
+        if file and file.filename:
+            import requests
+            files = {'photo': (file.filename, file.read(), file.mimetype)}
+            resp = requests.post(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto",
+                data={"chat_id": ADMIN_CHAT_ID, "caption": f"Фото для новости: {title}"},
+                files=files, timeout=15
+            )
+            if resp.ok:
+                photo_id = resp.json()["result"]["photo"][-1]["file_id"]
+
     conn = db()
     conn.execute(
-        "INSERT INTO news (title, content, author, created_at) VALUES (?, ?, ?, ?)",
-        (title, content, u.get("username", "admin"), now())
+        "INSERT INTO news (title, content, photo_id, created_at) VALUES (?, ?, ?, ?)",
+        (title, content, photo_id, now())
     )
     conn.commit()
     return jsonify(ok=True)
