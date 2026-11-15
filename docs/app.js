@@ -792,13 +792,7 @@ const API_URL = NOTIFY_URL;
     if (savedAvatar) {
       $("#p-avatar").innerHTML = `<img src="${savedAvatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
     } else {
-      // Показываем аватарку (если загружена)
-    const savedAvatar = localStorage_get("avatar_" + TG_ID);
-    if (savedAvatar) {
-      $("#p-avatar").innerHTML = `<img src="${savedAvatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-    } else {
       $("#p-avatar").textContent = me.nickname.charAt(0).toUpperCase();
-    }
     }
     $("#p-nick").textContent = me.nickname;
     $("#p-gid").textContent = me.game_id;
