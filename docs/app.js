@@ -1027,6 +1027,7 @@ const API_URL = NOTIFY_URL;
   const btnNewsSubmit = document.getElementById("btn-news-submit");
   if (btnNewsSubmit) {
     btnNewsSubmit.addEventListener("click", async () => {
+      toast("Публикация...", "ok");
       const title = $("#in-news-title").value.trim();
       const content = $("#in-news-content").value.trim();
       if (!title || !content) return toast("Заполните заголовок и текст", "err");
