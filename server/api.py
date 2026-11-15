@@ -18,7 +18,7 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN", "")  # пусто = dev-режим бе�
 ADMIN_IDS = {int(x) for x in os.environ.get("ADMIN_IDS", "6999358439").split(",") if x.strip().isdigit()}
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "shoke26")
 CHANNEL_ID = os.environ.get("CHANNEL_ID", "-1004336512603")
-ADMIN_CHAT_ID = os.environ.get("ADMIN_CHAT_ID", "-5577521115")
+ADMIN_CHAT_ID = os.environ.get("ADMIN_CHAT_ID", "-1003741583506")
 ADMIN_TOPIC_ID = os.environ.get("ADMIN_TOPIC_ID", "")  # ID темы "Проверка результатов"
 PUBLIC_CHAT_ID = os.environ.get("PUBLIC_CHAT_ID", "-1004336512603")
 PUBLIC_TOPIC_ID = os.environ.get("PUBLIC_TOPIC_ID", "")  # ID темы "Результаты матчей"
