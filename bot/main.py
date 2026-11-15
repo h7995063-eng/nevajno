@@ -2,7 +2,6 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from config import BOT_TOKEN
 import re
-import json
 
 MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/app_v3.html"
 ADMIN_CHAT_ID = -1003741583506
@@ -38,11 +37,9 @@ def handle_text(message):
     user_id = message.from_user.id
     text = message.text.strip()
 
-    # Если админ ответил на сообщение с фото (скриншот)
+    # Сценарий 1: админ ответил на фото (скриншот) — начинаем опрос
     if message.reply_to_message and message.reply_to_message.photo:
-        # Запрашиваем статистику по игрокам
         caption = message.reply_to_message.caption or ""
-        # Извлекаем список игроков из подписи (после "Игроки: ")
         players = []
         match = re.search(r"Игроки: (.+)", caption)
         if match:
@@ -58,9 +55,28 @@ def handle_text(message):
             "stats": {},
             "caption": caption,
         }
-
-        # Начинаем опрос первого игрока
         ask_next_player(message)
+        return
+
+    # Сценарий 2: админ вводит статистику (уже в процессе опроса)
+    if user_id in states:
+        state = states[user_id]
+        parts = text.split()
+        if len(parts) != 3:
+            bot.reply_to(message, "Ошибка: введите три числа через пробел (Киллы, Смерти, Ассисты).")
+            return
+        try:
+            kills, deaths, assists = map(int, parts)
+        except ValueError:
+            bot.reply_to(message, "Ошибка: введите числа.")
+            return
+
+        player = state["players"][state["current"]]
+        kd = kills / deaths if deaths > 0 else kills
+        state["stats"][player] = {"kills": kills, "deaths": deaths, "assists": assists, "kd": round(kd, 2)}
+        state["current"] += 1
+        ask_next_player(message)
+        return
 
 
 def ask_next_player(message):
@@ -71,7 +87,6 @@ def ask_next_player(message):
 
     idx = state["current"]
     if idx >= len(state["players"]):
-        # Все игроки опрошены — считаем КД и публикуем
         publish_results(message, state)
         return
 
@@ -84,42 +99,13 @@ def ask_next_player(message):
     )
 
 
-@bot.message_handler(func=lambda msg: msg.chat.id == ADMIN_CHAT_ID and msg.from_user.id in states and msg.reply_to_message is None)
-def handle_stats_input(message):
-    user_id = message.from_user.id
-    state = states.get(user_id)
-    if not state:
-        return
-
-    text = message.text.strip()
-    parts = text.split()
-    if len(parts) != 3:
-        bot.reply_to(message, "Ошибка: введите три числа через пробел (Киллы, Смерти, Ассисты).")
-        return
-
-    try:
-        kills, deaths, assists = map(int, parts)
-    except ValueError:
-        bot.reply_to(message, "Ошибка: введите числа.")
-        return
-
-    player = state["players"][state["current"]]
-    kd = kills / deaths if deaths > 0 else kills
-    state["stats"][player] = {"kills": kills, "deaths": deaths, "assists": assists, "kd": round(kd, 2)}
-    state["current"] += 1
-
-    ask_next_player(message)
-
-
 def publish_results(message, state):
-    # Формируем итоговую таблицу
     lines = ["📊 <b>Результаты матча</b>\n"]
     for player, s in state["stats"].items():
         lines.append(f"{player}: {s['kills']}/{s['deaths']}/{s['assists']} (КД {s['kd']})")
 
     text = "\n".join(lines)
     bot.reply_to(message, text, parse_mode="HTML")
-    # Сбрасываем состояние
     states.pop(message.from_user.id, None)
 
 
