@@ -145,3 +145,8 @@ def publish_results(message, state):
         bot.reply_to(message, f"❌ Ошибка публикации в паблик: {e}")
 
     states.pop(message.from_user.id, None)
+
+
+if __name__ == "__main__":
+    print("Бот запущен")
+    bot.infinity_polling()
