@@ -152,6 +152,10 @@ def publish_results(message, state):
             requests.post(f"{API_URL}/api/points/update", json={"nicknames": winners, "points_delta": 20}, headers=headers, timeout=10)
         if losers:
             requests.post(f"{API_URL}/api/points/update", json={"nicknames": losers, "points_delta": -15}, headers=headers, timeout=10)
+        # Обновляем КД и АВГ
+        for player, s in state["stats"].items():
+            kd = s["kills"] / s["deaths"] if s["deaths"] > 0 else s["kills"]
+            requests.post(f"{API_URL}/api/stats/update", json={"nickname": player, "kd": round(kd, 2), "avg": 0}, headers=headers, timeout=10)
         bot.reply_to(message, "✅ Поинты обновлены в базе.")
     except Exception as e:
         bot.reply_to(message, f"⚠️ Ошибка обновления поинтов: {e}")
