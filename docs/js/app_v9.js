@@ -1018,6 +1018,7 @@ const API_URL = NOTIFY_URL;
           <button class="btn ghost" data-adm="mute" data-id="${p.tg_id}" type="button">${ICON("mute")}Мут</button>
           <button class="btn ghost" data-adm="unban" data-id="${p.tg_id}" type="button">${ICON("check")}Разбан</button>
           <button class="btn ghost" data-adm="unmute" data-id="${p.tg_id}" type="button">${ICON("check")}Размут</button>
+          <button class="btn ghost" data-adm="badge" data-id="${p.tg_id}" type="button">${ICON("star")}Бейдж</button>
         </div>
       </div>`).join("") : `<div style="text-align:center; padding:40px 20px; color:rgba(139,152,168,0.5); font-size:14px;">Игроки не найдены</div>`;
   }
@@ -1025,6 +1026,20 @@ const API_URL = NOTIFY_URL;
   async function adminAction(action, id) {
     const p = getAllUsers().find((x) => x.tg_id === Number(id));
     if (!p) return;
+    if (action === "badge") {
+      punish = { action: "badge", id: p.tg_id, nickname: p.nickname };
+      $("#punish-title").textContent = "Выдать бейдж";
+      $("#punish-target").textContent = `${p.nickname} · ID ${p.game_id}`;
+      $("#sel-time").innerHTML = `
+        <option value="">Без бейджа</option>
+        <option value="hltv">HLTV</option>
+        <option value="cybershoke">CYBERSHOKE</option>
+      `;
+      $("#in-reason").value = "";
+      $("#punish-error").classList.add("hidden");
+      $("#m-punish").classList.remove("hidden");
+      return;
+    }
     if (action === "ban" || action === "mute") {
       toast("DEBUG: adminAction " + action + " for " + p.nickname, "ok");
       punish = { action, id: p.tg_id, nickname: p.nickname };
