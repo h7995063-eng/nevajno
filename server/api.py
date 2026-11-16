@@ -876,8 +876,14 @@ def api_admin():
         out = []
         for r in rows:
             d = dict(r)
-            d["is_banned"] = bool(d["is_banned"] and d["ban_until"] > t)
-            d["is_muted"] = bool(d["is_muted"] and d["mute_until"] > t)
+            try:
+                d["is_banned"] = bool(d["is_banned"] and d["ban_until"] and int(d["ban_until"]) > t)
+            except (TypeError, ValueError):
+                d["is_banned"] = bool(d["is_banned"])
+            try:
+                d["is_muted"] = bool(d["is_muted"] and d["mute_until"] and int(d["mute_until"]) > t)
+            except (TypeError, ValueError):
+                d["is_muted"] = bool(d["is_muted"])
             out.append(d)
         return jsonify(players=out)
 
