@@ -22,7 +22,8 @@ ADMIN_CHAT_ID = os.environ.get("ADMIN_CHAT_ID", "-1003741583506")
 ADMIN_TOPIC_ID = os.environ.get("ADMIN_TOPIC_ID", "")  # ID темы "Проверка результатов"
 PUBLIC_CHAT_ID = os.environ.get("PUBLIC_CHAT_ID", "-1004336512603")
 PUBLIC_TOPIC_ID = os.environ.get("PUBLIC_TOPIC_ID", "")  # ID темы "Результаты матчей"
-TOPIC_ID = os.environ.get("TOPIC_ID", "")  # ID темы «Активные матчи»; пусто = без темы
+TOPIC_ID = os.environ.get("TOPIC_ID", "")
+TOPIC_ID_PUNISH = os.environ.get("TOPIC_ID_PUNISH", "32")  # ID темы «Активные матчи»; пусто = без темы
 MINI_APP_URL = os.environ.get("MINI_APP_URL", "")  # https://t.me/<бот>/<приложение>
 PERMANENT = 4102444800  # 2100-01-01
 ONLINE_TTL = 120
@@ -87,8 +88,8 @@ def notify_punishment(kind, nickname, reason, duration, admin="CYBERSHOKE"):
         f"├ Забанил администратор <b>{admin}</b>"
     )
     data = {"chat_id": CHANNEL_ID, "text": text, "parse_mode": "HTML"}
-    if TOPIC_ID.isdigit():
-        data["message_thread_id"] = int(TOPIC_ID)
+    if TOPIC_ID_PUNISH.isdigit():
+        data["message_thread_id"] = int(TOPIC_ID_PUNISH)
     try:
         requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", data=data, timeout=10)
     except Exception as e:
