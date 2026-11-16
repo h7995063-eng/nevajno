@@ -952,7 +952,7 @@ const API_URL = NOTIFY_URL;
     } else {
       $("#p-avatar").textContent = me.nickname.charAt(0).toUpperCase();
     }
-    $("#p-nick").textContent = me.nickname;
+    $("#p-nick").innerHTML = me.nickname + (me.badge ? ` <img src="assets/badges/${me.badge}.png" style="width:20px;height:20px;vertical-align:middle;margin-left:4px;" onerror="this.style.display='none'">` : "");
     $("#p-gid").textContent = me.game_id;
     $("#p-points").textContent = me.points.toLocaleString("ru-RU");
     $("#p-coins").textContent = me.coins.toLocaleString("ru-RU");
@@ -1037,12 +1037,21 @@ const API_URL = NOTIFY_URL;
       `;
       $("#in-reason").value = "";
       $("#punish-error").classList.add("hidden");
+      // Скрываем "Срок" и "Причину" для бейджа
+      const selTimeLabel = $("#sel-time").closest(".field");
+      const reasonLabel = $("#in-reason").closest(".field");
+      if (selTimeLabel) selTimeLabel.style.display = "none";
+      if (reasonLabel) reasonLabel.style.display = "none";
       $("#m-punish").classList.remove("hidden");
       return;
     }
     if (action === "ban" || action === "mute") {
-      toast("DEBUG: adminAction " + action + " for " + p.nickname, "ok");
       punish = { action, id: p.tg_id, nickname: p.nickname };
+      // Показываем "Срок" и "Причину" обратно
+      const selTimeLabel = $("#sel-time").closest(".field");
+      const reasonLabel = $("#in-reason").closest(".field");
+      if (selTimeLabel) selTimeLabel.style.display = "";
+      if (reasonLabel) reasonLabel.style.display = "";
       $("#punish-title").textContent = action === "ban" ? "Бан игрока" : "Мут игрока";
       $("#punish-target").textContent = `${p.nickname} · ID ${p.game_id}`;
       $("#sel-time").innerHTML = TIMES.map((t) => `<option value="${t.min}">${esc(t.label)}</option>`).join("");
