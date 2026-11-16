@@ -1077,6 +1077,28 @@ const API_URL = NOTIFY_URL;
     const err = $("#punish-error");
     err.classList.add("hidden");
     try {
+      if (punish.action === "badge") {
+        const badge = $("#sel-time").value;
+        const res = await fetch(API_URL + "/api/admin/badge", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }),
+            "X-Admin-Password": window.ADMIN_PASSWORD || "shoke26",
+          },
+          body: JSON.stringify({ nickname: punish.nickname, badge }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          closeModals();
+          toast("Бейдж выдан", "ok");
+          drawAdminList();
+        } else {
+          err.textContent = data.error || "Ошибка";
+          err.classList.remove("hidden");
+        }
+        return;
+      }
       const minutes = Number($("#sel-time").value);
       const reason = $("#in-reason").value.trim();
       const res = await fetch(API_URL + "/api/admin", {
