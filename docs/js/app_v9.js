@@ -862,7 +862,7 @@ const API_URL = NOTIFY_URL;
     // Функция для бейджика
     const getBadge = (badge) => {
       if (!badge) return "";
-      return `<img src="assets/badges/${badge}.png" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;margin-left:4px;" onerror="this.style.display='none'">`;
+      return `<img src="assets/badges/${badge}.png" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-left:2px;" onerror="this.style.display='none'">`;
     };
 
     let podiumHtml = "";
@@ -952,7 +952,7 @@ const API_URL = NOTIFY_URL;
     } else {
       $("#p-avatar").textContent = me.nickname.charAt(0).toUpperCase();
     }
-    $("#p-nick").innerHTML = me.nickname + (me.badge ? ` <img src="assets/badges/${me.badge}.png" style="width:20px;height:20px;vertical-align:middle;margin-left:4px;" onerror="this.style.display='none'">` : "");
+    $("#p-nick").innerHTML = me.nickname + (me.badge ? ` <img src="assets/badges/${me.badge}.png" style="width:18px;height:18px;vertical-align:middle;margin-left:2px;" onerror="this.style.display='none'">` : "");
     $("#p-gid").textContent = me.game_id;
     $("#p-points").textContent = me.points.toLocaleString("ru-RU");
     $("#p-coins").textContent = me.coins.toLocaleString("ru-RU");
