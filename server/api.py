@@ -945,6 +945,20 @@ def api_admin():
     else:
         return jsonify(error="Неизвестное действие"), 400
     db().commit()
+
+    # Уведомляем канал о наказании
+    if action in ("ban", "mute"):
+        try:
+            row = db().execute("SELECT nickname FROM users WHERE tg_id=?", (target,)).fetchone()
+            nick = row["nickname"] if row else f"ID {target}"
+            if minutes == 0:
+                dur_text = "навсегда"
+            else:
+                dur_text = f"{minutes} мин"
+            notify_punishment(action, nick, reason if action == "ban" else "не указана", dur_text)
+        except Exception as e:
+            app.logger.warning(f"notify_punishment failed: {e}")
+
     return jsonify(ok=True)
 
 
