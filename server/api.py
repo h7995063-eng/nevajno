@@ -67,6 +67,33 @@ def handle_error(e):
     return jsonify(error="Внутренняя ошибка сервера"), 500
 
 
+
+def notify_punishment(kind, nickname, reason, duration, admin="CYBERSHOKE"):
+    """Отправляет уведомление о наказании в тему 'Наказание' (TOPIC_ID=32)."""
+    import requests
+    icons = {"ban": "🚫", "mute": "🔇", "warn": "⚠️"}
+    labels = {"ban": "забанен", "mute": "заглушён", "warn": "получил варн"}
+    icon = icons.get(kind, "⚠️")
+    label = labels.get(kind, "наказан")
+    if duration == "навсегда":
+        dur_text = "навсегда"
+    else:
+        dur_text = f"на {duration}"
+    text = (
+        f"{icon} <b>Игрок {label}</b>\n"
+        f"├ Ник: <b>{nickname}</b>\n"
+        f"├ Причина: {reason}\n"
+        f"└ {dur_text.capitalize()}\n"
+        f"├ Забанил администратор <b>{admin}</b>"
+    )
+    data = {"chat_id": CHANNEL_ID, "text": text, "parse_mode": "HTML"}
+    if TOPIC_ID.isdigit():
+        data["message_thread_id"] = int(TOPIC_ID)
+    try:
+        requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", data=data, timeout=10)
+    except Exception as e:
+        app.logger.warning(f"notify_punishment failed: {e}")
+
 def now():
     return int(time.time())
 
