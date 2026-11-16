@@ -1030,6 +1030,12 @@ const API_URL = NOTIFY_URL;
       punish = { action: "badge", id: p.tg_id, nickname: p.nickname };
       $("#punish-title").textContent = "Выдать бейдж";
       $("#punish-target").textContent = `${p.nickname} · ID ${p.game_id}`;
+      // Показываем поле "Срок" как выбор бейджа
+      const selTimeLabel = $("#sel-time").closest(".field");
+      if (selTimeLabel) {
+        selTimeLabel.style.display = "";
+        selTimeLabel.querySelector("span").textContent = "Бейдж";
+      }
       $("#sel-time").innerHTML = `
         <option value="">Без бейджа</option>
         <option value="hltv">HLTV</option>
@@ -1037,10 +1043,8 @@ const API_URL = NOTIFY_URL;
       `;
       $("#in-reason").value = "";
       $("#punish-error").classList.add("hidden");
-      // Скрываем "Срок" и "Причину" для бейджа
-      const selTimeLabel = $("#sel-time").closest(".field");
+      // Скрываем "Причину" для бейджа
       const reasonLabel = $("#in-reason").closest(".field");
-      if (selTimeLabel) selTimeLabel.style.display = "none";
       if (reasonLabel) reasonLabel.style.display = "none";
       $("#m-punish").classList.remove("hidden");
       return;
@@ -1050,7 +1054,10 @@ const API_URL = NOTIFY_URL;
       // Показываем "Срок" и "Причину" обратно
       const selTimeLabel = $("#sel-time").closest(".field");
       const reasonLabel = $("#in-reason").closest(".field");
-      if (selTimeLabel) selTimeLabel.style.display = "";
+      if (selTimeLabel) {
+        selTimeLabel.style.display = "";
+        selTimeLabel.querySelector("span").textContent = "Срок";
+      }
       if (reasonLabel) reasonLabel.style.display = "";
       $("#punish-title").textContent = action === "ban" ? "Бан игрока" : "Мут игрока";
       $("#punish-target").textContent = `${p.nickname} · ID ${p.game_id}`;
