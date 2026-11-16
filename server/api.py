@@ -227,7 +227,11 @@ def load_user(tg_id):
     if row is None:
         return None
     t = now()
-    if row["is_banned"] and row["ban_until"] <= t:
+    try:
+        ban_until = int(row["ban_until"]) if row["ban_until"] else 0
+    except (TypeError, ValueError):
+        ban_until = 0
+    if row["is_banned"] and ban_until <= t:
         db().execute("UPDATE users SET is_banned=0, ban_reason='', ban_until=0 WHERE tg_id=?", (tg_id,))
     if row["is_muted"] and row["mute_until"] <= t:
         db().execute("UPDATE users SET is_muted=0, mute_until=0 WHERE tg_id=?", (tg_id,))
