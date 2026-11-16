@@ -5,7 +5,7 @@ import re
 import json
 import requests
 
-MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/app_v5.html"
+MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/app_v6.html"
 API_URL = "https://instructors-built-mate-drain.trycloudflare.com"
 ADMIN_CHAT_ID = -1003741583506
 
