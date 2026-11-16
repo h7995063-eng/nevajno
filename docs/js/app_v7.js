@@ -217,6 +217,7 @@ const API_URL = NOTIFY_URL;
         body: JSON.stringify({}),
       });
       const data = await res.json();
+      if (data.banned) return { is_banned: true, ban_reason: data.ban_reason, ban_until: data.ban_until };
       if (data.registered && data.user) return withAdmin(data.user);
     } catch (e) { /* сервер недоступен */ }
     return null;
