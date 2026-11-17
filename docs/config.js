@@ -1,2 +1,1 @@
-window.API_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
-window.NOTIFY_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
+window.API_URL = "https://potentially-vacancies-washing-prefix.trycloudflare.com";
