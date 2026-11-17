@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ТОПЫ — CYBERSHOKE</title>
+<link rel="stylesheet" href="css/style_v2.css">
+<style>
+  .top-list { display: flex; flex-direction: column; gap: 8px; }
+  .top-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 12px;
+    text-decoration: none; color: var(--text);
+    transition: transform 0.15s;
+  }
+  .top-item:active { transform: scale(0.98); }
+  .top-item .rank {
+    font-family: 'Orbitron', sans-serif; font-weight: 900;
+    font-size: 16px; color: var(--muted); width: 28px;
+  }
+  .top-item:nth-child(1) .rank { color: #f0b358; }
+  .top-item:nth-child(2) .rank { color: #c0c0c0; }
+  .top-item:nth-child(3) .rank { color: #cd7f32; }
+  
+  .top-item .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--bg-2); display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron'; font-weight: 900; color: var(--muted);
+  }
+  .top-item .nick { flex: 1; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .top-item .elo { font-family: 'Orbitron', sans-serif; color: var(--accent-2); font-weight: 700; }
+</style>
+<link rel="stylesheet" href="css/nav.css"></head>
+<body>
+<div class="container">
+  <div class="header">
+    <a href="main_v3_v10.html" class="back"><svg style="width:20px;height:20px"><use href="assets/icons/back.svg#i"/></svg></a>
+    <div class="title"><h1>ЛИДЕРБОРД</h1><div class="sub">РЕЙТИНГ ИГРОКОВ</div></div>
+  </div>
+  <div id="top-list"></div>
+</div>
+<script src="js/app_v10.js?v=1"></script>
+<script>
+  (async function () {
+    const el = document.getElementById("top-list");
+    el.innerHTML = '<div class="loader"></div>';
+    
+    const { data } = await api("/api/stats/top");
+    if (!data?.ok) { el.innerHTML = '<div class="empty">Ошибка загрузки</div>'; return; }
+    if (!data.top.length) { el.innerHTML = '<div class="empty">Пока нет игроков</div>'; return; }
+
+    el.innerHTML = `<div class="top-list">${data.top.map((u, i) => `
+      <a href="player_v10.html?nick=${encodeURIComponent(u.nickname)}" class="top-item">
+        <div class="rank">#${i + 1}</div>
+        <div class="avatar">${u.nickname.charAt(0).toUpperCase()}</div>
+        <div class="nick">${u.nickname} ${u.is_premium ? '<span class="badge badge-premium">★ PRO</span>' : ''}</div>
+        <div class="elo">${u.elo}</div>
+      </a>
+    `).join("")}</div>`;
+  })();
+</script>
+<nav class="bottom-nav">
+  <a href="main_v3_v10.html"><svg><use href="assets/icons/home.svg#i"/></svg>Главная</a>
+  <a href="lobby_v10.html"><svg><use href="assets/icons/sword.svg#i"/></svg>Лобби</a>
+  <a href="stats_v3_v10.html"><svg><use href="assets/icons/trophy.svg#i"/></svg>Топы</a>
+  <a href="profile_v3_v10.html"><svg><use href="assets/icons/user.svg#i"/></svg>Профиль</a>
+</nav>
+</body>
+</html>

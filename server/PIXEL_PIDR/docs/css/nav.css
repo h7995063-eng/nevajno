@@ -1,0 +1,61 @@
+/* Нижняя навигация */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(10, 14, 20, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+.bottom-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 10px;
+  font-family: 'Orbitron', sans-serif;
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+.bottom-nav a.active {
+  color: var(--accent);
+  background: rgba(255, 70, 85, 0.1);
+}
+.bottom-nav a svg {
+  width: 24px; height: 24px;
+}
+
+/* Отступ для контента, чтобы не перекрывался навигацией */
+.container { padding-bottom: 100px; }
+
+/* Сетка для главной (карточки) */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.dashboard-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.15s;
+}
+.dashboard-card:active { transform: scale(0.97); }
+.dashboard-card .icon { color: var(--accent); }
+.dashboard-card .icon svg { width: 28px; height: 28px; }
+.dashboard-card .title { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px; }
+.dashboard-card .desc { font-size: 11px; color: var(--muted); }

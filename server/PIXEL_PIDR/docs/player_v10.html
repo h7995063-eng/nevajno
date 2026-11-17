@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Профиль — CYBERSHOKE</title>
+<link rel="stylesheet" href="css/style_v2.css">
+<style>
+  .player-head { text-align: center; padding: 20px 0; }
+  .player-head .avatar {
+    width: 84px; height: 84px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px; color: #fff; font-size: 36px; font-weight: 900;
+  }
+  .player-head .nick { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .player-head .game-id { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .stat-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 12px; }
+  .stat-box .v { font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; color: var(--accent-2); }
+  .stat-box .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <a href="stats_v3_v10.html" class="back"><svg style="width:20px;height:20px"><use href="assets/icons/back.svg#i"/></svg></a>
+    <div class="title"><h1>ПРОФИЛЬ ИГРОКА</h1></div>
+  </div>
+  <div id="player-content">
+    <div class="loader"></div>
+  </div>
+</div>
+<script src="js/app_v10.js?v=1"></script>
+<script>
+  (async function () {
+    const params = new URLSearchParams(window.location.search);
+    const nickname = params.get('nick');
+    if (!nickname) {
+      document.getElementById("player-content").innerHTML = '<div class="empty">Игрок не найден</div>';
+      return;
+    }
+
+    const { data } = await api("/api/player/" + encodeURIComponent(nickname));
+    if (!data?.ok) {
+      document.getElementById("player-content").innerHTML = '<div class="empty">Игрок не найден</div>';
+      return;
+    }
+
+    const u = data.user;
+    const initial = u.nickname.charAt(0).toUpperCase();
+
+    document.getElementById("player-content").innerHTML = `
+      <div class="player-head">
+        <div class="avatar">${initial}</div>
+        <div class="nick">${u.nickname} ${u.is_premium ? '<span class="badge badge-premium">★ PRO</span>' : ''}</div>
+        <div class="game-id">ID: ${u.game_id || '—'}</div>
+      </div>
+      <div class="stat-box">
+        <div class="v">${u.elo}</div>
+        <div class="l">ELO Рейтинг</div>
+      </div>
+      <div class="stat-box">
+        <div class="v">${new Date(u.created_at).toLocaleDateString('ru-RU')}</div>
+        <div class="l">Дата регистрации</div>
+      </div>
+    `;
+  })();
+</script>
+</body>
+</html>

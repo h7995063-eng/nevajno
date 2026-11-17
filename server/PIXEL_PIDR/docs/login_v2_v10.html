@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CYBERSHOK</title>
+<link rel="stylesheet" href="css/style_v2.css">
+<style>
+  .screen { display: none; animation: fadeIn 0.3s ease-in-out; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-loading { text-align: center; padding-top: 100px; }
+  .hero-loading .logo { width: 220px; margin-bottom: 20px; }
+  .rules-text { font-size: 14px; color: var(--muted); line-height: 1.6; background: var(--card); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 24px; }
+  .rules-text ul { padding-left: 20px; margin-top: 10px; }
+  .rules-text li { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div id="screen-loading" class="screen active">
+    <div class="hero-loading">
+      <img src="assets/logo.svg" alt="CYBERSHOK" class="logo">
+      <div class="tag" style="margin-bottom: 40px; letter-spacing: 4px; font-size: 13px;">COUNTERFLAME</div>
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <div id="screen-rules" class="screen">
+    <div class="header">
+      <img src="assets/logo.svg" alt="CYBERSHOK" class="logo">
+      <div class="title"><h1>ПРАВИЛА</h1><div class="sub">ПОЛИТИКА ПРИЛОЖЕНИЯ</div></div>
+    </div>
+    <div class="rules-text">
+      <p>Добро пожаловать в <b>CYBERSHOK</b>!</p>
+      <p>Для использования приложения необходимо согласиться с правилами:</p>
+      <ul>
+        <li>Играть честно, без использования читов.</li>
+        <li>Предоставлять правдивые скриншоты матчей.</li>
+        <li>Уважать других участников сообщества.</li>
+      </ul>
+      <p style="margin-top: 12px; color: var(--accent);">При нарушении — блокировка без права восстановления.</p>
+    </div>
+    <button class="btn btn-primary" onclick="nextScreen('screen-link')">ПРИНИМАЮ УСЛОВИЯ</button>
+  </div>
+
+  <div id="screen-link" class="screen">
+    <div class="header">
+      <a href="#" class="back" onclick="nextScreen('screen-rules')"><svg style="width:20px;height:20px"><use href="assets/icons/back.svg#i"/></svg></a>
+      <div class="title"><h1>ПРИВЯЗКА</h1><div class="sub">COUNTERFLAME АККАУНТ</div></div>
+    </div>
+    <form id="reg-form" class="form">
+      <div class="field">
+        <label>Ник в игре</label>
+        <input name="nickname" placeholder="Придумайте ник" required maxlength="32">
+      </div>
+      <div class="field">
+        <label>ID в CounterFlame</label>
+        <input name="game_id" placeholder="Введите ваш ID в CounterFlame" required maxlength="64">
+      </div>
+      <button type="submit" class="btn btn-primary" id="submit-btn">ПРИВЯЗАТЬ АККАУНТ</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/config_v2.js?v=8"></script>
+<script>
+  function nextScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  (async function () {
+    const { data } = await api("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ init_data: initData }),
+    });
+
+    if (data?.ok && !data.need_register) {
+      localStorage.setItem("cs_token", data.token);
+      localStorage.setItem("cs_user", JSON.stringify(data.user));
+      location.replace("main_v3_v10.html");
+      return;
+    }
+
+    setTimeout(() => nextScreen('screen-rules'), 1500);
+
+    document.getElementById("reg-form").onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("submit-btn");
+      btn.disabled = true;
+      btn.textContent = "ПРИВЯЗКА...";
+
+      const fd = new FormData(e.target);
+      const { data: r } = await api("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ init_data: initData, nickname: fd.get("nickname"), game_id: fd.get("game_id") }),
+      });
+
+      if (r?.ok) {
+        localStorage.setItem("cs_token", r.token);
+        localStorage.setItem("cs_user", JSON.stringify(r.user));
+        toast("Аккаунт привязан ✅", "ok");
+        setTimeout(() => location.replace("main_v3_v10.html"), 800);
+      } else if (r?.error === "already_registered") {
+        location.replace("main_v3_v10.html");
+      } else {
+        toast(r?.error || "Ошибка привязки", "error");
+        btn.disabled = false;
+        btn.textContent = "ПРИВЯЗАТЬ АККАУНТ";
+      }
+    };
+  })();
+</script>
+</body>
+</html>

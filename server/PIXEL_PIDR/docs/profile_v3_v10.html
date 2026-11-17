@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Профиль — CYBERSHOK</title>
+<link rel="stylesheet" href="css/style_v2.css">
+<link rel="stylesheet" href="css/nav.css"></head>
+<body>
+<div class="container">
+  <div class="header">
+    <a href="main_v3_v10.html" class="back"><svg><use href="assets/icons/back.svg#i"/></svg></a>
+    <div class="title">
+      <h1>ПРОФИЛЬ</h1>
+      <div class="sub">ТВОЙ АККАУНТ</div>
+    </div>
+  </div>
+
+  <div class="profile-head">
+    <div class="avatar"><svg><use href="assets/icons/user.svg#i"/></svg></div>
+    <div class="nick">
+      <span id="nick">—</span>
+      <span id="premium-badge"></span>
+    </div>
+    <div class="game-id">ID: <span id="game-id">—</span></div>
+    <div class="stats-row">
+      <div class="stat"><div class="v" id="elo">—</div><div class="l">ELO</div></div>
+      <div class="stat"><div class="v" id="coins">—</div><div class="l">Коины</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:10px">ПРЕМИУМ</h3>
+    <div class="row">
+      <span class="meta">Действует до:</span>
+      <span class="meta" id="premium-until">—</span>
+    </div>
+    <a href="premium_v3_v10.html" class="btn btn-primary" style="margin-top:12px; display:flex;">
+      <svg style="width:18px;height:18px"><use href="assets/icons/star.svg#i"/></svg>
+      ПЕРЕЙТИ К ПОДПИСКАМ
+    </a>
+  </div>
+
+  <form id="nick-form" class="card form">
+    <h3 style="margin-bottom:10px">СМЕНИТЬ НИК</h3>
+    <div class="field">
+      <input name="nickname" id="nick-input" placeholder="Новый ник" required maxlength="32">
+    </div>
+    <button type="submit" class="btn btn-secondary">СОХРАНИТЬ</button>
+  </form>
+</div>
+<script src="js/config.js"></script>
+<script src="js/profile.js?v=999"></script>
+<nav class="bottom-nav">
+  <a href="main_v3_v10.html"><svg><use href="assets/icons/home.svg#i"/></svg>Главная</a>
+  <a href="lobby_v10.html"><svg><use href="assets/icons/sword.svg#i"/></svg>Лобби</a>
+  <a href="stats_v3_v10.html"><svg><use href="assets/icons/trophy.svg#i"/></svg>Топы</a>
+  <a href="profile_v3_v10.html"><svg><use href="assets/icons/user.svg#i"/></svg>Профиль</a>
+</nav>
+</body>
+</html>

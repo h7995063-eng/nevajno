@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TEST</title>
+<style>
+body { background: #0a0e14; color: #fff; font-family: sans-serif; text-align: center; padding: 50px; }
+h1 { color: #ff4655; }
+p { font-size: 14px; }
+</style>
+</head>
+<body>
+<h1>TEST PAGE</h1>
+<p>Если ты видишь это в Telegram — значит, WebView работает.</p>
+<p id="info"></p>
+<script>
+document.getElementById("info").textContent = "URL: " + window.location.href + " | Telegram: " + (window.Telegram ? "YES" : "NO");
+</script>
+</body>
+</html>

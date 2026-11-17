@@ -15,12 +15,53 @@ from functools import wraps
 from urllib.parse import parse_qsl
 
 from flask import Flask, request, jsonify, g, send_from_directory
+import requests
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOCS_DIR = os.path.join(os.path.dirname(BASE_DIR), "docs")
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 DB_PATH = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "cybershoke.db"))
 
+
+
+try:
+    from config import BOT_TOKEN
+except ImportError:
+    BOT_TOKEN = "9226738939:AAFO3UtMr_3Mg4l_JqqC1CT_Hsa8dWh6vWA"
+
+LOG_CHAT_ID = -1004336512603
+LOG_THREAD_ID = 32
+
+def send_punishment_log(nickname, action_type, reason, admin_name, duration="Навсегда"):
+    if action_type == "ban":
+        title = "🚫 Игрок забанен"
+    elif action_type == "mute":
+        title = "🔇 Игрок заглушен"
+    elif action_type == "warn":
+        title = "⚠️ Игрок получил варн"
+    else:
+        title = "🛑 Наказание"
+
+    text = (
+        f"{title}\n"
+        f"├ Игрок: {nickname}\n"
+        f"├ Причина: {reason}\n"
+        f"└ {duration}\n"
+        f"├ забанил администратор {admin_name}"
+    )
+
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": LOG_CHAT_ID,
+        "message_thread_id": LOG_THREAD_ID,
+        "text": text,
+        "parse_mode": "HTML"
+    }
+
+    try:
+        requests.post(url, json=payload, timeout=5)
+    except Exception:
+        pass
 
 def load_token():
     token = os.environ.get("BOT_TOKEN", "").strip()
@@ -70,6 +111,26 @@ BANNER_UPLOAD_PLANS = ("premium", "lite")
 IMAGE_MAX_BYTES = 5 * 1024 * 1024
 
 app = Flask(__name__, static_folder=None)
+
+@app.route("/api/support", methods=["POST", "OPTIONS"])
+def api_support():
+    if request.method == "OPTIONS": return jsonify(ok=True)
+    tg_id = g.tg["id"]
+    data = request.json
+    category = data.get("category", "Другое")
+    message = data.get("message", "")
+    
+    con = db()
+    con.execute("INSERT INTO support_tickets (tg_id, category, message, created_at) VALUES (?, ?, ?, ?)", (tg_id, category, message, now()))
+    con.commit()
+    
+    # Отправляем в ТГ
+    try:
+        text = f"📩 Новое обращение\n👤 От: {tg_id}\n📂 Категория: {category}\n📝 Текст: {message}"
+        requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", json={"chat_id": LOG_CHAT_ID, "message_thread_id": LOG_THREAD_ID, "text": text}, timeout=5)
+    except: pass
+    
+    return jsonify(ok=True)
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024
 ONLINE = {}
 LAST_NOTIFY = {}
@@ -1431,12 +1492,16 @@ def api_admin():
             return jsonify(error="Неверное время"), 400
         until = PERMANENT if minutes <= 0 else now() + minutes * 60
         reason = str(body.get("reason", "")).strip()[:200]
+        target_row = con.execute("SELECT nickname FROM users WHERE tg_id=?", (target,)).fetchone()
+        nick = target_row["nickname"] if target_row else str(target)
         if action == "ban":
             if not reason:
                 return jsonify(error="Укажите причину бана"), 400
             con.execute("UPDATE users SET is_banned=1, ban_reason=?, ban_until=? WHERE tg_id=?", (reason, until, target))
+            send_punishment_log(nick, "ban", reason, "CYBERSHOKE", "Навсегда")
         else:
             con.execute("UPDATE users SET is_muted=1, mute_until=? WHERE tg_id=?", (until, target))
+            send_punishment_log(nick, "mute", reason or "Не указана", "CYBERSHOKE", "Навсегда")
     elif action == "unban":
         con.execute("UPDATE users SET is_banned=0, ban_reason='', ban_until=0 WHERE tg_id=?", (target,))
     elif action == "unmute":

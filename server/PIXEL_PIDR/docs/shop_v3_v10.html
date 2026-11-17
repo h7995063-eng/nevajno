@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>МАГАЗИН — CYBERSHOKE</title>
+<link rel="stylesheet" href="css/style_v2.css">
+<style>
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .shop-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.2s;
+  }
+  .shop-item:active { transform: scale(0.98); }
+  .shop-item.owned { border-color: var(--ok); }
+  .shop-item.premium-only { border-color: var(--premium-color); }
+  
+  .shop-item-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+  .shop-item-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .shop-item-price {
+    font-size: 12px;
+    color: var(--accent-2);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .shop-item-price.premium { color: var(--premium-color); }
+  
+  .shop-badge {
+    position: absolute; top: 8px; right: 8px;
+    background: var(--premium-color); color: #000;
+    font-size: 9px; font-weight: 900;
+    padding: 2px 6px; border-radius: 4px;
+  }
+</style>
+<link rel="stylesheet" href="css/nav.css"></head>
+<body>
+<div class="container">
+  <div class="header">
+    <a href="main_v3_v10.html" class="back"><svg style="width:20px;height:20px"><use href="assets/icons/back.svg#i"/></svg></a>
+    <div class="title"><h1>МАГАЗИН</h1><div class="sub">КАСТОМИЗАЦИЯ</div></div>
+  </div>
+
+  <!-- Баланс коинов -->
+  <div class="card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <span style="color:var(--muted); font-size:14px;">Ваш баланс:</span>
+    <span style="font-family:'Orbitron'; font-weight:900; color:var(--accent-2); font-size:18px;" id="shop-coins">0</span>
+  </div>
+
+  <h2 style="font-size:16px; margin-bottom:12px;">ЦВЕТА НИКА</h2>
+  <div class="shop-grid" id="shop-colors"></div>
+
+  <h2 style="font-size:16px; margin-top:24px; margin-bottom:12px;">РАМКИ ПРОФИЛЯ</h2>
+  <div class="shop-grid" id="shop-borders"></div>
+</div>
+
+<script src="js/app_v10.js?v=1"></script>
+<script>
+  // Данные магазина (пока статичные)
+  const colors = [
+    { id: 'red', name: 'Красный', price: 50, icon: '🔴', color: '#ff4655' },
+    { id: 'blue', name: 'Синий', price: 50, icon: '🔵', color: '#00d9ff' },
+    { id: 'gold', name: 'Золотой', price: 100, icon: '🟡', color: '#f0b358', premium: true },
+    { id: 'purple', name: 'Фиолетовый', price: 100, icon: '🟣', color: '#a855f7', premium: true },
+  ];
+
+  const borders = [
+    { id: 'none', name: 'Без рамки', price: 0, icon: '⬜', owned: true },
+    { id: 'bronze', name: 'Бронза', price: 75, icon: '🥉' },
+    { id: 'silver', name: 'Серебро', price: 150, icon: '🥈' },
+    { id: 'gold', name: 'Золото', price: 300, icon: '🥇', premium: true },
+  ];
+
+  // Рендер цветов
+  document.getElementById('shop-colors').innerHTML = colors.map(c => `
+    <div class="shop-item ${c.premium ? 'premium-only' : ''}" onclick="buyItem('color', '${c.id}', ${c.price})">
+      ${c.premium ? '<div class="shop-badge">PRO</div>' : ''}
+      <div class="shop-item-icon">${c.icon}</div>
+      <div class="shop-item-name">${c.name}</div>
+      <div class="shop-item-price ${c.premium ? 'premium' : ''}">${c.price} 🪙</div>
+    </div>
+  `).join("");
+
+  // Рендер рамок
+  document.getElementById('shop-borders').innerHTML = borders.map(b => `
+    <div class="shop-item ${b.premium ? 'premium-only' : ''} ${b.owned ? 'owned' : ''}" onclick="buyItem('border', '${b.id}', ${b.price})">
+      ${b.premium ? '<div class="shop-badge">PRO</div>' : ''}
+      <div class="shop-item-icon">${b.icon}</div>
+      <div class="shop-item-name">${b.name}</div>
+      <div class="shop-item-price ${b.premium ? 'premium' : ''}">${b.owned ? 'Есть' : b.price + ' 🪙'}</div>
+    </div>
+  `).join("");
+
+  // Загружаем баланс
+  (async function() {
+    const { data } = await api("/api/profile/me");
+    if (data?.ok) {
+      document.getElementById("shop-coins").textContent = data.user.coins;
+    }
+  })();
+
+  // Имитация покупки (пока просто показывает уведомление)
+  function buyItem(type, id, price) {
+    if (price === 0) return toast("Уже есть", "ok");
+    toast(`Покупка ${type} за ${price} монет (скоро)`, "warn");
+  }
+</script>
+<nav class="bottom-nav">
+  <a href="main_v3_v10.html"><svg><use href="assets/icons/home.svg#i"/></svg>Главная</a>
+  <a href="lobby_v10.html"><svg><use href="assets/icons/sword.svg#i"/></svg>Лобби</a>
+  <a href="stats_v3_v10.html"><svg><use href="assets/icons/trophy.svg#i"/></svg>Топы</a>
+  <a href="profile_v3_v10.html"><svg><use href="assets/icons/user.svg#i"/></svg>Профиль</a>
+</nav>
+</body>
+</html>

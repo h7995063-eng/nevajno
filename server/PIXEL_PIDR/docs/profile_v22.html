@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Профиль</title><link rel="stylesheet" href="css/style_main.css"></head>
+<body style="display:block; background:var(--bg);">
+<div class="page-container">
+  <div class="page-header">
+    <a href="app_v21.html" class="back-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></a>
+    <div class="page-title">ПРОФИЛЬ</div>
+  </div>
+  <div id="profile-content" class="card-glass" style="text-align:center;">Загрузка...</div>
+  <a href="premium_v22.html" class="card-glass" style="display:block; text-align:center; color:var(--premium); text-decoration:none; font-family:'Orbitron'; font-weight:700;">ПЕРЕЙТИ К ПОДПИСКАМ</a>
+</div>
+<script src="js/app_v10.js?v=22"></script>
+<script>
+  (async function () {
+    const el = document.getElementById("profile-content");
+    const { data } = await api("/api/profile/me");
+    if (!data?.ok) { el.innerHTML = "Ошибка"; return; }
+    const u = data.user;
+    el.innerHTML = `
+      <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg, var(--accent), var(--accent-2)); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; color:#fff; font-size:32px; font-weight:900;">${u.nickname.charAt(0).toUpperCase()}</div>
+      <div style="font-family:'Orbitron'; font-size:22px; font-weight:900;">${u.nickname}</div>
+      <div style="color:var(--muted); font-size:13px; margin-top:4px;">ID: ${u.game_id || 'Не привязан'}</div>
+      <div style="margin-top:12px; display:flex; justify-content:center; gap:16px;">
+        <span class="badge" style="color:var(--accent-2); border-color:var(--accent-2);">${u.elo} CP</span>
+        <span class="badge" style="color:var(--premium); border-color:var(--premium);">🪙 ${u.coins}</span>
+      </div>
+    `;
+  })();
+</script>
+</body></html>

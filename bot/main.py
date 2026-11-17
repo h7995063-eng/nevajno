@@ -8,6 +8,8 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from config import BOT_TOKEN, SERVER_URL
 
+import os
+TUNNEL_URL = open(os.path.expanduser("~/cybershoke/.tunnel_url")).read().strip() if os.path.exists(os.path.expanduser("~/cybershoke/.tunnel_url")) else ""
 MINIAPP_URL = "https://h7995063-eng.github.io/nevajno/app_v4.html"
 ADMIN_CHAT_ID = -1003741583506
 TUNNEL_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".tunnel_url")
