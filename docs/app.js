@@ -111,11 +111,17 @@
     const list = [];
     try {
         const fromUrl = new URLSearchParams(location.search).get("api");
-        if (fromUrl) list.push(fromUrl.replace(/\/+$/, ""));
+        if (fromUrl) {
+            const cleanUrl = fromUrl.replace(/\/+$/, "");
+            list.push(cleanUrl);
+        }
     } catch(e) {}
+    
     if (list.length === 0 && window.API_URL) {
-        list.push(window.API_URL);
+        const conf = String(window.API_URL).replace(/\/+$/, "");
+        if (conf) list.push(conf);
     }
+    
     list.push("");
     return list;
 }
