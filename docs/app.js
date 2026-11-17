@@ -154,7 +154,10 @@
     if (fromUrl && validBase(fromUrl)) { store("cs_api", fromUrl); list.push(fromUrl); }
     const saved = cleanBase(store("cs_api"));
     if (saved && validBase(saved)) list.push(saved);
-    const conf = cleanBase(window.API_URL);
+    const urlParams = new URLSearchParams(window.location.search);
+const apiParam = urlParams.get("api");
+if (apiParam) window.API_URL = apiParam;
+const conf = cleanBase(window.API_URL);
     if (conf && validBase(conf)) list.push(conf);
     list.push("");
     return list.filter((v, i) => list.indexOf(v) === i);
