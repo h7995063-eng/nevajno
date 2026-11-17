@@ -297,7 +297,7 @@ window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
     return (list || []).filter((b) => BADGES[b]).map((b) => `<span class="badge b-${b}">${esc(BADGES[b])}</span>`).join("");
   }
 
-  let me = null;
+  window.me = null;
   let my = null;
   let stack = [];
   let timers = [];
@@ -340,7 +340,7 @@ window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
       const res = await api("/api/auth", { method: "POST", body: {} });
       if (res.banned) return showBan(res);
       if (!res.registered) return show(store("terms") === "1" ? "s-register" : "s-welcome");
-      me = res.user;
+      window.me = res.user;
       enterApp();
     } catch (e) {
       if (e.data && e.data.banned) return showBan(e.data);
@@ -369,7 +369,7 @@ window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
     try {
       const res = await api("/api/auth", { method: "POST", body: { nickname: $("#in-nick").value.trim(), game_id: $("#in-gid").value.trim() } });
       if (res.banned) return showBan(res);
-      me = res.user;
+      window.me = res.user;
       enterApp();
     } catch (e) {
       err.textContent = e.message;
@@ -916,7 +916,7 @@ window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
   async function loadProfile() {
     fillProfile();
     const d = await api("/api/profile");
-    me = d.user;
+    window.me = d.user;
     fillProfile();
   }
 
@@ -945,7 +945,7 @@ window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
     const form = new FormData();
     form.append("file", blob, "avatar.jpg");
     const d = await api("/api/profile/avatar", { form });
-    me = d.user;
+    window.me = d.user;
     fillProfile();
     toast("Аватарка обновлена");
     haptic("ok");
@@ -953,7 +953,7 @@ window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
 
   async function removeAvatar() {
     const d = await api("/api/profile/avatar", { method: "POST", body: { avatar: "" } });
-    me = d.user;
+    window.me = d.user;
     fillProfile();
     toast("Фото профиля удалено");
   }
@@ -971,7 +971,7 @@ window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
 
   async function setBanner(value) {
     const d = await api("/api/profile/banner", { method: "POST", body: { banner: value } });
-    me = d.user;
+    window.me = d.user;
     fillProfile();
     openBanners();
     toast("Баннер обновлён");
