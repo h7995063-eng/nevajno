@@ -139,7 +139,7 @@
     if (tg && tg.close) tg.close(); else toast("Закройте вкладку, чтобы выйти");
   }
 
-  function openSupport() { window.location.href = "support.html"; } catch (e) {}
+  function openSupport() { window.location.href = "support.html"; }
     window.open(SUPPORT_URL, "_blank");
   }
 
@@ -149,15 +149,20 @@
 
   function apiCandidates() {
     const list = [];
+    try {
+        const fromUrl = new URLSearchParams(window.location.search).get("api");
+        if (fromUrl) {
+            const cleanUrl = fromUrl.replace(/\/+$/, "");
+            store("cs_api", cleanUrl);
+            list.push(cleanUrl);
+        }
+    } catch(e) {}
     let fromUrl = "";
     try { fromUrl = cleanBase(new URLSearchParams(location.search).get("api")); } catch (e) {}
     if (fromUrl && validBase(fromUrl)) { store("cs_api", fromUrl); list.push(fromUrl); }
     const saved = cleanBase(store("cs_api"));
     if (saved && validBase(saved)) list.push(saved);
-    const urlParams = new URLSearchParams(window.location.search);
-const apiParam = urlParams.get("api");
-if (apiParam) window.API_URL = apiParam;
-const conf = cleanBase(window.API_URL);
+    const conf = cleanBase(window.API_URL);
     if (conf && validBase(conf)) list.push(conf);
     list.push("");
     return list.filter((v, i) => list.indexOf(v) === i);
