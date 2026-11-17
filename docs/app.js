@@ -109,19 +109,16 @@
 
   function apiCandidates() {
     const list = [];
-    let fromUrl = "";
-    try { fromUrl = cleanBase(new URLSearchParams(location.search).get("api")); } catch (e) {}
-    if (fromUrl && validBase(fromUrl)) { store("cs_api", fromUrl); list.push(fromUrl); }
-    const saved = cleanBase(store("cs_api"));
-    if (saved && validBase(saved)) list.push(saved);
-    const urlParams = new URLSearchParams(window.location.search);
-    const apiParam = urlParams.get("api");
-    if (apiParam) window.API_URL = apiParam;
-    const conf = cleanBase(window.API_URL);
-    if (conf && validBase(conf)) list.push(conf);
+    try {
+        const fromUrl = new URLSearchParams(location.search).get("api");
+        if (fromUrl) list.push(fromUrl.replace(/\/+$/, ""));
+    } catch(e) {}
+    if (list.length === 0 && window.API_URL) {
+        list.push(window.API_URL);
+    }
     list.push("");
-    return list.filter((v, i) => list.indexOf(v) === i);
-  }
+    return list;
+}
 
   async function ping(base) {
     const ctrl = new AbortController();
