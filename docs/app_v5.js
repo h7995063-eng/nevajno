@@ -1,3 +1,13 @@
+
+// ==================== ПРИНУДИТЕЛЬНЫЙ СБРОС КЭША ====================
+try {
+    localStorage.removeItem('cs_api');
+    localStorage.removeItem('api_url');
+    localStorage.setItem('cs_api', 'https://discussed-delhi-appears-devel.trycloudflare.com');
+} catch(e) { console.error('Ошибка localStorage', e); }
+window.API_URL = 'https://discussed-delhi-appears-devel.trycloudflare.com';
+// ==================================================================
+
 window.API_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
 (() => {
   "use strict";
