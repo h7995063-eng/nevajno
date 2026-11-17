@@ -22,3 +22,6 @@ __pycache__/
 Thumbs.db
 bot/config.py
 .tunnel_url
+*.pid
+server/PIXEL_PIDR/
+server/uploads/
