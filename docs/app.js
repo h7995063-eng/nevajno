@@ -1,3 +1,4 @@
+window.API_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
 (() => {
   "use strict";
 
@@ -93,6 +94,7 @@
     return `${Math.floor(m / 1440)} дн назад`;
   }
 
+  try { localStorage.removeItem("cs_api"); } catch(e) {} 
   const tg = (window.Telegram && window.Telegram.WebApp) || null;
   if (tg) { try { tg.ready(); tg.expand(); } catch (e) {} }
 
