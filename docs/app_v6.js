@@ -1363,7 +1363,7 @@ window.sendTicket = async function() {
   try {
     const api = window.API_URL || "https://crimes-vegetables-paperbacks-semiconductor.trycloudflare.com";
     const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
-    const nick = (window.me && window.me.nickname) ? window.me.nickname : (typeof me !== "undefined" && me && me.nickname) ? me.nickname : "Игрок";
+    const nick = (typeof me !== "undefined" && me && me.nickname) ? me.nickname : (window.currentUser && window.currentUser.nickname) ? window.currentUser.nickname : "Игрок";
 
     const res = await fetch(api + "/api/support", {
       method: "POST",
