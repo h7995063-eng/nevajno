@@ -14,12 +14,17 @@ def init_support_routes(app, bot_token):
             
         tg_id = data.get("tg_id")
         nickname = data.get("nickname", "Игрок")
+        username = data.get("username", "")
+        
         if not tg_id:
             return jsonify({"ok": False, "error": "Нет TG ID"}), 400
 
+        user_info = f"@{username}" if username else "нет юзернейма"
+        
         msg_text = (
             f"🎫 <b>Новый тикет</b>\n\n"
             f"👤 <b>Ник:</b> {nickname}\n"
+            f"🔗 <b>Юзер:</b> {user_info}\n"
             f"🆔 <b>TG ID:</b> <code>{tg_id}</code>\n\n"
             f"💬 <b>Сообщение:</b>\n{text}"
         )

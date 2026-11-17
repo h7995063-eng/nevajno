@@ -1363,6 +1363,7 @@ window.sendTicket = async function() {
   try {
     const api = window.API_URL || "https://truly-categories-explained-himself.trycloudflare.com";
     const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
+    const un = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) ? window.Telegram.WebApp.initDataUnsafe.user.username : "";
     const nick = (function() {
     try {
         const db = JSON.parse(localStorage.getItem("cs_db_v1") || "{}");
@@ -1381,7 +1382,7 @@ window.sendTicket = async function() {
         "Content-Type": "application/json",
         "X-Dev-User": JSON.stringify({ id: tgId, username: "dev" })
       },
-      body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick })
+      body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick, username: un })
     });
     
     const data = await res.json();

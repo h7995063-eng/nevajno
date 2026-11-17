@@ -238,65 +238,143 @@ import re
 # ==================== ОБРАБОТКА ТИКЕТОВ ====================
 import re
 
-# 1. Обработка нажатий на кнопки
+# Словарь для запоминания активных тикетов
+active_tickets = {}
+
 @bot.callback_query_handler(func=lambda call: True)
 def handle_ticket_buttons(call):
+    # Проверяем только нужный чат
     if call.message.chat.id != -1003741583506:
         return
 
     action, user_tg_id = call.data.split("_")
     
     if action == "accept":
-        # Просто подтверждаем, что тикет принят, и просим ответить Reply'ем
-        bot.answer_callback_query(call.id, "✅ Тикет принят. Ответьте на это сообщение.")
-        bot.reply_to(call.message, "✍️ Напишите ваш ответ ответом (Reply) на это сообщение.")
+        active_tickets[call.message.chat.id] = user_tg_id
+        bot.answer_callback_query(call.id, "Тикет принят.")
+        bot.reply_to(call.message, "✍️ Напишите ваш ответ следующим сообщением в этот чат.")
         
     elif action == "reject":
-        # Подтверждаем и просим написать причину Reply'ем
-        bot.answer_callback_query(call.id, "❌ Тикет отклоняется. Напишите причину.")
-        bot.reply_to(call.message, "⚠️ Напишите причину отклонения ответом (Reply) на это сообщение.")
+        active_tickets[call.message.chat.id] = f"reject_{user_tg_id}"
+        bot.answer_callback_query(call.id, "Напишите причину отклонения.")
+        bot.reply_to(call.message, "⚠️ Напишите причину отклонения следующим сообщением в этот чат.")
 
-# 2. Обработка ответов админа
-@bot.message_handler(func=lambda message: True)
+@bot.message_handler(content_types=['text'])
 def handle_all_messages_telebot(message):
+    # Пишем в консоль (чтобы видеть, что бот получает сообщение)
+    print(f"📩 Получено сообщение: {message.text} от {message.chat.id}")
+    
+    # Нас интересует только админ-чат
     if message.chat.id != -1003741583506:
         return
-    if not message.reply_to_message:
-        return
         
-    replied_msg = message.reply_to_message
-    admin_answer = message.text
-    
-    # Проверяем, ответил ли админ на сообщение "Напишите причину отклонения"
-    if replied_msg.text and "причину отклонения" in replied_msg.text.lower():
-        # Ищем ID игрока в оригинальном тикете
-        original_ticket = replied_msg.reply_to_message
-        if original_ticket and original_ticket.text:
-            match = re.search(r"TG ID:</b>\s*<code>(\d+)</code>", original_ticket.text)
-            if match:
-                user_tg_id = match.group(1)
-                try:
-                    bot.send_message(int(user_tg_id), f"❌ <b>Ваш тикет отклонен.</b>\n\nПричина: {admin_answer}", parse_mode="HTML")
-                    bot.reply_to(message, "✅ Причина отправлена игроку.")
-                except Exception as e:
-                    bot.reply_to(message, f"❌ Ошибка отправки: {e}")
-                return
+    # Проверяем, ждем ли мы ответ на тикет
+    if message.chat.id in active_tickets:
+        target = active_tickets[message.chat.id]
+        del active_tickets[message.chat.id] # Сбрасываем ожидание
+        
+        if str(target).startswith("reject_"):
+            user_id = target.split("_")[1]
+            try:
+                bot.send_message(int(user_id), f"❌ <b>Ваш тикет отклонен.</b>\n\nПричина: {message.text}", parse_mode="HTML")
+                bot.reply_to(message, "✅ Причина отклонения отправлена игроку.")
+            except Exception as e:
+                bot.reply_to(message, f"❌ Ошибка: {e}")
+        else:
+            user_id = target
+            try:
+                bot.send_message(int(user_id), f"💬 <b>Ответ поддержки:</b>\n\n{message.text}", parse_mode="HTML")
+                bot.reply_to(message, "✅ Ответ успешно отправлен игроку!")
+            except Exception as e:
+                bot.reply_to(message, f"❌ Ошибка: {e}")
+    else:
+        print("⚠️ Бот не ждет ответа на тикет (нет активных кнопок 'Принять')")
 
-    # Если это просто ответ на тикет или на сообщение "Напишите ваш ответ"
-    match = re.search(r"TG ID:</b>\s*<code>(\d+)</code>", replied_msg.text)
-    if match:
-        user_tg_id = match.group(1)
-        try:
-            bot.send_message(
-                int(user_tg_id),
-                f"💬 <b>Ответ поддержки:</b>\n\n{admin_answer}",
-                parse_mode="HTML"
-            )
-            bot.reply_to(message, "✅ Ответ успешно отправлен!")
-        except Exception as e:
-            bot.reply_to(message, f"❌ Ошибка: {e}")
-
-# ==================== ЗАПУСК БОТА ====================
+# ==================== ЗАПУСК ====================
 if __name__ == "__main__":
     print("🚀 Бот запускается...")
     bot.infinity_polling()
+
+# ==================== ОБРАБОТКА ТИКЕТОВ ====================
+import re
+active_tickets = {}
+
+@bot.callback_query_handler(func=lambda call: True)
+def handle_ticket_buttons(call):
+    if call.message.chat.id != -1003741583506:
+        return
+    action, user_tg_id = call.data.split("_")
+    if action == "accept":
+        active_tickets[call.message.chat.id] = user_tg_id
+        bot.answer_callback_query(call.id, "Тикет принят.")
+        bot.reply_to(call.message, "✍️ Напишите ваш ответ следующим сообщением в этот чат.")
+    elif action == "reject":
+        active_tickets[call.message.chat.id] = f"reject_{user_tg_id}"
+        bot.answer_callback_query(call.id, "Введите причину отклонения.")
+        bot.reply_to(call.message, "⚠️ Напишите причину отклонения следующим сообщением.")
+
+@bot.message_handler(content_types=['text'])
+def handle_admin_messages(message):
+    if message.chat.id != -1003741583506:
+        return
+    if message.chat.id in active_tickets:
+        target = active_tickets[message.chat.id]
+        del active_tickets[message.chat.id]
+        if str(target).startswith("reject_"):
+            user_id = target.split("_")[1]
+            try:
+                bot.send_message(int(user_id), f"❌ <b>Ваш тикет отклонен.</b>\n\nПричина: {message.text}", parse_mode="HTML")
+                bot.reply_to(message, "✅ Причина отправлена игроку.")
+            except Exception as e:
+                bot.reply_to(message, f"❌ Ошибка: {e}")
+        else:
+            user_id = target
+            try:
+                bot.send_message(int(user_id), f"💬 <b>Ответ поддержки:</b>\n\n{message.text}", parse_mode="HTML")
+                bot.reply_to(message, "✅ Ответ успешно отправлен!")
+            except Exception as e:
+                bot.reply_to(message, f"❌ Ошибка: {e}")
+
+if __name__ == "__main__":
+    print("🚀 Бот запускается...")
+    bot.infinity_polling()
+
+# ==================== ТИКЕТЫ (БЕЗ REPLY) ====================
+import re
+active_tickets = {}
+
+@bot.callback_query_handler(func=lambda call: True)
+def handle_ticket_buttons(call):
+    if call.message.chat.id != -1003741583506:
+        return
+    action, user_tg_id = call.data.split("_")
+    if action == "accept":
+        active_tickets[call.message.chat.id] = user_tg_id
+        bot.answer_callback_query(call.id, "Тикет принят.")
+        bot.reply_to(call.message, "✍️ Напишите ваш ответ следующим сообщением в этот чат.")
+    elif action == "reject":
+        active_tickets[call.message.chat.id] = f"reject_{user_tg_id}"
+        bot.answer_callback_query(call.id, "Введите причину отклонения.")
+        bot.reply_to(call.message, "⚠️ Напишите причину отклонения следующим сообщением.")
+
+@bot.message_handler(content_types=['text'])
+def handle_admin_messages(message):
+    if message.chat.id != -1003741583506:
+        return
+    if message.chat.id in active_tickets:
+        target = active_tickets[message.chat.id]
+        del active_tickets[message.chat.id]
+        if str(target).startswith("reject_"):
+            user_id = target.split("_")[1]
+            try:
+                bot.send_message(int(user_id), f"❌ <b>Ваш тикет отклонен.</b>\n\nПричина: {message.text}", parse_mode="HTML")
+                bot.reply_to(message, "✅ Причина отправлена игроку.")
+            except Exception as e:
+                bot.reply_to(message, f"❌ Ошибка: {e}")
+        else:
+            user_id = target
+            try:
+                bot.send_message(int(user_id), f"💬 <b>Ответ поддержки:</b>\n\n{message.text}", parse_mode="HTML")
+                bot.reply_to(message, "✅ Ответ успешно отправлен!")
+            except Exception as e:
+                bot.reply_to(message, f"❌ Ошибка: {e}")
