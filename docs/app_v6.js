@@ -1363,7 +1363,7 @@ window.sendTicket = async function() {
   try {
     const api = window.API_URL || "https://truly-categories-explained-himself.trycloudflare.com";
     const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
-    const nick = (typeof me !== "undefined" && me && me.nickname) ? me.nickname : (window.currentUser && window.currentUser.nickname) ? window.currentUser.nickname : "Игрок";
+    const nick = (typeof me !== "undefined" && me && me.nickname) ? me.nickname : (JSON.parse(localStorage.getItem("cs_db_v1") || "{}").users?.find(u => u.tg_id == TG_ID)?.nickname) || "Игрок";
 
     const res = await fetch(api + "/api/support", {
       method: "POST",
