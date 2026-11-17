@@ -25,3 +25,5 @@ bot/config.py
 *.pid
 server/PIXEL_PIDR/
 server/uploads/
+.tunnel_url
+backups/
