@@ -1,6 +1,27 @@
 window.API_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
 (() => {
   "use strict";
+  
+  // --- Функция для всплывающих уведомлений ---
+  window.toast = function(msg, type = "ok") {
+    let t = document.getElementById("toast-container");
+    if (!t) {
+      t = document.createElement("div");
+      t.id = "toast-container";
+      t.style.cssText = "position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:10000; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none;";
+      document.body.appendChild(t);
+    }
+    const el = document.createElement("div");
+    el.className = "toast " + type;
+    el.textContent = msg;
+    el.style.cssText = "background:" + (type === "err" ? "#e53935" : "#2e7d32") + "; color:#fff; padding:12px 20px; border-radius:8px; font-size:14px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.3); opacity:0; transition:opacity 0.3s; pointer-events:auto;";
+    t.appendChild(el);
+    setTimeout(() => el.style.opacity = "1", 10);
+    setTimeout(() => {
+      el.style.opacity = "0";
+      setTimeout(() => el.remove(), 300);
+    }, 3000);
+  };
 
   const PERMANENT = 4102444800;
   const SUPPORT_URL = "https://t.me/crymbog";
