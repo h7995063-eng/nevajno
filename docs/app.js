@@ -56,7 +56,7 @@
 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "'" }[c]));
   const ICON = (id) => `<svg><use href="#i-${id}"/></svg>`;
   const now = () => Math.floor(Date.now() / 1000);
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -140,8 +140,6 @@
   }
 
   function openSupport() { window.location.href = "support.html"; }
-    window.open(SUPPORT_URL, "_blank");
-  }
 
   const cleanBase = (u) => String(u || "").trim().replace(/\/+$/, "");
   const validBase = (u) => /^https?:\/\/[^\s"'<>]+$/i.test(u);
@@ -149,21 +147,24 @@
 
   function apiCandidates() {
     const list = [];
+    // 1. Берем из URL (то, что передал бот)
     try {
-        const fromUrl = new URLSearchParams(window.location.search).get("api");
-        if (fromUrl) {
-            const cleanUrl = fromUrl.replace(/\/+$/, "");
-            store("cs_api", cleanUrl);
-            list.push(cleanUrl);
-        }
-    } catch(e) {}
-    let fromUrl = "";
-    try { fromUrl = cleanBase(new URLSearchParams(location.search).get("api")); } catch (e) {}
-    if (fromUrl && validBase(fromUrl)) { store("cs_api", fromUrl); list.push(fromUrl); }
+      const fromUrl = cleanBase(new URLSearchParams(location.search).get("api"));
+      if (fromUrl && validBase(fromUrl)) { 
+          store("cs_api", fromUrl); 
+          list.push(fromUrl); 
+      }
+    } catch (e) {}
+    
+    // 2. Берем из сохраненного (localStorage)
     const saved = cleanBase(store("cs_api"));
     if (saved && validBase(saved)) list.push(saved);
+    
+    // 3. Берем из глобальной переменной (если задана)
     const conf = cleanBase(window.API_URL);
     if (conf && validBase(conf)) list.push(conf);
+    
+    // 4. Локальный хост (для разработки)
     list.push("");
     return list.filter((v, i) => list.indexOf(v) === i);
   }
@@ -1285,51 +1286,5 @@
 
   $$(".logo-img").forEach((img) => { if (img.complete && img.naturalWidth === 0) logoFallback(img); });
   boot();
-
-  async function loadAdminTickets() {
-    try {
-      const data = await api("/api/admin/support", { admin: adminPass });
-      adminTickets = data;
-      renderAdminTickets();
-    } catch(e) { alert("Ошибка загрузки жалоб: " + e.message); }
-  }
-
-  function renderAdminTickets() {
-    const container = document.getElementById("admin-tickets-list");
-    if (!container) return;
-    if (!adminTickets || !adminTickets.length) {
-      container.innerHTML = '<div class="card empty">Жалоб нет.</div>';
-      return;
-    }
-    container.innerHTML = adminTickets.map(t => `
-      <div class="card" style="margin-bottom:10px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-          <b style="color:#6b7cff;">#${t.id} | ${t.category}</b>
-          <span style="color:${t.status === 'open' ? '#ffb3b3' : '#7dffb3'}; font-size:12px;">${t.status === 'open' ? 'Открыта' : 'Закрыта'}</span>
-        </div>
-        <div style="font-size:13px; color:#b0b5c5; margin-bottom:8px;">
-          <b>От:</b> ${t.tg_id}<br>
-          <b>Текст:</b> ${t.message}
-        </div>
-        ${t.status === 'open' ? `
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="reply-${t.id}" placeholder="Ответ игроку..." style="flex:1; background:#1a1d2d; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px; color:#fff; font-size:13px;">
-            <button onclick="submitTicketReply(${t.id})" style="background:#6b7cff; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-weight:600; cursor:pointer;">Ответить</button>
-          </div>
-        ` : `<div style="font-size:13px; color:#7dffb3; margin-top:8px;"><b>Ответ:</b> ${t.admin_reply || '—'}</div>`}
-      </div>
-    `).join("");
-  }
-
-  window.submitTicketReply = async function(id) {
-    const input = document.getElementById("reply-" + id);
-    const reply = input.value.trim();
-    if (!reply) return alert("Введите текст ответа");
-    try {
-      await api("/api/admin/support/reply", { method: "POST", admin: adminPass, body: { id, reply } });
-      alert("✅ Ответ отправлен");
-      loadAdminTickets();
-    } catch(e) { alert("Ошибка: " + e.message); }
-  };
 
 })();
