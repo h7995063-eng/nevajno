@@ -1347,23 +1347,7 @@ window.openSupportClose = function() {
   }
 };
 
-async function sendTicket() {
-  const text = document.getElementById("support-text").value.trim();
-  const btn = document.getElementById("btn-send-ticket");
-  if (btn) { btn.disabled = true; btn.textContent = "Отправка..."; }
-  
-  try {
-    // Берем адрес из конфига или ставим дефолтный
-    const api = window.API_URL || (typeof API_URL !== "undefined" ? API_URL : "https://discussed-delhi-appears-devel.trycloudflare.com");
-    const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
-    const nick = (typeof me !== "undefined" && me) ? me.nickname : "Игрок";
-
-    const res = await fetch(api + "/api/support", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Dev-User": JSON.stringify({ id: tgId, username: "dev" })
-      },
+,
       body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick })
     });
     
@@ -1380,3 +1364,40 @@ async function sendTicket() {
     if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; }
   }
 }
+
+// ==================== ГЛОБАЛЬНАЯ ОТПРАВКА ТИКЕТА ====================
+window.sendTicket = async function() {
+  const text = document.getElementById("support-text").value.trim();
+  if (!text) return alert("Введите текст");
+  
+  const btn = document.getElementById("btn-send-ticket");
+  if (btn) { btn.disabled = true; btn.textContent = "Отправка..."; }
+  
+  try {
+    const api = window.API_URL || "https://discussed-delhi-appears-devel.trycloudflare.com";
+    const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
+    const nick = (typeof me !== "undefined" && me) ? me.nickname : "Игрок";
+
+    const res = await fetch(api + "/api/support", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Dev-User": JSON.stringify({ id: tgId, username: "dev" })
+      },
+      body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick })
+    });
+    
+    const data = await res.json();
+    if (data.ok) {
+      alert("Тикет успешно отправлен!");
+      document.getElementById("modal-support").style.display = "none";
+      document.getElementById("support-text").value = "";
+    } else {
+      alert("Ошибка сервера: " + (data.error || "Неизвестная ошибка"));
+    }
+  } catch(e) {
+    alert("Ошибка сети: " + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; }
+  }
+};
