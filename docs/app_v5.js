@@ -1,4 +1,12 @@
 
+try {
+    localStorage.clear();
+    sessionStorage.clear();
+    console.log('Кэш очищен принудительно');
+} catch(e) {}
+window.API_URL = 'https://updates-suspension-aircraft-correctly.trycloudflare.com';
+
+
 // ==================== ПРИНУДИТЕЛЬНЫЙ СБРОС КЭША ====================
 try {
     localStorage.removeItem('cs_api');
