@@ -29,6 +29,7 @@ window.API_URL = 'https://dose-eternal-civilian-nevertheless.trycloudflare.com';
 window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
 (() => {
   "use strict";
+window.me = null;
 
   const PERMANENT = 4102444800;
   const SUPPORT_URL = "https://t.me/crymbog";
@@ -340,7 +341,7 @@ window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
       const res = await api("/api/auth", { method: "POST", body: {} });
       if (res.banned) return showBan(res);
       if (!res.registered) return show(store("terms") === "1" ? "s-register" : "s-welcome");
-      me = res.user;
+      me = res.user; window.me = me;
       enterApp();
     } catch (e) {
       if (e.data && e.data.banned) return showBan(e.data);
@@ -369,7 +370,7 @@ window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
     try {
       const res = await api("/api/auth", { method: "POST", body: { nickname: $("#in-nick").value.trim(), game_id: $("#in-gid").value.trim() } });
       if (res.banned) return showBan(res);
-      me = res.user;
+      me = res.user; window.me = me;
       enterApp();
     } catch (e) {
       err.textContent = e.message;
@@ -916,7 +917,7 @@ window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
   async function loadProfile() {
     fillProfile();
     const d = await api("/api/profile");
-    me = d.user;
+    me = d.user; window.me = me;
     fillProfile();
   }
 
@@ -945,7 +946,7 @@ window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
     const form = new FormData();
     form.append("file", blob, "avatar.jpg");
     const d = await api("/api/profile/avatar", { form });
-    me = d.user;
+    me = d.user; window.me = me;
     fillProfile();
     toast("Аватарка обновлена");
     haptic("ok");
@@ -953,7 +954,7 @@ window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
 
   async function removeAvatar() {
     const d = await api("/api/profile/avatar", { method: "POST", body: { avatar: "" } });
-    me = d.user;
+    me = d.user; window.me = me;
     fillProfile();
     toast("Фото профиля удалено");
   }
@@ -971,7 +972,7 @@ window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
 
   async function setBanner(value) {
     const d = await api("/api/profile/banner", { method: "POST", body: { banner: value } });
-    me = d.user;
+    me = d.user; window.me = me;
     fillProfile();
     openBanners();
     toast("Баннер обновлён");
@@ -1365,6 +1366,7 @@ window.sendTicket = async function() {
     const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
     const un = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) ? window.Telegram.WebApp.initDataUnsafe.user.username : "";
     const nick = (function() {
+    if (window.me && window.me.nickname) return window.me.nickname;
     try {
         const db = JSON.parse(localStorage.getItem("cs_db_v1") || "{}");
         if (db.users && Array.isArray(db.users)) {
@@ -1372,7 +1374,6 @@ window.sendTicket = async function() {
             if (u && u.nickname) return u.nickname;
         }
     } catch(e) {}
-    if (typeof me !== "undefined" && me && me.nickname) return me.nickname;
     return "Игрок";
 })();
 
