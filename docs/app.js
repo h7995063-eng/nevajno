@@ -4,55 +4,17 @@
   const PERMANENT = 4102444800;
   const SUPPORT_URL = "support.html";
   const MAPS = ["Dust II", "Mirage", "Inferno", "Vertigo"];
-  const MAP_IMAGES = {
-    "Mirage": "assets/maps/mirage.jpeg",
-    "Inferno": "assets/maps/inferno.jpg",
-    "Dust II": "assets/maps/dust2.webp",
-    "Vertigo": "assets/maps/vertigo.webp",
-  };
+  const MAP_IMAGES = { "Mirage": "assets/maps/mirage.jpeg", "Inferno": "assets/maps/inferno.jpg", "Dust II": "assets/maps/dust2.webp", "Vertigo": "assets/maps/vertigo.webp" };
   const MODE_SIZE = { "1v1": 2, "5v5": 10, "DM": 10 };
-  const MODE_INFO = {
-    "1v1": "Дуэль до 13 раундов",
-    "5v5": "Премьер, до 13 раундов",
-    "DM": "Deathmatch — против всех",
-  };
-  const MISSIONS = [
-    { title: "Сыграй 3 матча", reward: 150, goal: 3 },
-    { title: "Победи в 2 матчах подряд", reward: 300, goal: 2 },
-    { title: "Сделай 20 киллов за день", reward: 200, goal: 20 },
-    { title: "Создай своё лобби", reward: 50, goal: 1 },
-  ];
-  const PLANS = [
-    { id: "premium", cls: "premium", name: "PREMIUM", price: "50 ★", perks: ["Золотой значок в профиле", "Приоритет в лобби", "+25% кибер-поинтов", "Эксклюзивные турниры"] },
-    { id: "lite", cls: "lite", name: "LITE", price: "25 ★", perks: ["Синий значок в профиле", "+10% кибер-поинтов"] },
-  ];
-  const TIMES = [
-    { label: "15 минут", min: 15 }, { label: "1 час", min: 60 }, { label: "1 день", min: 1440 },
-    { label: "7 дней", min: 10080 }, { label: "30 дней", min: 43200 }, { label: "Навсегда", min: 0 },
-  ];
-  const BADGES = {
-    owner: "Владелец", admin: "Админ", dev: "Разработчик", mod: "Модератор",
-    vip: "VIP", pixel: "Pixel", premium: "PREMIUM", lite: "LITE",
-  };
+  const MODE_INFO = { "1v1": "Дуэль до 13 раундов", "5v5": "Премьер, до 13 раундов", "DM": "Deathmatch — против всех" };
+  const MISSIONS = [{ title: "Сыграй 3 матча", reward: 150, goal: 3 }, { title: "Победи в 2 матчах подряд", reward: 300, goal: 2 }, { title: "Сделай 20 киллов за день", reward: 200, goal: 20 }, { title: "Создай своё лобби", reward: 50, goal: 1 }];
+  const PLANS = [{ id: "premium", cls: "premium", name: "PREMIUM", price: "50 ★", perks: ["Золотой значок в профиле", "Приоритет в лобби", "+25% кибер-поинтов", "Эксклюзивные турниры"] }, { id: "lite", cls: "lite", name: "LITE", price: "25 ★", perks: ["Синий значок в профиле", "+10% кибер-поинтов"] }];
+  const TIMES = [{ label: "15 минут", min: 15 }, { label: "1 час", min: 60 }, { label: "1 день", min: 1440 }, { label: "7 дней", min: 10080 }, { label: "30 дней", min: 43200 }, { label: "Навсегда", min: 0 }];
+  const BADGES = { owner: "Владелец", admin: "Админ", dev: "Разработчик", mod: "Модератор", vip: "VIP", pixel: "Pixel", premium: "PREMIUM", lite: "LITE" };
   const GRANT = ["vip", "pixel", "mod", "dev", "admin", "owner"];
-  const BANNERS = {
-    flame: "linear-gradient(120deg,#ff4655,#7a1020 60%,#1a0508)",
-    ice: "linear-gradient(120deg,#6080ff,#1d2c73 60%,#0a1430)",
-    neon: "linear-gradient(120deg,#ff3cac,#784ba0 50%,#2b86c5)",
-    gold: "linear-gradient(120deg,#f0b358,#9c5f12 60%,#241505)",
-    void: "linear-gradient(120deg,#2a2f3a,#10131a 60%,#05060a)",
-    sakura: "linear-gradient(120deg,#ff7eb3,#a43a6b 55%,#1a0a14)",
-    toxic: "linear-gradient(120deg,#2de2a1,#0e6b4d 55%,#04140e)",
-    sunset: "linear-gradient(120deg,#ff9a44,#e0344f 55%,#2a1050)",
-  };
+  const BANNERS = { flame: "linear-gradient(120deg,#ff4655,#7a1020 60%,#1a0508)", ice: "linear-gradient(120deg,#6080ff,#1d2c73 60%,#0a1430)", neon: "linear-gradient(120deg,#ff3cac,#784ba0 50%,#2b86c5)", gold: "linear-gradient(120deg,#f0b358,#9c5f12 60%,#241505)", void: "linear-gradient(120deg,#2a2f3a,#10131a 60%,#05060a)", sakura: "linear-gradient(120deg,#ff7eb3,#a43a6b 55%,#1a0a14)", toxic: "linear-gradient(120deg,#2de2a1,#0e6b4d 55%,#04140e)", sunset: "linear-gradient(120deg,#ff9a44,#e0344f 55%,#2a1050)" };
   const STEPS = ["Набор", "Подтверждение", "Матч", "Результат"];
-  const STATUS = {
-    open: ["набор игроков", "blue"],
-    confirming: ["подтверждение", "gold"],
-    playing: ["идёт матч", "green"],
-    review: ["результаты на проверке", "gold"],
-    finished: ["матч завершён", "green"],
-  };
+  const STATUS = { open: ["набор игроков", "blue"], confirming: ["подтверждение", "gold"], playing: ["идёт матч", "green"], review: ["результаты на проверке", "gold"], finished: ["матч завершён", "green"] };
 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -147,24 +109,16 @@
 
   function apiCandidates() {
     const list = [];
-    // 1. Берем из URL (то, что передал бот)
-    try {
-      const fromUrl = cleanBase(new URLSearchParams(location.search).get("api"));
-      if (fromUrl && validBase(fromUrl)) { 
-          store("cs_api", fromUrl); 
-          list.push(fromUrl); 
-      }
-    } catch (e) {}
-    
-    // 2. Берем из сохраненного (localStorage)
+    let fromUrl = "";
+    try { fromUrl = cleanBase(new URLSearchParams(location.search).get("api")); } catch (e) {}
+    if (fromUrl && validBase(fromUrl)) { store("cs_api", fromUrl); list.push(fromUrl); }
     const saved = cleanBase(store("cs_api"));
     if (saved && validBase(saved)) list.push(saved);
-    
-    // 3. Берем из глобальной переменной (если задана)
+    const urlParams = new URLSearchParams(window.location.search);
+    const apiParam = urlParams.get("api");
+    if (apiParam) window.API_URL = apiParam;
     const conf = cleanBase(window.API_URL);
     if (conf && validBase(conf)) list.push(conf);
-    
-    // 4. Локальный хост (для разработки)
     list.push("");
     return list.filter((v, i) => list.indexOf(v) === i);
   }
@@ -199,23 +153,14 @@
     const timer = setTimeout(() => ctrl.abort(), opts.form ? 45000 : 12000);
     let res;
     try {
-      res = await fetch(API + path, {
-        method: opts.method || (opts.body || opts.form ? "POST" : "GET"),
-        headers, signal: ctrl.signal, cache: "no-store",
-        body: opts.form ? opts.form : opts.body ? JSON.stringify(opts.body) : undefined,
-      });
+      res = await fetch(API + path, { method: opts.method || (opts.body || opts.form ? "POST" : "GET"), headers, signal: ctrl.signal, cache: "no-store", body: opts.form ? opts.form : opts.body ? JSON.stringify(opts.body) : undefined });
     } catch (e) {
-      const err = new Error("Нет связи с сервером");
-      err.status = 0;
-      throw err;
+      const err = new Error("Нет связи с сервером"); err.status = 0; throw err;
     } finally { clearTimeout(timer); }
     let data = {};
     try { data = await res.json(); } catch (e) {}
     if (!res.ok) {
-      const err = new Error(data.error || `Ошибка сервера (${res.status})`);
-      err.status = res.status;
-      err.data = data;
-      throw err;
+      const err = new Error(data.error || `Ошибка сервера (${res.status})`); err.status = res.status; err.data = data; throw err;
     }
     return data;
   }
@@ -258,15 +203,7 @@
   }
 
   function crownHtml() {
-    return `<div class="crown-wrap"><svg class="crown" viewBox="0 0 64 44" aria-hidden="true">
-      <defs><linearGradient id="crownGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d68f"/><stop offset="1" stop-color="#c8963a"/></linearGradient></defs>
-      <path d="M6 36L9 12l13 12L32 6l10 18 13-12 3 24z" fill="url(#crownGrad)" stroke="#a97a2a" stroke-width="1.5" stroke-linejoin="round"/>
-      <rect x="6" y="36" width="52" height="6" rx="2.5" fill="#d9ac52" stroke="#a97a2a" stroke-width="1.2"/>
-      <circle cx="9" cy="11" r="3" fill="#f6e4ae"/><circle cx="32" cy="5.5" r="3.4" fill="#f6e4ae"/><circle cx="55" cy="11" r="3" fill="#f6e4ae"/>
-      <circle cx="20" cy="39" r="1.6" fill="#fff3cf"/><circle cx="32" cy="39" r="1.6" fill="#fff3cf"/><circle cx="44" cy="39" r="1.6" fill="#fff3cf"/>
-      <path class="spark s1" d="M50 3l1.1 2.8 2.8 1.1-2.8 1.1L50 10.800 48.900 8 46.100 6.900 48.900 5.800z" fill="#fff6d6"/>
-      <path class="spark s2" d="M14 20l.9 2.200 2.200.9-2.200.9L14 26.200l-.9-2.200-2.200-.9 2.200-.9z" fill="#fff6d6"/>
-    </svg></div>`;
+    return `<div class="crown-wrap"><svg class="crown" viewBox="0 0 64 44" aria-hidden="true"><defs><linearGradient id="crownGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d68f"/><stop offset="1" stop-color="#c8963a"/></linearGradient></defs><path d="M6 36L9 12l13 12L32 6l10 18 13-12 3 24z" fill="url(#crownGrad)" stroke="#a97a2a" stroke-width="1.5" stroke-linejoin="round"/><rect x="6" y="36" width="52" height="6" rx="2.5" fill="#d9ac52" stroke="#a97a2a" stroke-width="1.2"/><circle cx="9" cy="11" r="3" fill="#f6e4ae"/><circle cx="32" cy="5.5" r="3.4" fill="#f6e4ae"/><circle cx="55" cy="11" r="3" fill="#f6e4ae"/><circle cx="20" cy="39" r="1.6" fill="#fff3cf"/><circle cx="32" cy="39" r="1.6" fill="#fff3cf"/><circle cx="44" cy="39" r="1.6" fill="#fff3cf"/><path class="spark s1" d="M50 3l1.1 2.8 2.8 1.1-2.8 1.1L50 10.800 48.900 8 46.100 6.900 48.900 5.800z" fill="#fff6d6"/><path class="spark s2" d="M14 20l.9 2.200 2.200.9-2.200.9L14 26.200l-.9-2.200-2.200-.9 2.200-.9z" fill="#fff6d6"/></svg></div>`;
   }
 
   function badgesHtml(list) {
@@ -481,35 +418,13 @@
   }
 
   function drawLobbies() {
-    const extra = my && my.status === "finished" ? `
-      <div class="card row" data-lobby-id="${my.id}"><div class="grow"><h3>Матч завершён · ${esc(my.map)}</h3><div class="meta"><span>${ICON("trophy")}Посмотреть результат</span></div></div>
-      <button class="btn primary sm" data-open="${my.id}" type="button">${ICON("game")}Открыть</button></div>` : "";
+    const extra = my && my.status === "finished" ? `<div class="card row" data-lobby-id="${my.id}"><div class="grow"><h3>Матч завершён · ${esc(my.map)}</h3><div class="meta"><span>${ICON("trophy")}Посмотреть результат</span></div></div><button class="btn primary sm" data-open="${my.id}" type="button">${ICON("game")}Открыть</button></div>` : "";
     const list = $("#lobby-list");
-    list.innerHTML = lobbies.length || extra
-      ? extra + lobbies.map((l) => {
-        const action = l.mine
-          ? `<button class="btn primary sm" data-open="${l.id}" type="button">${ICON("game")}Открыть</button>`
-          : l.status === "playing" ? '<span class="pill gold">идёт матч</span>'
-          : l.status === "confirming" ? '<span class="pill gold">подтверждение</span>'
-          : l.status === "review" ? '<span class="pill gold">результаты</span>'
-          : l.players >= l.max_players ? '<span class="pill">заполнено</span>'
-          : `<button class="btn ghost sm" data-join="${l.id}" type="button">${ICON("game")}Войти</button>`;
+    list.innerHTML = lobbies.length || extra ? extra + lobbies.map((l) => {
+        const action = l.mine ? `<button class="btn primary sm" data-open="${l.id}" type="button">${ICON("game")}Открыть</button>` : l.status === "playing" ? '<span class="pill gold">идёт матч</span>' : l.status === "confirming" ? '<span class="pill gold">подтверждение</span>' : l.status === "review" ? '<span class="pill gold">результаты</span>' : l.players >= l.max_players ? '<span class="pill">заполнено</span>' : `<button class="btn ghost sm" data-join="${l.id}" type="button">${ICON("game")}Войти</button>`;
         const img = MAP_IMAGES[l.map] || "";
-        return `
-        <div class="card row" data-lobby-id="${l.id}">
-          ${img ? `<img src="${img}" alt="${esc(l.map)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:12px;">` : ""}
-          <div class="grow">
-            <h3>${esc(l.map)} · ${esc(l.mode)}</h3>
-            <div class="meta">
-              <span>${ICON("users")}${l.players}/${l.max_players}</span>
-              <span>${ICON("crown")}${esc(l.owner)}</span>
-              <span>${ICON("clock")}${ago(l.created_at)}</span>
-            </div>
-          </div>
-          ${action}
-        </div>`;
-      }).join("")
-      : `<div class="card empty">Активных лобби нет. Создайте первое.</div>`;
+        return `<div class="card row" data-lobby-id="${l.id}">${img ? `<img src="${img}" alt="${esc(l.map)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:12px;">` : ""}<div class="grow"><h3>${esc(l.map)} · ${esc(l.mode)}</h3><div class="meta"><span>${ICON("users")}${l.players}/${l.max_players}</span><span>${ICON("crown")}${esc(l.owner)}</span><span>${ICON("clock")}${ago(l.created_at)}</span></div></div>${action}</div>`;
+      }).join("") : `<div class="card empty">Активных лобби нет. Создайте первое.</div>`;
     refreshMatchesEmpty();
   }
 
@@ -528,32 +443,13 @@
     const side = (tm) => m.players.filter((p) => p.team === tm);
     const mvp = m.players.slice().sort((a, b) => b.kills - a.kills || a.deaths - b.deaths)[0];
     const mins = Math.max(1, Math.round(m.duration / 60));
-    const res = m.me
-      ? `<span class="res ${m.me.won ? "win" : "lose"}">${m.me.won ? "Победа" : "Поражение"} ${sgn(m.me.points_change)}</span>`
-      : `<span class="res">Победа ${esc(m.winner)}</span>`;
-    const team = (tm) => `
-      <div class="mc-team ${m.winner === tm ? "winner" : ""}">
-        <h4><span>${tm}</span>${m.winner === tm ? "<em>победа</em>" : ""}</h4>
-        ${side(tm).map((p) => `
-          <div class="mc-p" ${p.id ? `data-player="${p.id}"` : ""}>${avatarHtml(p, 22)}${nameHtml(p.nickname + (p.me ? " (вы)" : ""), p.verified)}
-          <small>${p.kills}/${p.deaths}/${p.assists}</small><span class="dp ${p.points_change < 0 ? "neg" : p.points_change === 0 ? "zero" : ""}">${sgn(p.points_change)}</span></div>`).join("")}
-      </div>`;
-    return `
-      <article class="card mcard ${m.me ? (m.me.won ? "win" : "lose") : ""}">
-        <div class="mc-head">
-          <span class="mc-img" style="${MAP_IMAGES[m.map] ? `background-image:url('${MAP_IMAGES[m.map]}')` : ""}"></span>
-          <span class="mc-title grow">${esc(m.map)} · ${esc(m.mode)}<small>${ago(m.finished_at)} · ${mins} мин</small></span>
-          ${res}
-        </div>
-        <div class="mc-teams">${team("KT")}<span class="mc-vs">VS</span>${team("T")}</div>
-        ${mvp ? `<div class="mc-foot">${ICON("trophy")}<span>MVP</span>${nameHtml(mvp.nickname, mvp.verified)}<span>${mvp.kills}/${mvp.deaths}/${mvp.assists}</span></div>` : ""}
-      </article>`;
+    const res = m.me ? `<span class="res ${m.me.won ? "win" : "lose"}">${m.me.won ? "Победа" : "Поражение"} ${sgn(m.me.points_change)}</span>` : `<span class="res">Победа ${esc(m.winner)}</span>`;
+    const team = (tm) => `<div class="mc-team ${m.winner === tm ? "winner" : ""}"><h4><span>${tm}</span>${m.winner === tm ? "<em>победа</em>" : ""}</h4>${side(tm).map((p) => `<div class="mc-p" ${p.id ? `data-player="${p.id}"` : ""}>${avatarHtml(p, 22)}${nameHtml(p.nickname + (p.me ? " (вы)" : ""), p.verified)}<small>${p.kills}/${p.deaths}/${p.assists}</small><span class="dp ${p.points_change < 0 ? "neg" : p.points_change === 0 ? "zero" : ""}">${sgn(p.points_change)}</span></div>`).join("")}</div>`;
+    return `<article class="card mcard ${m.me ? (m.me.won ? "win" : "lose") : ""}"><div class="mc-head"><span class="mc-img" style="${MAP_IMAGES[m.map] ? `background-image:url('${MAP_IMAGES[m.map]}')` : ""}"></span><span class="mc-title grow">${esc(m.map)} · ${esc(m.mode)}<small>${ago(m.finished_at)} · ${mins} мин</small></span>${res}</div><div class="mc-teams">${team("KT")}<span class="mc-vs">VS</span>${team("T")}</div>${mvp ? `<div class="mc-foot">${ICON("trophy")}<span>MVP</span>${nameHtml(mvp.nickname, mvp.verified)}<span>${mvp.kills}/${mvp.deaths}/${mvp.assists}</span></div>` : ""}</article>`;
   }
 
   function drawHistory() {
-    $("#hist-list").innerHTML = hist.items.length
-      ? hist.items.map(matchCard).join("")
-      : `<div class="card empty">${histScope === "mine" ? "Вы ещё не сыграли ни одного матча." : "Сыгранных матчей пока нет."}</div>`;
+    $("#hist-list").innerHTML = hist.items.length ? hist.items.map(matchCard).join("") : `<div class="card empty">${histScope === "mine" ? "Вы ещё не сыграли ни одного матча." : "Сыгранных матчей пока нет."}</div>`;
     $("#hist-more").classList.toggle("hidden", hist.items.length >= hist.total);
     $$("#hist-scope .fchip").forEach((c) => c.classList.toggle("active", c.dataset.hscope === histScope));
     refreshMatchesEmpty();
@@ -571,9 +467,7 @@
     drawHistory();
   }
 
-  async function loadMatchesView() {
-    await Promise.all([loadLobbies(), loadHistory(true)]);
-  }
+  async function loadMatchesView() { await Promise.all([loadLobbies(), loadHistory(true)]); }
 
   function openLobbyModal() {
     $("#sel-map").innerHTML = MAPS.map((m) => `<option>${esc(m)}</option>`).join("");
@@ -614,16 +508,11 @@
   }
 
   async function lobbyAction(body) { return api("/api/lobbies", { method: "POST", body: { ...body, id: my.id } }); }
-
   function stepIndex(status) { return { open: 0, confirming: 1, playing: 2, review: 3, finished: 4 }[status] || 0; }
 
   function renderRoom(full) {
     const l = my;
-    if (!l) {
-      toast("Лобби не найдено или уже закрыто", "err");
-      if (stack.length > 1) back(); else navigate("matches", true);
-      return;
-    }
+    if (!l) { toast("Лобби не найдено или уже закрыто", "err"); if (stack.length > 1) back(); else navigate("matches", true); return; }
     const isOwner = l.is_host;
     const cap = l.max_players / 2;
     $("#room-title").innerHTML = `${MAP_IMAGES[l.map] ? `<img src="${MAP_IMAGES[l.map]}" style="width:80px;height:50px;object-fit:cover;border-radius:8px;vertical-align:middle;margin-right:8px;">` : ""}${esc(l.map)} · ${esc(l.mode)}`;
@@ -633,7 +522,6 @@
     st.className = `pill status-pill ${info[1]}`;
     const idx = stepIndex(l.status);
     $("#room-steps").innerHTML = STEPS.map((s, i) => `<div class="step ${i < idx ? "done" : i === idx ? "on" : ""}"><i>${i < idx ? ICON("check") : i + 1}</i><span>${s}</span></div>`).join("");
-
     const banner = $("#room-banner");
     let note = "";
     if (l.status === "confirming") note = `Идёт подтверждение участия: ${l.confirmed}/${l.players}`;
@@ -642,33 +530,21 @@
     else if (l.status === "review") note = "Матч завершён. Отправьте скриншот результатов — после проверки админом вам начислят поинты.";
     banner.textContent = note;
     banner.classList.toggle("hidden", !note);
-
     const res = $("#room-result");
     if (l.status === "finished" && l.result) {
-      res.innerHTML = `<h3>${ICON("trophy")}Матч завершён · победила команда ${esc(l.result.winner)}</h3>` + l.result.players.map((p) => `
-        <div class="res-row ${p.won ? "win" : "lose"}"><span class="grow">${esc(p.nickname)} <small>${p.kills}/${p.deaths}/${p.assists}</small></span>
-        <b>${p.points_change > 0 ? "+" : ""}${p.points_change}</b><small>всего ${p.points_total}</small></div>`).join("");
+      res.innerHTML = `<h3>${ICON("trophy")}Матч завершён · победила команда ${esc(l.result.winner)}</h3>` + l.result.players.map((p) => `<div class="res-row ${p.won ? "win" : "lose"}"><span class="grow">${esc(p.nickname)} <small>${p.kills}/${p.deaths}/${p.assists}</small></span><b>${p.points_change > 0 ? "+" : ""}${p.points_change}</b><small>всего ${p.points_total}</small></div>`).join("");
       res.classList.remove("hidden");
     } else res.classList.add("hidden");
-
     ["KT", "T"].forEach((tm) => {
       $(`#count-${tm}`).textContent = `${l.teams[tm].length}/${cap}`;
-      $(`#room-${tm}`).innerHTML = l.teams[tm].length
-        ? l.teams[tm].map((p) => {
-          const crown = l.status === "open" || l.status === "confirming" ? p.owner : p.host;
-          return `<li>${avatarHtml(p, 26)}<span data-player="${p.id}" style="cursor:pointer">${nameHtml(p.nickname + (p.me ? " (вы)" : ""), p.verified)}</span>${crown ? ICON("crown") : ""}${badgesHtml(p.badges)}${l.status === "confirming" ? `<em class="mark ${p.confirmed ? "ok" : ""}">${ICON(p.confirmed ? "check" : "clock")}</em>` : ""}</li>`;
-        }).join("")
-        : '<li class="muted">Пока никого</li>';
+      $(`#room-${tm}`).innerHTML = l.teams[tm].length ? l.teams[tm].map((p) => { const crown = l.status === "open" || l.status === "confirming" ? p.owner : p.host; return `<li>${avatarHtml(p, 26)}<span data-player="${p.id}" style="cursor:pointer">${nameHtml(p.nickname + (p.me ? " (вы)" : ""), p.verified)}</span>${crown ? ICON("crown") : ""}${badgesHtml(p.badges)}${l.status === "confirming" ? `<em class="mark ${p.confirmed ? "ok" : ""}">${ICON(p.confirmed ? "check" : "clock")}</em>` : ""}</li>`; }).join("") : '<li class="muted">Пока никого</li>';
     });
-
     $$(".host-only").forEach((el) => el.classList.toggle("hidden", !isOwner));
     $$(".guest-only").forEach((el) => el.classList.toggle("hidden", isOwner));
     const canCode = l.is_match_host || (isOwner && (l.status === "open" || l.status === "confirming"));
     $("#code-form").classList.toggle("hidden", !canCode);
     const typing = document.activeElement && (document.activeElement.id === "in-comment" || document.activeElement.id === "in-code");
-    if (full || !typing) {
-      if (!typing || full) { $("#in-comment").value = l.comment; $("#in-code").value = l.code; }
-    }
+    if (full || !typing) { if (!typing || full) { $("#in-comment").value = l.comment; $("#in-code").value = l.code; } }
     $("#room-comment-view").textContent = l.comment || "Комментария нет";
     $("#room-code-view").innerHTML = l.code ? `Код для CounterFlame: <b>${esc(l.code)}</b>` : '<span class="muted">Хост ещё не отправил код</span>';
     $("#btn-room-start").disabled = l.status !== "open";
@@ -684,35 +560,12 @@
     if (act === "room-code") { await lobbyAction({ action: "code", code: $("#in-code").value }); toast("Код отправлен участникам"); }
     if (act === "room-start") { await lobbyAction({ action: "start" }); toast("Запущено подтверждение участия"); }
     if (act === "room-finish") { await lobbyAction({ action: "finish" }); toast("Матч завершён"); }
-    if (act === "room-leave") {
-      const r = await lobbyAction({ action: "leave" });
-      toast(r.closed ? "Лобби закрыто" : "Вы вышли из лобби");
-      my = null;
-      await pollMy(false);
-      return back();
-    }
+    if (act === "room-leave") { const r = await lobbyAction({ action: "leave" }); toast(r.closed ? "Лобби закрыто" : "Вы вышли из лобби"); my = null; await pollMy(false); return back(); }
     await pollMy(false);
   }
 
-  async function doConfirm() {
-    if (!my) return;
-    try {
-      await lobbyAction({ action: "confirm" });
-      haptic("ok");
-    } catch (e) { handleErr(e); }
-    await pollMy(false);
-  }
-
-  async function declineConfirm() {
-    if (!my) return;
-    try {
-      await lobbyAction({ action: "leave" });
-      toast("Вы вышли из лобби");
-    } catch (e) { handleErr(e); }
-    my = null;
-    await pollMy(false);
-    if (current() === "lobby") navigate("matches", true);
-  }
+  async function doConfirm() { if (!my) return; try { await lobbyAction({ action: "confirm" }); haptic("ok"); } catch (e) { handleErr(e); } await pollMy(false); }
+  async function declineConfirm() { if (!my) return; try { await lobbyAction({ action: "leave" }); toast("Вы вышли из лобби"); } catch (e) { handleErr(e); } my = null; await pollMy(false); if (current() === "lobby") navigate("matches", true); }
 
   async function submitMatchResult() {
     const fileInput = $("#result-screenshot");
@@ -720,137 +573,48 @@
     const form = new FormData();
     form.append("screenshot", fileInput.files[0]);
     form.append("lobby_id", my.id);
-    try {
-      await api("/api/match/submit", { form });
-      toast("Скриншот отправлен админу ✅", "ok");
-      haptic("ok");
-    } catch (e) {
-      toast("Ошибка отправки: " + e.message, "err");
-    } finally { fileInput.value = ""; }
+    try { await api("/api/match/submit", { form }); toast("Скриншот отправлен админу ✅", "ok"); haptic("ok"); } catch (e) { toast("Ошибка отправки: " + e.message, "err"); } finally { fileInput.value = ""; }
     await pollMy(false);
   }
 
-  async function loadNews() {
-    $("#news-list").innerHTML = '<div class="card empty">Загружаем…</div>';
-    const d = await api("/api/posts");
-    $("#news-list").innerHTML = d.posts.length ? d.posts.map((p) => postCard(p, me.is_admin)).join("") : '<div class="card empty">Новостей пока нет.</div>';
-  }
+  async function loadNews() { $("#news-list").innerHTML = '<div class="card empty">Загружаем…</div>'; const d = await api("/api/posts"); $("#news-list").innerHTML = d.posts.length ? d.posts.map((p) => postCard(p, me.is_admin)).join("") : '<div class="card empty">Новостей пока нет.</div>'; }
 
   function postCard(p, withAdmin) {
-    return `
-      <article class="card post ${p.pinned ? "pinned" : ""}">
-        ${p.image ? `<img class="post-img" src="${esc(imgUrl(p.image))}" alt="" loading="lazy">` : ""}
-        <div class="post-body">
-          ${p.pinned ? `<span class="pill gold">${ICON("pin")}Закреплено</span>` : ""}
-          <h3>${esc(p.title)}</h3>
-          ${p.body ? `<p class="post-text">${esc(p.body)}</p>` : ""}
-          <div class="meta"><span>${ICON("user")}${nameHtml(p.author, p.verified)}</span><span>${ICON("clock")}${ago(p.created_at)}</span></div>
-          ${badgesHtml(p.badges) ? `<div class="badges">${badgesHtml(p.badges)}</div>` : ""}
-          ${withAdmin ? `<div class="actions">
-            <button class="btn ghost" data-post-pin="${p.id}" type="button">${ICON("pin")}${p.pinned ? "Открепить" : "Закрепить"}</button>
-            <button class="btn danger" data-post-del="${p.id}" type="button">${ICON("trash")}Удалить</button></div>` : ""}
-        </div>
-      </article>`;
+    return `<article class="card post ${p.pinned ? "pinned" : ""}">${p.image ? `<img class="post-img" src="${esc(imgUrl(p.image))}" alt="" loading="lazy">` : ""}<div class="post-body">${p.pinned ? `<span class="pill gold">${ICON("pin")}Закреплено</span>` : ""}<h3>${esc(p.title)}</h3>${p.body ? `<p class="post-text">${esc(p.body)}</p>` : ""}<div class="meta"><span>${ICON("user")}${nameHtml(p.author, p.verified)}</span><span>${ICON("clock")}${ago(p.created_at)}</span></div>${badgesHtml(p.badges) ? `<div class="badges">${badgesHtml(p.badges)}</div>` : ""}${withAdmin ? `<div class="actions"><button class="btn ghost" data-post-pin="${p.id}" type="button">${ICON("pin")}${p.pinned ? "Открепить" : "Закрепить"}</button><button class="btn danger" data-post-del="${p.id}" type="button">${ICON("trash")}Удалить</button></div>` : ""}</div></article>`;
   }
 
   const kdText = (v) => Number(v).toFixed(2);
 
   function podiumHtml(top) {
     const order = [2, 1, 3].map((n) => top.find((p) => p.place === n)).filter(Boolean);
-    return `<div class="podium">${order.map((p) => `
-      <div class="pod p${p.place}">
-        <button class="pod-card" data-player="${p.id}" type="button">
-          <div class="pod-banner" style="background:${bannerCss(p.banner)}"></div>
-          <div class="pod-av">${p.place === 1 ? crownHtml() : ""}${avatarHtml(p, p.place === 1 ? 68 : 56)}</div>
-          <div class="pod-name">${nameHtml(p.nickname, p.verified)}</div>
-          <div class="badges">${badgesHtml(p.badges)}</div>
-          <div class="pod-pts"><b>${p.points}</b>Поинтов</div>
-          <div class="pod-sub">К/Д ${kdText(p.kd)} · ${p.winrate}% побед</div>
-        </button>
-        <div class="pod-step">${p.place}</div>
-      </div>`).join("")}</div>`;
+    return `<div class="podium">${order.map((p) => `<div class="pod p${p.place}"><button class="pod-card" data-player="${p.id}" type="button"><div class="pod-banner" style="background:${bannerCss(p.banner)}"></div><div class="pod-av">${p.place === 1 ? crownHtml() : ""}${avatarHtml(p, p.place === 1 ? 68 : 56)}</div><div class="pod-name">${nameHtml(p.nickname, p.verified)}</div><div class="badges">${badgesHtml(p.badges)}</div><div class="pod-pts"><b>${p.points}</b>Поинтов</div><div class="pod-sub">К/Д ${kdText(p.kd)} · ${p.winrate}% побед</div></button><div class="pod-step">${p.place}</div></div>`).join("")}</div>`;
   }
 
   async function loadLeaderboard() {
     const d = await api("/api/leaderboard");
     const top = d.players.slice(0, 3);
     $("#lb-podium").innerHTML = top.length ? podiumHtml(top) : "";
-    $("#lb-list").innerHTML = top.length
-      ? d.players.slice(3).map((p) => `
-        <button class="card row lb-row clickable ${p.me ? "me" : ""}" data-player="${p.id}" type="button">
-          <div class="rank">${p.place}</div>${avatarHtml(p, 40)}
-          <div class="grow"><h3>${nameHtml(p.nickname, p.verified)}</h3>${badgesHtml(p.badges) ? `<div class="badges">${badgesHtml(p.badges)}</div>` : ""}<div class="meta"><span>К/Д ${kdText(p.kd)}</span><span>${p.matches} матчей</span></div></div>
-          <span class="pill gold">${p.points} Поинтов</span>
-        </button>`).join("")
-      : `<div class="card empty">Рейтинг пока пуст.</div>`;
+    $("#lb-list").innerHTML = top.length ? d.players.slice(3).map((p) => `<button class="card row lb-row clickable ${p.me ? "me" : ""}" data-player="${p.id}" type="button"><div class="rank">${p.place}</div>${avatarHtml(p, 40)}<div class="grow"><h3>${nameHtml(p.nickname, p.verified)}</h3>${badgesHtml(p.badges) ? `<div class="badges">${badgesHtml(p.badges)}</div>` : ""}<div class="meta"><span>К/Д ${kdText(p.kd)}</span><span>${p.matches} матчей</span></div></div><span class="pill gold">${p.points} Поинтов</span></button>`).join("") : `<div class="card empty">Рейтинг пока пуст.</div>`;
   }
 
-  function renderMissions() {
-    $("#mission-list").innerHTML = MISSIONS.map((m) => `
-      <div class="card">
-        <div class="row" style="padding:0">
-          <div class="grow"><h3>${esc(m.title)}</h3><div class="meta"><span>${ICON("coin")}+${m.reward} коинов</span></div></div>
-          <span class="pill">0/${m.goal}</span>
-        </div>
-        <div class="bar"><i style="width:0%"></i></div>
-      </div>`).join("");
-  }
-
+  function renderMissions() { $("#mission-list").innerHTML = MISSIONS.map((m) => `<div class="card"><div class="row" style="padding:0"><div class="grow"><h3>${esc(m.title)}</h3><div class="meta"><span>${ICON("coin")}+${m.reward} коинов</span></div></div><span class="pill">0/${m.goal}</span></div><div class="bar"><i style="width:0%"></i></div></div>`).join(""); }
   function planDays(until) { return Math.max(1, Math.ceil((until - now()) / 86400)); }
 
   function renderSubs() {
     const active = me.plan ? PLANS.find((p) => p.id === me.plan) : null;
-    $("#subs-hero").innerHTML = `
-      <div class="hero-card ${active ? active.cls : ""}">
-        <div class="hero-glow"></div>
-        <div class="hero-icon">${ICON("diamond")}</div>
-        <h3>CYBERSHOKE PREMIUM</h3>
-        <p>Больше кибер-поинтов за каждую победу, золотые значки и доступ к эксклюзивным турнирам.</p>
-        ${active ? `<div class="hero-status">${ICON("check")}Активна: ${esc(active.name)} · осталось ${planDays(me.plan_until)} дн.</div>` : ""}
-        <div class="hero-perks"><span>${ICON("bolt")}+25% поинтов</span><span>${ICON("crown")}Золотой значок</span><span>${ICON("trophy")}Турниры</span></div>
-      </div>`;
-    $("#subs-list").innerHTML = PLANS.map((p) => `
-      <div class="card plan ${p.cls}">
-        ${p.id === "premium" ? '<div class="ribbon">ЛУЧШИЙ ВЫБОР</div>' : ""}
-        <div class="row" style="padding:0"><h3 class="grow">${esc(p.name)}</h3><span class="price">${esc(p.price)}</span></div>
-        <ul>${p.perks.map((x) => `<li>${ICON("check")}${esc(x)}</li>`).join("")}</ul>
-        <button class="btn ${p.cls === "premium" ? "gold" : "lite"} wide" data-sub="${esc(p.id)}" type="button">${ICON("star")}Купить</button>
-      </div>`).join("") + '<p class="muted small">Оплата в Telegram Stars: после нажатия откроется чат с @crymbog.</p>';
+    $("#subs-hero").innerHTML = `<div class="hero-card ${active ? active.cls : ""}"><div class="hero-glow"></div><div class="hero-icon">${ICON("diamond")}</div><h3>CYBERSHOKE PREMIUM</h3><p>Больше кибер-поинтов за каждую победу, золотые значки и доступ к эксклюзивным турнирам.</p>${active ? `<div class="hero-status">${ICON("check")}Активна: ${esc(active.name)} · осталось ${planDays(me.plan_until)} дн.</div>` : ""}<div class="hero-perks"><span>${ICON("bolt")}+25% поинтов</span><span>${ICON("crown")}Золотой значок</span><span>${ICON("trophy")}Турниры</span></div></div>`;
+    $("#subs-list").innerHTML = PLANS.map((p) => `<div class="card plan ${p.cls}">${p.id === "premium" ? '<div class="ribbon">ЛУЧШИЙ ВЫБОР</div>' : ""}<div class="row" style="padding:0"><h3 class="grow">${esc(p.name)}</h3><span class="price">${esc(p.price)}</span></div><ul>${p.perks.map((x) => `<li>${ICON("check")}${esc(x)}</li>`).join("")}</ul><button class="btn ${p.cls === "premium" ? "gold" : "lite"} wide" data-sub="${esc(p.id)}" type="button">${ICON("star")}Купить</button></div>`).join("") + '<p class="muted small">Оплата в Telegram Stars: после нажатия откроется чат с @crymbog.</p>';
   }
 
   function heroHtml(u, own) {
     const avatar = avatarHtml(u, 96);
-    const holder = own
-      ? `<button class="av-edit" data-act="avatar-pick" type="button" aria-label="Изменить аватарку">${avatar}<span class="cam">${ICON("camera")}</span></button>`
-      : avatar;
-    return `
-      <div class="ph">
-        <div class="ph-banner" style="background:${bannerCss(u.banner)}"></div>
-        <div class="ph-av">${holder}</div>
-        <div class="ph-body">
-          <h3 class="ph-nick">${nameHtml(u.nickname, u.verified)}</h3>
-          ${badgesHtml(u.badges) ? `<div class="badges">${badgesHtml(u.badges)}</div>` : ""}
-          <div class="ph-meta">${u.rank ? `<span class="chip-s">#${u.rank} в рейтинге</span>` : ""}${own ? `<span class="chip-s">ID: ${esc(u.game_id)}</span>` : ""}</div>
-        </div>
-      </div>`;
+    const holder = own ? `<button class="av-edit" data-act="avatar-pick" type="button" aria-label="Изменить аватарку">${avatar}<span class="cam">${ICON("camera")}</span></button>` : avatar;
+    return `<div class="ph"><div class="ph-banner" style="background:${bannerCss(u.banner)}"></div><div class="ph-av">${holder}</div><div class="ph-body"><h3 class="ph-nick">${nameHtml(u.nickname, u.verified)}</h3>${badgesHtml(u.badges) ? `<div class="badges">${badgesHtml(u.badges)}</div>` : ""}<div class="ph-meta">${u.rank ? `<span class="chip-s">#${u.rank} в рейтинге</span>` : ""}${own ? `<span class="chip-s">ID: ${esc(u.game_id)}</span>` : ""}</div></div></div>`;
   }
 
   function statsHtml(u, own) {
     const tile = (icon, cls, value, label) => `<div class="card stat"><svg class="${cls}"><use href="#i-${icon}"/></svg><b>${value}</b><span>${label}</span></div>`;
-    return `
-      <div class="stats-grid">
-        ${tile("target", "c-blue", Number(u.points).toLocaleString("ru-RU"), "Кибер-поинты")}
-        ${own ? tile("coin", "c-gold", Number(u.coins).toLocaleString("ru-RU"), "Коины") : tile("trophy", "c-gold", u.rank ? "#" + u.rank : "—", "Место")}
-        ${tile("game", "c-red", Number(u.kd).toFixed(2), "К/Д")}
-        ${tile("trophy", "c-blue", Number(u.avg).toFixed(1), "АВГ")}
-        ${tile("chart", "c-blue", u.matches || 0, "Матчей")}
-        ${tile("trophy", "c-gold", u.wins || 0, "Побед")}
-      </div>
-      <div class="card wr">
-        <div class="wr-head"><span>Винрейт</span><b>${u.winrate || 0}%</b></div>
-        <div class="wr-bar"><i style="width:${u.winrate || 0}%"></i></div>
-        <small class="muted">Побед: ${u.wins || 0} из ${u.matches || 0}</small>
-      </div>`;
+    return `<div class="stats-grid">${tile("target", "c-blue", Number(u.points).toLocaleString("ru-RU"), "Кибер-поинты")}${own ? tile("coin", "c-gold", Number(u.coins).toLocaleString("ru-RU"), "Коины") : tile("trophy", "c-gold", u.rank ? "#" + u.rank : "—", "Место")}${tile("game", "c-red", Number(u.kd).toFixed(2), "К/Д")}${tile("trophy", "c-blue", Number(u.avg).toFixed(1), "АВГ")}${tile("chart", "c-blue", u.matches || 0, "Матчей")}${tile("trophy", "c-gold", u.wins || 0, "Побед")}</div><div class="card wr"><div class="wr-head"><span>Винрейт</span><b>${u.winrate || 0}%</b></div><div class="wr-bar"><i style="width:${u.winrate || 0}%"></i></div><small class="muted">Побед: ${u.wins || 0} из ${u.matches || 0}</small></div>`;
   }
 
   function fillProfile() {
@@ -884,17 +648,10 @@
     const u = d.player;
     $("#pl-hero").innerHTML = heroHtml(u, false);
     $("#pl-stats").innerHTML = statsHtml(u, false);
-    $("#pl-recent").innerHTML = u.recent.length ? `<div class="recent"><h3>${ICON("history")}Последние матчи</h3>${u.recent.map((r) => `
-      <div class="card rc-row ${r.won ? "win" : ""}"><i class="res-dot"></i><div class="grow"><b>${esc(r.map)} · ${esc(r.mode)}</b><br><small>${ago(r.finished_at)} · ${r.kills}/${r.deaths}/${r.assists}</small></div>
-      <span class="res ${r.won ? "win" : "lose"}">${r.won ? "Победа" : "Поражение"} ${sgn(r.points_change)}</span></div>`).join("")}</div>` : "";
+    $("#pl-recent").innerHTML = u.recent.length ? `<div class="recent"><h3>${ICON("history")}Последние матчи</h3>${u.recent.map((r) => `<div class="card rc-row ${r.won ? "win" : ""}"><i class="res-dot"></i><div class="grow"><b>${esc(r.map)} · ${esc(r.mode)}</b><br><small>${ago(r.finished_at)} · ${r.kills}/${r.deaths}/${r.assists}</small></div><span class="res ${r.won ? "win" : "lose"}">${r.won ? "Победа" : "Поражение"} ${sgn(r.points_change)}</span></div>`).join("")}</div>` : "";
   }
 
-  async function loadProfile() {
-    fillProfile();
-    const d = await api("/api/profile");
-    me = d.user;
-    fillProfile();
-  }
+  async function loadProfile() { fillProfile(); const d = await api("/api/profile"); me = d.user; fillProfile(); }
 
   function prepareImage(file, { max = 1200, square = false, quality = 0.88 } = {}) {
     return new Promise((resolve, reject) => {
@@ -916,301 +673,71 @@
     });
   }
 
-  async function uploadAvatar(file) {
-    const blob = await prepareImage(file, { max: 512, square: true, quality: 0.9 });
-    const form = new FormData();
-    form.append("file", blob, "avatar.jpg");
-    const d = await api("/api/profile/avatar", { form });
-    me = d.user;
-    fillProfile();
-    toast("Аватарка обновлена");
-    haptic("ok");
-  }
-
-  async function removeAvatar() {
-    const d = await api("/api/profile/avatar", { method: "POST", body: { avatar: "" } });
-    me = d.user;
-    fillProfile();
-    toast("Фото профиля удалено");
-  }
+  async function uploadAvatar(file) { const blob = await prepareImage(file, { max: 512, square: true, quality: 0.9 }); const form = new FormData(); form.append("file", blob, "avatar.jpg"); const d = await api("/api/profile/avatar", { form }); me = d.user; fillProfile(); toast("Аватарка обновлена"); haptic("ok"); }
+  async function removeAvatar() { const d = await api("/api/profile/avatar", { method: "POST", body: { avatar: "" } }); me = d.user; fillProfile(); toast("Фото профиля удалено"); }
 
   function openBanners() {
     const cur = me.banner || "";
-    $("#banner-grid").innerHTML = `<button class="banner-tile none ${cur === "" ? "sel" : ""}" data-banner="" type="button"><span>Без баннера</span></button>` +
-      Object.keys(BANNERS).map((k) => `<button class="banner-tile ${cur === "preset:" + k ? "sel" : ""}" data-banner="preset:${k}" style="background:${BANNERS[k]}" type="button"></button>`).join("") +
-      (cur.startsWith("/uploads/") ? `<button class="banner-tile sel" data-banner="${esc(cur)}" style="background:${esc(bannerCss(cur))}" type="button"></button>` : "");
+    $("#banner-grid").innerHTML = `<button class="banner-tile none ${cur === "" ? "sel" : ""}" data-banner="" type="button"><span>Без баннера</span></button>` + Object.keys(BANNERS).map((k) => `<button class="banner-tile ${cur === "preset:" + k ? "sel" : ""}" data-banner="preset:${k}" style="background:${BANNERS[k]}" type="button"></button>`).join("") + (cur.startsWith("/uploads/") ? `<button class="banner-tile sel" data-banner="${esc(cur)}" style="background:${esc(bannerCss(cur))}" type="button"></button>` : "");
     const can = me.can_upload_banner;
     $("#btn-banner-upload").classList.toggle("locked", !can);
     $("#banner-note").textContent = can ? "Загрузите свою картинку (PNG, JPG, WEBP, GIF до 5 МБ)." : "Свой баннер доступен с подпиской или статусом VIP.";
     openModal("m-banner");
   }
 
-  async function setBanner(value) {
-    const d = await api("/api/profile/banner", { method: "POST", body: { banner: value } });
-    me = d.user;
-    fillProfile();
-    openBanners();
-    toast("Баннер обновлён");
-  }
+  async function setBanner(value) { const d = await api("/api/profile/banner", { method: "POST", body: { banner: value } }); me = d.user; fillProfile(); openBanners(); toast("Баннер обновлён"); }
+  async function uploadBanner(file) { const blob = await prepareImage(file, { max: 1200, quality: 0.85 }); const form = new FormData(); form.append("file", blob, "banner.jpg"); form.append("purpose", "banner"); const up = await api("/api/upload", { form }); await setBanner(up.url); }
 
-  async function uploadBanner(file) {
-    const blob = await prepareImage(file, { max: 1200, quality: 0.85 });
-    const form = new FormData();
-    form.append("file", blob, "banner.jpg");
-    form.append("purpose", "banner");
-    const up = await api("/api/upload", { form });
-    await setBanner(up.url);
-  }
-
-  function renderAdminState() {
-    const unlocked = Boolean(adminPass);
-    $("#admin-lock").classList.toggle("hidden", unlocked);
-    $("#admin-body").classList.toggle("hidden", !unlocked);
-    if (unlocked) loadAdminTab();
-  }
+  function renderAdminState() { const unlocked = Boolean(adminPass); $("#admin-lock").classList.toggle("hidden", unlocked); $("#admin-body").classList.toggle("hidden", !unlocked); if (unlocked) loadAdminTab(); }
 
   async function adm(body) {
-    try {
-      return await api("/api/admin", { method: "POST", admin: adminPass, body });
-    } catch (e) {
-      if (e.status === 403 && e.message === "Неверный пароль") { adminPass = ""; renderAdminState(); }
-      throw e;
-    }
+    try { return await api("/api/admin", { method: "POST", admin: adminPass, body }); }
+    catch (e) { if (e.status === 403 && e.message === "Неверный пароль") { adminPass = ""; renderAdminState(); } throw e; }
   }
 
-  async function adminLogin() {
-    const err = $("#admin-error");
-    err.classList.add("hidden");
-    const pass = $("#in-admin-pass").value;
-    try {
-      await api("/api/admin", { method: "POST", admin: pass, body: { action: "ping" } });
-      adminPass = pass;
-      $("#in-admin-pass").value = "";
-      renderAdminState();
-    } catch (e) {
-      err.textContent = e.message;
-      err.classList.remove("hidden");
-    }
-  }
+  async function adminLogin() { const err = $("#admin-error"); err.classList.add("hidden"); const pass = $("#in-admin-pass").value; try { await api("/api/admin", { method: "POST", admin: pass, body: { action: "ping" } }); adminPass = pass; $("#in-admin-pass").value = ""; renderAdminState(); } catch (e) { err.textContent = e.message; err.classList.remove("hidden"); } }
 
-  function ensureAdmin(cb) {
-    if (adminPass) return cb();
-    afterAdmin = cb;
-    $("#in-adminpass2").value = "";
-    $("#adminpass-error").classList.add("hidden");
-    openModal("m-adminpass");
-  }
+  function ensureAdmin(cb) { if (adminPass) return cb(); afterAdmin = cb; $("#in-adminpass2").value = ""; $("#adminpass-error").classList.add("hidden"); openModal("m-adminpass"); }
 
-  async function adminPassOk() {
-    const err = $("#adminpass-error");
-    err.classList.add("hidden");
-    const pass = $("#in-adminpass2").value;
-    try {
-      await api("/api/admin", { method: "POST", admin: pass, body: { action: "ping" } });
-      adminPass = pass;
-      closeModals();
-      const cb = afterAdmin;
-      afterAdmin = null;
-      if (cb) cb();
-    } catch (e) {
-      err.textContent = e.message;
-      err.classList.remove("hidden");
-    }
-  }
+  async function adminPassOk() { const err = $("#adminpass-error"); err.classList.add("hidden"); const pass = $("#in-adminpass2").value; try { await api("/api/admin", { method: "POST", admin: pass, body: { action: "ping" } }); adminPass = pass; closeModals(); const cb = afterAdmin; afterAdmin = null; if (cb) cb(); } catch (e) { err.textContent = e.message; err.classList.remove("hidden"); } }
 
   async function loadAdminTab() {
     $$("#admin-tabs .fchip").forEach((c) => c.classList.toggle("active", c.dataset.atab === adminTab));
     ["players", "news", "stats"].forEach((t) => $(`#atab-${t}`).classList.toggle("hidden", t !== adminTab));
     if (adminTab === "players") { const d = await adm({ action: "list" }); adminUsers = d.players; drawAdminList(); }
-    if (adminTab === "news") {
-      const d = await api("/api/posts");
-      $("#admin-news-list").innerHTML = d.posts.length ? d.posts.map((p) => postCard(p, true)).join("") : '<div class="card empty">Новостей пока нет.</div>';
-    }
-    if (adminTab === "stats") {
-      const s = await adm({ action: "stats" });
-      const items = [["users", "Игроков", s.users], ["bolt", "Онлайн", s.online], ["game", "Активных лобби", s.lobbies], ["trophy", "Матчей", s.matches], ["check", "Результатов начислено", s.finished], ["news", "Постов", s.posts], ["star", "С подпиской", s.premium]];
-      $("#admin-stats").innerHTML = items.map((i) => `<div class="card stat">${ICON(i[0])}<b>${i[2]}</b><span>${i[1]}</span></div>`).join("");
-    }
+    if (adminTab === "news") { const d = await api("/api/posts"); $("#admin-news-list").innerHTML = d.posts.length ? d.posts.map((p) => postCard(p, true)).join("") : '<div class="card empty">Новостей пока нет.</div>'; }
+    if (adminTab === "stats") { const s = await adm({ action: "stats" }); const items = [["users", "Игроков", s.users], ["bolt", "Онлайн", s.online], ["game", "Активных лобби", s.lobbies], ["trophy", "Матчей", s.matches], ["check", "Результатов начислено", s.finished], ["news", "Постов", s.posts], ["star", "С подпиской", s.premium]]; $("#admin-stats").innerHTML = items.map((i) => `<div class="card stat">${ICON(i[0])}<b>${i[2]}</b><span>${i[1]}</span></div>`).join(""); }
   }
 
   function drawAdminList() {
     const q = $("#in-admin-search").value.trim().toLowerCase();
     const rows = adminUsers.filter((p) => !q || p.nickname.toLowerCase().includes(q) || String(p.game_id).includes(q) || String(p.tg_id).includes(q));
-    $("#admin-list").innerHTML = rows.length ? rows.map((p) => `
-      <div class="card row admin-row">
-        <div class="row" style="padding:0">
-          <div class="grow">
-            <h3>${nameHtml(p.nickname, p.verified)}</h3>
-            ${badgesHtml(p.badges) ? `<div class="badges">${badgesHtml(p.badges)}</div>` : ""}
-            <div class="meta"><span>ID ${esc(p.game_id)}</span><span>TG ${p.tg_id}</span><span>${p.points} Поинтов</span></div>
-          </div>
-          ${p.is_banned ? '<span class="pill red">бан</span>' : ""}${p.is_muted ? '<span class="pill gold">мут</span>' : ""}
-        </div>
-        ${p.is_banned ? `<div class="meta"><span>Причина: ${esc(p.ban_reason)} · ${fmtDate(p.ban_until)}</span></div>` : ""}
-        <div class="actions">
-          <button class="btn danger" data-adm="ban" data-id="${p.tg_id}" type="button">${ICON("ban")}Бан</button>
-          <button class="btn ghost" data-adm="mute" data-id="${p.tg_id}" type="button">${ICON("mute")}Мут</button>
-          <button class="btn ghost" data-adm="unban" data-id="${p.tg_id}" type="button">${ICON("check")}Разбан</button>
-          <button class="btn ghost" data-adm="unmute" data-id="${p.tg_id}" type="button">${ICON("check")}Размут</button>
-          <button class="btn lite" data-adm="badge" data-id="${p.tg_id}" type="button">${ICON("shield")}Бейдж</button>
-          <button class="btn gold" data-adm="plan" data-id="${p.tg_id}" type="button">${ICON("star")}Премиум</button>
-          <button class="btn ghost" data-adm="points" data-id="${p.tg_id}" type="button">${ICON("target")}Поинты</button>
-        </div>
-      </div>`).join("") : `<div class="card empty">Игроки не найдены.</div>`;
+    $("#admin-list").innerHTML = rows.length ? rows.map((p) => `<div class="card row admin-row"><div class="row" style="padding:0"><div class="grow"><h3>${nameHtml(p.nickname, p.verified)}</h3>${badgesHtml(p.badges) ? `<div class="badges">${badgesHtml(p.badges)}</div>` : ""}<div class="meta"><span>ID ${esc(p.game_id)}</span><span>TG ${p.tg_id}</span><span>${p.points} Поинтов</span></div></div>${p.is_banned ? '<span class="pill red">бан</span>' : ""}${p.is_muted ? '<span class="pill gold">мут</span>' : ""}</div>${p.is_banned ? `<div class="meta"><span>Причина: ${esc(p.ban_reason)} · ${fmtDate(p.ban_until)}</span></div>` : ""}<div class="actions"><button class="btn danger" data-adm="ban" data-id="${p.tg_id}" type="button">${ICON("ban")}Бан</button><button class="btn ghost" data-adm="mute" data-id="${p.tg_id}" type="button">${ICON("mute")}Мут</button><button class="btn ghost" data-adm="unban" data-id="${p.tg_id}" type="button">${ICON("check")}Разбан</button><button class="btn ghost" data-adm="unmute" data-id="${p.tg_id}" type="button">${ICON("check")}Размут</button><button class="btn lite" data-adm="badge" data-id="${p.tg_id}" type="button">${ICON("shield")}Бейдж</button><button class="btn gold" data-adm="plan" data-id="${p.tg_id}" type="button">${ICON("star")}Премиум</button><button class="btn ghost" data-adm="points" data-id="${p.tg_id}" type="button">${ICON("target")}Поинты</button></div></div>`).join("") : `<div class="card empty">Игроки не найдены.</div>`;
   }
 
   async function adminAction(action, id) {
     const p = adminUsers.find((x) => x.tg_id === Number(id));
     if (!p) return;
-    if (action === "ban" || action === "mute") {
-      punish = { action, id: p.tg_id };
-      $("#punish-title").textContent = action === "ban" ? "Бан игрока" : "Мут игрока";
-      $("#punish-target").textContent = `${p.nickname} · ID ${p.game_id}`;
-      $("#sel-time").innerHTML = TIMES.map((t) => `<option value="${t.min}">${esc(t.label)}</option>`).join("");
-      $("#in-reason").value = "";
-      $("#punish-error").classList.add("hidden");
-      return openModal("m-punish");
-    }
-    if (action === "badge") {
-      badgeTarget = p;
-      $("#badge-target").textContent = `${p.nickname} · ID ${p.game_id}`;
-      $("#badge-now").innerHTML = badgesHtml(p.badges) || '<span class="muted small">Бейджей нет</span>';
-      $("#vfy-state").textContent = p.verified ? "есть" : "нет";
-      $("#sel-badge").innerHTML = GRANT.map((b) => `<option value="${b}">${esc(BADGES[b])}</option>`).join("");
-      return openModal("m-badge");
-    }
-    if (action === "plan") {
-      planTarget = p;
-      $("#plan-target").textContent = `${p.nickname} · ID ${p.game_id}`;
-      $("#plan-error").classList.add("hidden");
-      return openModal("m-plan");
-    }
-    if (action === "points") {
-      pointsTarget = p;
-      $("#points-target").textContent = `${p.nickname} · сейчас ${p.points} поинтов`;
-      $("#in-points").value = "";
-      $("#points-error").classList.add("hidden");
-      return openModal("m-points");
-    }
+    if (action === "ban" || action === "mute") { punish = { action, id: p.tg_id }; $("#punish-title").textContent = action === "ban" ? "Бан игрока" : "Мут игрока"; $("#punish-target").textContent = `${p.nickname} · ID ${p.game_id}`; $("#sel-time").innerHTML = TIMES.map((t) => `<option value="${t.min}">${esc(t.label)}</option>`).join(""); $("#in-reason").value = ""; $("#punish-error").classList.add("hidden"); return openModal("m-punish"); }
+    if (action === "badge") { badgeTarget = p; $("#badge-target").textContent = `${p.nickname} · ID ${p.game_id}`; $("#badge-now").innerHTML = badgesHtml(p.badges) || '<span class="muted small">Бейджей нет</span>'; $("#vfy-state").textContent = p.verified ? "есть" : "нет"; $("#sel-badge").innerHTML = GRANT.map((b) => `<option value="${b}">${esc(BADGES[b])}</option>`).join(""); return openModal("m-badge"); }
+    if (action === "plan") { planTarget = p; $("#plan-target").textContent = `${p.nickname} · ID ${p.game_id}`; $("#plan-error").classList.add("hidden"); return openModal("m-plan"); }
+    if (action === "points") { pointsTarget = p; $("#points-target").textContent = `${p.nickname} · сейчас ${p.points} поинтов`; $("#in-points").value = ""; $("#points-error").classList.add("hidden"); return openModal("m-points"); }
     await adm({ action, tg_id: p.tg_id });
     toast(action === "unban" ? "Игрок разбанен" : "Мут снят");
     loadAdminTab();
   }
 
-  async function submitPunish() {
-    const err = $("#punish-error");
-    err.classList.add("hidden");
-    try {
-      await adm({ action: punish.action, tg_id: punish.id, minutes: Number($("#sel-time").value), reason: $("#in-reason").value });
-      closeModals();
-      toast(punish.action === "ban" ? "Игрок забанен" : "Игрок заглушён");
-      loadAdminTab();
-    } catch (e) {
-      err.textContent = e.message;
-      err.classList.remove("hidden");
-    }
-  }
+  async function submitPunish() { const err = $("#punish-error"); err.classList.add("hidden"); try { await adm({ action: punish.action, tg_id: punish.id, minutes: Number($("#sel-time").value), reason: $("#in-reason").value }); closeModals(); toast(punish.action === "ban" ? "Игрок забанен" : "Игрок заглушён"); loadAdminTab(); } catch (e) { err.textContent = e.message; err.classList.remove("hidden"); } }
+  async function badgeChange(kind) { await adm({ action: kind, tg_id: badgeTarget.tg_id, badge: $("#sel-badge").value }); closeModals(); toast(kind === "badge_add" ? "Бейдж выдан" : "Бейдж снят"); loadAdminTab(); }
+  async function verifySet(value) { await adm({ action: "verify_set", tg_id: badgeTarget.tg_id, value }); badgeTarget.verified = value; $("#vfy-state").textContent = value ? "есть" : "нет"; toast(value ? "Галочка выдана" : "Галочка снята"); loadAdminTab(); }
+  async function channelTest() { const box = $("#channel-test-result"); box.innerHTML = '<div class="card empty">Отправляем тестовые сообщения…</div>'; const d = await adm({ action: "channel_test" }); box.innerHTML = d.results.map((r) => `<div class="card row"><div class="grow"><h3>${esc(r.topic)} · тема ${esc(r.topic_id)}</h3><div class="meta"><span>${ICON(r.ok ? "check" : "close")}${r.ok ? "Сообщение доставлено" : esc(r.error || "Ошибка отправки")}</span></div></div><span class="pill ${r.ok ? "green" : "red"}">${r.ok ? "OK" : "ошибка"}</span></div>`).join(""); }
+  async function submitPlan() { const err = $("#plan-error"); err.classList.add("hidden"); try { await adm({ action: "plan_set", tg_id: planTarget.tg_id, plan: $("#sel-plan").value, days: Number($("#in-plan-days").value) || 30 }); closeModals(); toast("Подписка обновлена"); loadAdminTab(); } catch (e) { err.textContent = e.message; err.classList.remove("hidden"); } }
+  async function submitPoints() { const err = $("#points-error"); err.classList.add("hidden"); try { await adm({ action: "points_add", tg_id: pointsTarget.tg_id, delta: Number($("#in-points").value) }); closeModals(); toast("Поинты обновлены"); loadAdminTab(); } catch (e) { err.textContent = e.message; err.classList.remove("hidden"); } }
 
-  async function badgeChange(kind) {
-    await adm({ action: kind, tg_id: badgeTarget.tg_id, badge: $("#sel-badge").value });
-    closeModals();
-    toast(kind === "badge_add" ? "Бейдж выдан" : "Бейдж снят");
-    loadAdminTab();
-  }
-
-  async function verifySet(value) {
-    await adm({ action: "verify_set", tg_id: badgeTarget.tg_id, value });
-    badgeTarget.verified = value;
-    $("#vfy-state").textContent = value ? "есть" : "нет";
-    toast(value ? "Галочка выдана" : "Галочка снята");
-    loadAdminTab();
-  }
-
-  async function channelTest() {
-    const box = $("#channel-test-result");
-    box.innerHTML = '<div class="card empty">Отправляем тестовые сообщения…</div>';
-    const d = await adm({ action: "channel_test" });
-    box.innerHTML = d.results.map((r) => `
-      <div class="card row"><div class="grow"><h3>${esc(r.topic)} · тема ${esc(r.topic_id)}</h3>
-      <div class="meta"><span>${ICON(r.ok ? "check" : "close")}${r.ok ? "Сообщение доставлено" : esc(r.error || "Ошибка отправки")}</span></div></div>
-      <span class="pill ${r.ok ? "green" : "red"}">${r.ok ? "OK" : "ошибка"}</span></div>`).join("");
-  }
-
-  async function submitPlan() {
-    const err = $("#plan-error");
-    err.classList.add("hidden");
-    try {
-      await adm({ action: "plan_set", tg_id: planTarget.tg_id, plan: $("#sel-plan").value, days: Number($("#in-plan-days").value) || 30 });
-      closeModals();
-      toast("Подписка обновлена");
-      loadAdminTab();
-    } catch (e) {
-      err.textContent = e.message;
-      err.classList.remove("hidden");
-    }
-  }
-
-  async function submitPoints() {
-    const err = $("#points-error");
-    err.classList.add("hidden");
-    try {
-      await adm({ action: "points_add", tg_id: pointsTarget.tg_id, delta: Number($("#in-points").value) });
-      closeModals();
-      toast("Поинты обновлены");
-      loadAdminTab();
-    } catch (e) {
-      err.textContent = e.message;
-      err.classList.remove("hidden");
-    }
-  }
-
-  function openPostModal() {
-    ensureAdmin(() => {
-      postImage = "";
-      $("#in-post-title").value = "";
-      $("#in-post-body").value = "";
-      $("#chk-post-pin").checked = false;
-      $("#chk-post-notify").checked = true;
-      $("#post-image-label").textContent = "Добавить картинку";
-      $("#post-error").classList.add("hidden");
-      openModal("m-post");
-    });
-  }
-
-  async function uploadPostImage(file) {
-    const form = new FormData();
-    form.append("file", file);
-    form.append("purpose", "post");
-    try {
-      const up = await api("/api/upload", { form, admin: adminPass });
-      postImage = up.url;
-      $("#post-image-label").textContent = "Картинка загружена ✓";
-    } catch (e) { handleErr(e); }
-  }
-
-  async function submitPost() {
-    const err = $("#post-error");
-    err.classList.add("hidden");
-    try {
-      await adm({ action: "post_create", title: $("#in-post-title").value, body: $("#in-post-body").value, image: postImage, pinned: $("#chk-post-pin").checked, notify: $("#chk-post-notify").checked });
-      closeModals();
-      toast("Пост опубликован");
-      if (current() === "news") loadNews(); else if (current() === "admin") loadAdminTab();
-    } catch (e) {
-      err.textContent = e.message;
-      err.classList.remove("hidden");
-    }
-  }
-
-  async function postAdmin(action, id) {
-    ensureAdmin(async () => {
-      await run(async () => {
-        await adm({ action, id: Number(id) });
-        toast(action === "post_delete" ? "Пост удалён" : "Готово");
-        if (current() === "news") loadNews(); else loadAdminTab();
-      });
-    });
-  }
+  function openPostModal() { ensureAdmin(() => { postImage = ""; $("#in-post-title").value = ""; $("#in-post-body").value = ""; $("#chk-post-pin").checked = false; $("#chk-post-notify").checked = true; $("#post-image-label").textContent = "Добавить картинку"; $("#post-error").classList.add("hidden"); openModal("m-post"); }); }
+  async function uploadPostImage(file) { const form = new FormData(); form.append("file", file); form.append("purpose", "post"); try { const up = await api("/api/upload", { form, admin: adminPass }); postImage = up.url; $("#post-image-label").textContent = "Картинка загружена ✓"; } catch (e) { handleErr(e); } }
+  async function submitPost() { const err = $("#post-error"); err.classList.add("hidden"); try { await adm({ action: "post_create", title: $("#in-post-title").value, body: $("#in-post-body").value, image: postImage, pinned: $("#chk-post-pin").checked, notify: $("#chk-post-notify").checked }); closeModals(); toast("Пост опубликован"); if (current() === "news") loadNews(); else if (current() === "admin") loadAdminTab(); } catch (e) { err.textContent = e.message; err.classList.remove("hidden"); } }
+  async function postAdmin(action, id) { ensureAdmin(async () => { await run(async () => { await adm({ action, id: Number(id) }); toast(action === "post_delete" ? "Пост удалён" : "Готово"); if (current() === "news") loadNews(); else loadAdminTab(); }); }); }
 
   document.addEventListener("click", (ev) => {
     const pl = ev.target.closest("[data-player]");
@@ -1280,11 +807,8 @@
   $("#btn-post-submit").addEventListener("click", submitPost);
   document.addEventListener("visibilitychange", () => { if (!document.hidden && me) pollMy(false); });
   window.addEventListener("unhandledrejection", (e) => { if (e.reason && e.reason.message) handleErr(e.reason); });
-  if (tg && tg.BackButton) {
-    try { tg.BackButton.onClick(() => ($("#s-register").classList.contains("active") ? show("s-welcome") : back())); } catch (e) {}
-  }
+  if (tg && tg.BackButton) { try { tg.BackButton.onClick(() => ($("#s-register").classList.contains("active") ? show("s-welcome") : back())); } catch (e) {} }
 
   $$(".logo-img").forEach((img) => { if (img.complete && img.naturalWidth === 0) logoFallback(img); });
   boot();
-
 })();
