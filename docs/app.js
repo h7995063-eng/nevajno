@@ -211,9 +211,15 @@ const API_URL = NOTIFY_URL;
   /* ----- Пользователи ----- */
   async function getUser() {
     try {
+      const headers = { "Content-Type": "application/json" };
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
+        headers["X-Init-Data"] = window.Telegram.WebApp.initData;
+      }
+      headers["X-Dev-User"] = JSON.stringify({ id: TG_ID, username: "dev" });
+      
       const res = await fetch(API_URL + "/api/auth", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+        headers: headers,
         body: JSON.stringify({}),
       });
       const data = await res.json();
@@ -228,9 +234,15 @@ const API_URL = NOTIFY_URL;
     if (!/^[A-Za-z0-9_\-А-Яа-яЁё]{3,20}$/.test(nickname)) throw new Error("Ник: 3–20 символов, буквы, цифры, _ и -");
     if (!/^\d{4,12}$/.test(game_id)) throw new Error("ID CounterFlame: от 4 до 12 цифр");
 
+    const headers = { "Content-Type": "application/json" };
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
+      headers["X-Init-Data"] = window.Telegram.WebApp.initData;
+    }
+    headers["X-Dev-User"] = JSON.stringify({ id: TG_ID, username: "dev" });
+
     const res = await fetch(API_URL + "/api/auth", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" }) },
+      headers: headers,
       body: JSON.stringify({ nickname, game_id }),
     });
     const data = await res.json();
