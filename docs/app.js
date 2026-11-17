@@ -1332,3 +1332,25 @@ window.openSupportClose = function() {
     setTimeout(() => m.style.display = "none", 200);
   }
 };
+
+// ==================== ЖЕСТКИЙ ПЕРЕХВАТ ПОДДЕРЖКИ ====================
+// Перезаписываем функцию, чтобы она ВСЕГДА открывала модалку, даже если в коде осталась старая ссылка
+window.openSupport = function() {
+  console.log("Открываем модалку поддержки...");
+  const m = document.getElementById("modal-support");
+  if (m) {
+    m.style.display = "flex";
+    setTimeout(() => m.classList.add("show"), 10);
+  } else {
+    console.error("Модалка #modal-support не найдена в HTML!");
+    alert("Ошибка: окно поддержки не загрузилось. Обновите страницу.");
+  }
+};
+
+window.openSupportClose = function() {
+  const m = document.getElementById("modal-support");
+  if (m) {
+    m.classList.remove("show");
+    setTimeout(() => m.style.display = "none", 200);
+  }
+};
