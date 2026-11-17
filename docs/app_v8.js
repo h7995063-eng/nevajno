@@ -1398,3 +1398,48 @@ window.sendTicket = async function() {
     if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; }
   }
 };
+
+// ==================== УВЕДОМЛЕНИЯ И ПРОЧЕЕ ====================
+window.openOther = function() {
+  const m = document.getElementById('modal-other');
+  if (m) { m.style.display = 'flex'; }
+};
+
+window.openNotifications = function() {
+  const m = document.getElementById('modal-notifications');
+  if (m) { m.style.display = 'flex'; }
+  const badge = document.getElementById('notif-badge');
+  if (badge) badge.style.display = 'none';
+  // Заглушка: можно очищать список уведомлений
+  // localStorage.setItem('cs_notifications', JSON.stringify([]));
+};
+
+// Пример функции для добавления уведомления (можешь вызывать ее из других мест)
+window.addNotification = function(title, text, icon) {
+  const list = document.getElementById('notif-list');
+  if (!list) return;
+  
+  // Удаляем "Пока нет уведомлений"
+  if (list.innerHTML.includes('Пока нет уведомлений')) list.innerHTML = '';
+  
+  const el = document.createElement('div');
+  el.style.cssText = 'background:#0a0c12; border:1px solid #2a3040; border-radius:10px; padding:15px; display:flex; gap:12px; align-items:center;';
+  el.innerHTML = `
+    <div style="background:#1f2433; padding:8px; border-radius:50%; color:#3b82f6;">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-${icon || 'bell'}"/></svg>
+    </div>
+    <div>
+      <div style="color:#fff; font-weight:600; font-size:14px; margin-bottom:4px;">${title}</div>
+      <div style="color:#8b98a8; font-size:12px; line-height:1.4;">${text}</div>
+    </div>
+  `;
+  list.prepend(el);
+  
+  // Показываем бейдж
+  const badge = document.getElementById('notif-badge');
+  if (badge) {
+    badge.style.display = 'flex';
+    let count = parseInt(badge.textContent) || 0;
+    badge.textContent = count + 1;
+  }
+};
