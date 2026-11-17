@@ -9,13 +9,10 @@
     "Inferno": "assets/maps/inferno.jpg",
     "Dust II": "assets/maps/dust2.webp",
     "Vertigo": "assets/maps/vertigo.webp",
-  };
-  const MODE_SIZE = { "1v1": 2, "5v5": 10, "DM": 10 };
   const MODE_INFO = {
     "1v1": "Дуэль до 13 раундов",
     "5v5": "Премьер, до 13 раундов",
     "DM": "Deathmatch — против всех",
-  };
   const MISSIONS = [
     { title: "Сыграй 3 матча", reward: 150, goal: 3 },
     { title: "Победи в 2 матчах подряд", reward: 300, goal: 2 },
@@ -33,7 +30,6 @@
   const BADGES = {
     owner: "Владелец", admin: "Админ", dev: "Разработчик", mod: "Модератор",
     vip: "VIP", pixel: "Pixel", premium: "PREMIUM", lite: "LITE",
-  };
   const GRANT = ["vip", "pixel", "mod", "dev", "admin", "owner"];
   const BANNERS = {
     flame: "linear-gradient(120deg,#ff4655,#7a1020 60%,#1a0508)",
@@ -44,7 +40,6 @@
     sakura: "linear-gradient(120deg,#ff7eb3,#a43a6b 55%,#1a0a14)",
     toxic: "linear-gradient(120deg,#2de2a1,#0e6b4d 55%,#04140e)",
     sunset: "linear-gradient(120deg,#ff9a44,#e0344f 55%,#2a1050)",
-  };
   const STEPS = ["Набор", "Подтверждение", "Матч", "Результат"];
   const STATUS = {
     open: ["набор игроков", "blue"],
@@ -52,7 +47,6 @@
     playing: ["идёт матч", "green"],
     review: ["результаты на проверке", "gold"],
     finished: ["матч завершён", "green"],
-  };
 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -118,7 +112,6 @@
   }
 
   function resolveDevId() {
-    const valid = (v) => { const n = Number(v); return Number.isInteger(n) && n > 0 ? n : 0; };
     let id = 0;
     try { id = valid(new URLSearchParams(location.search).get("tg_id")); } catch (e) {}
     if (id) { store("cs_dev_id", String(id)); return id; }
@@ -177,7 +170,6 @@
   }
 
   async function api(path, opts = {}) {
-    const headers = { "Bypass-Tunnel-Reminder": "true", "ngrok-skip-browser-warning": "1" };
     if (!opts.form) headers["Content-Type"] = "application/json";
     const init = readInitData();
     if (init) headers["X-Init-Data"] = init;
@@ -197,7 +189,6 @@
       err.status = 0;
       throw err;
     } finally { clearTimeout(timer); }
-    let data = {};
     try { data = await res.json(); } catch (e) {}
     if (!res.ok) {
       const err = new Error(data.error || `Ошибка сервера (${res.status})`);
@@ -391,7 +382,6 @@
     const handlers = {
       matches: loadMatchesView, news: loadNews, leaderboard: loadLeaderboard, missions: renderMissions,
       profile: loadProfile, subs: renderSubs, admin: renderAdminState, lobby: () => renderRoom(true), player: loadPlayer,
-    };
     run(handlers[view]);
   }
 
@@ -501,7 +491,6 @@
     refreshMatchesEmpty();
   }
 
-  const hist = { items: [], total: 0, totalAll: null, loaded: false };
   let histScope = "all";
   let histTick = 0;
 
@@ -566,7 +555,6 @@
   function openLobbyModal() {
     $("#sel-map").innerHTML = MAPS.map((m) => `<option>${esc(m)}</option>`).join("");
     $("#sel-mode").innerHTML = Object.keys(MODE_SIZE).map((m) => `<option>${esc(m)}</option>`).join("");
-    const updateDesc = () => { $("#mode-desc").textContent = MODE_INFO[$("#sel-mode").value] || ""; };
     $("#sel-mode").onchange = updateDesc;
     updateDesc();
     openModal("m-lobby");
@@ -898,8 +886,6 @@
         canvas.height = Math.max(1, Math.round(sh * scale));
         canvas.getContext("2d").drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
         canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Не удалось обработать картинку"))), "image/jpeg", quality);
-      };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Не удалось прочитать картинку")); };
       img.src = url;
     });
   }
@@ -1051,7 +1037,6 @@
     const p = adminUsers.find((x) => x.tg_id === Number(id));
     if (!p) return;
     if (action === "ban" || action === "mute") {
-      punish = { action, id: p.tg_id };
       $("#punish-title").textContent = action === "ban" ? "Бан игрока" : "Мут игрока";
       $("#punish-target").textContent = `${p.nickname} · ID ${p.game_id}`;
       $("#sel-time").innerHTML = TIMES.map((t) => `<option value="${t.min}">${esc(t.label)}</option>`).join("");
@@ -1309,12 +1294,17 @@ async function sendTicket() {
 }
 
 // ==================== ОТКРЫТИЕ ПОДДЕРЖКИ ====================
-window.openSupport = function() {
-  const m = document.getElementById("modal-support");
-  if (m) {
-    m.style.display = "flex";
-    m.classList.remove("hidden");
   } else {
     alert("Ошибка: модалка не найдена в HTML");
   }
-};
+
+// ==================== ПЛАВНОЕ ОТКРЫТИЕ/ЗАКРЫТИЕ ПОДДЕРЖКИ ====================
+    setTimeout(() => m.classList.add("show"), 10);
+  } else {
+    alert("Модалка не найдена");
+  }
+
+window.openSupportClose = function() {
+    m.classList.remove("show");
+    setTimeout(() => m.style.display = "none", 200);
+  }
