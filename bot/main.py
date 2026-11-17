@@ -260,3 +260,11 @@ async def handle_admin_reply(message: types.Message):
     except Exception as e:
         await message.reply(f"❌ Ошибка: {e}")
 # =========================================================
+        await bot.send_message(
+            chat_id=user_tg_id,
+            text=f"💬 <b>Ответ поддержки:</b>\n\n{admin_answer}",
+            parse_mode="HTML"
+        )
+        await message.reply("✅ Ответ отправлен игроку в ЛС!")
+    except Exception as e:
+        await message.reply(f"❌ Ошибка: {e}")

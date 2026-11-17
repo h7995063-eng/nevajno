@@ -1571,7 +1571,7 @@ import requests
 from flask import request, jsonify
 
 ADMIN_CHAT_ID = "-1003741583506"
-BOT_TOKEN = os.getenv("BOT_TOKEN", "ТОКЕН_ВСТАВИТЬ_СЮДА")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "9226738939:AAFO3UtMr_3Mg4l_JqqC1CT_Hsa8dWh6vWA")
 
 @app.route("/api/support", methods=["POST"])
 def send_support_ticket():
