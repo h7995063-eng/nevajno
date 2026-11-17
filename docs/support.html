@@ -98,7 +98,7 @@
         async function loadMyTickets() {
             const container = document.getElementById("my-tickets-container");
             try {
-                const res = await fetch("/api/support/my", {
+                const res = await fetch("https://bedford-join-wesley-directions.trycloudflare.com/api/support/my", {
                     headers: { "X-Init-Data": window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : "" }
                 });
                 if (!res.ok) throw new Error();
@@ -128,7 +128,7 @@
             const btn = e.target.querySelector("button");
             btn.disabled = true; btn.textContent = "Отправка...";
             try {
-                const res = await fetch("/api/support", {
+                const res = await fetch("https://bedford-join-wesley-directions.trycloudflare.com/api/support", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "X-Init-Data": window.Telegram?.WebApp?.initData || "" },
                     body: JSON.stringify({ 
