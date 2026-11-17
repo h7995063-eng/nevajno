@@ -139,11 +139,6 @@
     if (tg && tg.close) tg.close(); else toast("Закройте вкладку, чтобы выйти");
   }
 
-    try {
-      if (tg && tg.openTelegramLink) return tg.openTelegramLink(SUPPORT_URL);
-    } catch (e) {}
-    window.open(SUPPORT_URL, "_blank");
-  }
 
   const cleanBase = (u) => String(u || "").trim().replace(/\/+$/, "");
   const validBase = (u) => /^https?:\/\/[^\s"'<>]+$/i.test(u);
