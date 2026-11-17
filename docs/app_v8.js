@@ -1,4 +1,16 @@
 
+window.onerror = function(msg, url, line, col, error) {
+    let errDiv = document.getElementById('debug-error');
+        errDiv = document.createElement('div');
+        errDiv.id = 'debug-error';
+        errDiv.style.cssText = 'position:fixed; top:0; left:0; width:100%; background:red; color:white; padding:10px; z-index:99999; font-size:12px; word-wrap:break-word;';
+        document.body.appendChild(errDiv);
+    }
+    errDiv.innerHTML = '<b>ОШИБКА:</b> ' + msg + '<br>Файл: ' + url + '<br>Строка: ' + line;
+    return false;
+};
+
+
 console.log('=== 1. СКРИПТ ЗАГРУЖЕН ===');
 window.addEventListener('error', function(e) {
     console.log('❌ ОШИБКА JS:', e.message, 'в файле', e.filename, 'строка', e.lineno);
