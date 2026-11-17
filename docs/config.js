@@ -1,1 +1,1 @@
-window.API_URL = "https://sixth-compatible-lightbox-invitations.trycloudflare.com";
+window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
