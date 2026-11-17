@@ -1,16 +1,4 @@
 
-window.onerror = function(msg, url, line, col, error) {
-    let errDiv = document.getElementById('debug-error');
-        errDiv = document.createElement('div');
-        errDiv.id = 'debug-error';
-        errDiv.style.cssText = 'position:fixed; top:0; left:0; width:100%; background:red; color:white; padding:10px; z-index:99999; font-size:12px; word-wrap:break-word;';
-        document.body.appendChild(errDiv);
-    }
-    errDiv.innerHTML = '<b>ОШИБКА:</b> ' + msg + '<br>Файл: ' + url + '<br>Строка: ' + line;
-    return false;
-};
-
-
 console.log('=== 1. СКРИПТ ЗАГРУЖЕН ===');
 window.addEventListener('error', function(e) {
     console.log('❌ ОШИБКА JS:', e.message, 'в файле', e.filename, 'строка', e.lineno);
@@ -26,19 +14,19 @@ try {
     sessionStorage.clear();
     console.log('Кэш очищен принудительно');
 } catch(e) {}
-window.API_URL = 'https://dose-eternal-civilian-nevertheless.trycloudflare.com';
+window.API_URL = 'https://truly-categories-explained-himself.trycloudflare.com';
 
 
 // ==================== ПРИНУДИТЕЛЬНЫЙ СБРОС КЭША ====================
 try {
     localStorage.removeItem('cs_api');
     localStorage.removeItem('api_url');
-    localStorage.setItem('cs_api', 'https://dose-eternal-civilian-nevertheless.trycloudflare.com');
+    localStorage.setItem('cs_api', 'https://truly-categories-explained-himself.trycloudflare.com');
 } catch(e) { console.error('Ошибка localStorage', e); }
-window.API_URL = 'https://dose-eternal-civilian-nevertheless.trycloudflare.com';
+window.API_URL = 'https://truly-categories-explained-himself.trycloudflare.com';
 // ==================================================================
 
-window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
+window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
 (() => {
   "use strict";
 
@@ -199,7 +187,7 @@ window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
     if (fromUrl && validBase(fromUrl)) { store("cs_api", fromUrl); list.push(fromUrl); }
     const saved = cleanBase(store("cs_api"));
     if (saved && validBase(saved)) list.push(saved);
-    const conf = cleanBase(window.API_URL) || "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
+    const conf = cleanBase(window.API_URL) || "https://truly-categories-explained-himself.trycloudflare.com";
     if (conf && validBase(conf)) list.push(conf);
     list.push("");
     return list.filter((v, i) => list.indexOf(v) === i);
@@ -1373,8 +1361,9 @@ window.sendTicket = async function() {
   if (btn) { btn.disabled = true; btn.textContent = "Отправка..."; }
   
   try {
-    const api = window.API_URL || "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
+    const api = window.API_URL || "https://truly-categories-explained-himself.trycloudflare.com";
     const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
+    const un = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) ? window.Telegram.WebApp.initDataUnsafe.user.username : "";
     const nick = (function() {
     try {
         const db = JSON.parse(localStorage.getItem("cs_db_v1") || "{}");
@@ -1393,7 +1382,7 @@ window.sendTicket = async function() {
         "Content-Type": "application/json",
         "X-Dev-User": JSON.stringify({ id: tgId, username: "dev" })
       },
-      body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick })
+      body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick, username: un })
     });
     
     const data = await res.json();
@@ -1408,50 +1397,5 @@ window.sendTicket = async function() {
     alert("Ошибка сети: " + e.message);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; }
-  }
-};
-
-// ==================== УВЕДОМЛЕНИЯ И ПРОЧЕЕ ====================
-window.openOther = function() {
-  const m = document.getElementById('modal-other');
-  if (m) { m.style.display = 'flex'; }
-};
-
-window.openNotifications = function() {
-  const m = document.getElementById('modal-notifications');
-  if (m) { m.style.display = 'flex'; }
-  const badge = document.getElementById('notif-badge');
-  if (badge) badge.style.display = 'none';
-  // Заглушка: можно очищать список уведомлений
-  // localStorage.setItem('cs_notifications', JSON.stringify([]));
-};
-
-// Пример функции для добавления уведомления (можешь вызывать ее из других мест)
-window.addNotification = function(title, text, icon) {
-  const list = document.getElementById('notif-list');
-  if (!list) return;
-  
-  // Удаляем "Пока нет уведомлений"
-  if (list.innerHTML.includes('Пока нет уведомлений')) list.innerHTML = '';
-  
-  const el = document.createElement('div');
-  el.style.cssText = 'background:#0a0c12; border:1px solid #2a3040; border-radius:10px; padding:15px; display:flex; gap:12px; align-items:center;';
-  el.innerHTML = `
-    <div style="background:#1f2433; padding:8px; border-radius:50%; color:#3b82f6;">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-${icon || 'bell'}"/></svg>
-    </div>
-    <div>
-      <div style="color:#fff; font-weight:600; font-size:14px; margin-bottom:4px;">${title}</div>
-      <div style="color:#8b98a8; font-size:12px; line-height:1.4;">${text}</div>
-    </div>
-  `;
-  list.prepend(el);
-  
-  // Показываем бейдж
-  const badge = document.getElementById('notif-badge');
-  if (badge) {
-    badge.style.display = 'flex';
-    let count = parseInt(badge.textContent) || 0;
-    badge.textContent = count + 1;
   }
 };
