@@ -1351,6 +1351,8 @@ window.openSupportClose = function() {
 }
 
 // ==================== ГЛОБАЛЬНАЯ ОТПРАВКА ТИКЕТА ====================
+
+// ==================== ОТПРАВКА ТИКЕТА (ФИНАЛЬНАЯ) ====================
 window.sendTicket = async function() {
   const text = document.getElementById("support-text").value.trim();
   if (!text) return alert("Введите текст");
