@@ -1,1 +1,1 @@
-window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
+window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
