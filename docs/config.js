@@ -1,2 +1,2 @@
-window.API_URL = "https://fisheries-pepper-adventures-academy.trycloudflare.com";
-window.NOTIFY_URL = "https://fisheries-pepper-adventures-academy.trycloudflare.com";
+window.API_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
+window.NOTIFY_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
