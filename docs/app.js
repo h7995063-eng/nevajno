@@ -139,10 +139,7 @@
     if (tg && tg.close) tg.close(); else toast("Закройте вкладку, чтобы выйти");
   }
 
-  function openSupport() {
-    try {
-      if (tg && tg.openTelegramLink) return tg.openTelegramLink(SUPPORT_URL);
-    } catch (e) {}
+  function openSupport() { window.location.href = "support.html"; } catch (e) {}
     window.open(SUPPORT_URL, "_blank");
   }
 
@@ -1280,4 +1277,51 @@
 
   $$(".logo-img").forEach((img) => { if (img.complete && img.naturalWidth === 0) logoFallback(img); });
   boot();
+
+  async function loadAdminTickets() {
+    try {
+      const data = await api("/api/admin/support", { admin: adminPass });
+      adminTickets = data;
+      renderAdminTickets();
+    } catch(e) { alert("Ошибка загрузки жалоб: " + e.message); }
+  }
+
+  function renderAdminTickets() {
+    const container = document.getElementById("admin-tickets-list");
+    if (!container) return;
+    if (!adminTickets || !adminTickets.length) {
+      container.innerHTML = '<div class="card empty">Жалоб нет.</div>';
+      return;
+    }
+    container.innerHTML = adminTickets.map(t => `
+      <div class="card" style="margin-bottom:10px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <b style="color:#6b7cff;">#${t.id} | ${t.category}</b>
+          <span style="color:${t.status === 'open' ? '#ffb3b3' : '#7dffb3'}; font-size:12px;">${t.status === 'open' ? 'Открыта' : 'Закрыта'}</span>
+        </div>
+        <div style="font-size:13px; color:#b0b5c5; margin-bottom:8px;">
+          <b>От:</b> ${t.tg_id}<br>
+          <b>Текст:</b> ${t.message}
+        </div>
+        ${t.status === 'open' ? `
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="reply-${t.id}" placeholder="Ответ игроку..." style="flex:1; background:#1a1d2d; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px; color:#fff; font-size:13px;">
+            <button onclick="submitTicketReply(${t.id})" style="background:#6b7cff; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-weight:600; cursor:pointer;">Ответить</button>
+          </div>
+        ` : `<div style="font-size:13px; color:#7dffb3; margin-top:8px;"><b>Ответ:</b> ${t.admin_reply || '—'}</div>`}
+      </div>
+    `).join("");
+  }
+
+  window.submitTicketReply = async function(id) {
+    const input = document.getElementById("reply-" + id);
+    const reply = input.value.trim();
+    if (!reply) return alert("Введите текст ответа");
+    try {
+      await api("/api/admin/support/reply", { method: "POST", admin: adminPass, body: { id, reply } });
+      alert("✅ Ответ отправлен");
+      loadAdminTickets();
+    } catch(e) { alert("Ошибка: " + e.message); }
+  };
+
 })();
