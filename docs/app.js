@@ -90,8 +90,6 @@ const API_URL = NOTIFY_URL;
 
   /** DEV_ID: 1) ?tg_id=... в URL, 2) localStorage cs_dev_id, 3) тестовый 6999358439. */
   function resolveDevId() {
-    let fromUrl = new URLSearchParams(location.search).get("tg_id");
-    if (fromUrl) { store("cs_dev_id", fromUrl); return Number(fromUrl); }
     const valid = (v) => { const n = Number(v); return Number.isInteger(n) && n > 0 ? n : 0; };
     let id = 0;
     try { id = valid(new URLSearchParams(location.search).get("tg_id")); } catch (e) { /* нет параметра */ }
