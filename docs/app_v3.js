@@ -11,7 +11,7 @@
   const PLAYING_TTL = 10800;
   // Адрес бэкенда с /api/notify (например "https://api.example.com"). Пусто = уведомления в канал выключены.
   const SUPPORT_URL = "https://t.me/crymbog";
-  const NOTIFY_URL = "https://runs-converted-mileage-helena.trycloudflare.com";
+  const NOTIFY_URL = (typeof window !== "undefined" && window.NOTIFY_URL) || "";
 const API_URL = (typeof window !== "undefined" && window.API_URL) || NOTIFY_URL;
   const MAPS = ["Dust II", "Mirage", "Inferno", "Vertigo"];
   const MAP_IMAGES = {
