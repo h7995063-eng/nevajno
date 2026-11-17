@@ -139,7 +139,6 @@
     if (tg && tg.close) tg.close(); else toast("Закройте вкладку, чтобы выйти");
   }
 
-  function openSupport() {
     try {
       if (tg && tg.openTelegramLink) return tg.openTelegramLink(SUPPORT_URL);
     } catch (e) {}
@@ -1313,3 +1312,14 @@ async function sendTicket() {
     btn.textContent = "Отправить тикет";
   }
 }
+
+// ==================== ОТКРЫТИЕ ПОДДЕРЖКИ ====================
+window.openSupport = function() {
+  const m = document.getElementById("modal-support");
+  if (m) {
+    m.style.display = "flex";
+    m.classList.remove("hidden");
+  } else {
+    alert("Ошибка: модалка не найдена в HTML");
+  }
+};
