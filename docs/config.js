@@ -1,1 +1,1 @@
-window.API_URL = "https://bedford-join-wesley-directions.trycloudflare.com";
+// Конфиг пуст, URL берётся из параметров ссылки
