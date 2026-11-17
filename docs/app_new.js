@@ -1347,7 +1347,6 @@ window.openSupportClose = function() {
   }
 };
 
-,
       body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick })
     });
     
