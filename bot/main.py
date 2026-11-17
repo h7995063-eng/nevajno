@@ -232,3 +232,31 @@ def publish_results(message, state):
 if __name__ == "__main__":
     print("Бот запущен")
     bot.infinity_polling()
+
+# ==================== ОТВЕТ НА ТИКЕТЫ ====================
+import re
+from aiogram import types
+
+@dp.message_handler(is_reply=True)
+async def handle_admin_reply(message: types.Message):
+    if message.chat.id != -1003741583506:
+        return
+    replied_msg = message.reply_to_message
+    if not replied_msg or not replied_msg.text:
+        return
+    match = re.search(r"TG ID:</b> <code>(\d+)</code>", replied_msg.text)
+    if not match:
+        await message.reply("❌ Не удалось найти TG ID игрока в этом сообщении.")
+        return
+    user_tg_id = match.group(1)
+    admin_answer = message.text
+    try:
+        await bot.send_message(
+            chat_id=user_tg_id,
+            text=f"💬 <b>Ответ поддержки:</b>\n\n{admin_answer}",
+            parse_mode="HTML"
+        )
+        await message.reply("✅ Ответ отправлен игроку в ЛС!")
+    except Exception as e:
+        await message.reply(f"❌ Ошибка: {e}")
+# =========================================================

@@ -395,7 +395,21 @@
   </div>
 </section>
 
-<script src="config.js?v=313"></script>
-<script src="app.js?v=313"></script>
+<script src="config.js?v=314"></script>
+<script src="app.js?v=314"></script>
+
+<div id="modal-support" class="modal hidden" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:#1a1a1a; padding:20px; border-radius:12px; width:90%; max-width:500px;">
+    <h3 style="color:#fff; margin-top:0;">Поддержка</h3>
+    <p style="color:#ff4444; font-size:12px; margin-bottom:10px;">
+      ⚠️ Отправка шуточного, оскорбительного или не имеющего смысла тикета карается предупреждением, а в последующий раз — баном на площадке CYBERSHOKE без возможности разбана.
+    </p>
+    <textarea id="support-text" placeholder="Опишите проблему..." rows="4" style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid #333; background:#0d0d0d; color:#fff;"></textarea>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <button onclick="document.getElementById('modal-support').style.display='none'" style="flex:1; padding:12px; background:#333; color:#fff; border:none; border-radius:8px;">Отмена</button>
+      <button id="btn-send-ticket" onclick="sendTicket()" style="flex:2; padding:12px; background:#e53935; color:#fff; border:none; border-radius:8px; font-weight:bold;">Отправить тикет</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
