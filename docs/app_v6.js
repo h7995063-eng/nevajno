@@ -1363,7 +1363,17 @@ window.sendTicket = async function() {
   try {
     const api = window.API_URL || "https://truly-categories-explained-himself.trycloudflare.com";
     const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
-    const nick = (typeof me !== "undefined" && me && me.nickname) ? me.nickname : (JSON.parse(localStorage.getItem("cs_db_v1") || "{}").users?.find(u => u.tg_id == TG_ID)?.nickname) || "Игрок";
+    const nick = (function() {
+    try {
+        const db = JSON.parse(localStorage.getItem("cs_db_v1") || "{}");
+        if (db.users && Array.isArray(db.users)) {
+            const u = db.users.find(x => x.tg_id == TG_ID);
+            if (u && u.nickname) return u.nickname;
+        }
+    } catch(e) {}
+    if (typeof me !== "undefined" && me && me.nickname) return me.nickname;
+    return "Игрок";
+})();
 
     const res = await fetch(api + "/api/support", {
       method: "POST",
