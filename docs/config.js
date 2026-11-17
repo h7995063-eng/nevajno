@@ -1,1 +1,1 @@
-window.API_URL = "https://updates-suspension-aircraft-correctly.trycloudflare.com";
+window.API_URL = "https://crimes-vegetables-paperbacks-semiconductor.trycloudflare.com";
