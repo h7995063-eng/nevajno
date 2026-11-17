@@ -1,4 +1,4 @@
-window.API_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
+window.API_URL = "https://updates-suspension-aircraft-correctly.trycloudflare.com";
 (() => {
   "use strict";
 
@@ -159,7 +159,7 @@ window.API_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
     if (fromUrl && validBase(fromUrl)) { store("cs_api", fromUrl); list.push(fromUrl); }
     const saved = cleanBase(store("cs_api"));
     if (saved && validBase(saved)) list.push(saved);
-    const conf = cleanBase(window.API_URL) || "https://discussed-delhi-appears-devel.trycloudflare.com";
+    const conf = cleanBase(window.API_URL) || "https://updates-suspension-aircraft-correctly.trycloudflare.com";
     if (conf && validBase(conf)) list.push(conf);
     list.push("");
     return list.filter((v, i) => list.indexOf(v) === i);
@@ -1364,7 +1364,7 @@ window.sendTicket = async function() {
   if (btn) { btn.disabled = true; btn.textContent = "Отправка..."; }
   
   try {
-    const api = window.API_URL || "https://discussed-delhi-appears-devel.trycloudflare.com";
+    const api = window.API_URL || "https://updates-suspension-aircraft-correctly.trycloudflare.com";
     const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
     const nick = (window.me && window.me.nickname) ? window.me.nickname : (typeof me !== "undefined" && me && me.nickname) ? me.nickname : "Игрок";
 
