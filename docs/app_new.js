@@ -1344,20 +1344,6 @@ window.openSupportClose = function() {
   if (m) {
     m.classList.remove("show");
     setTimeout(() => m.style.display = "none", 200);
-  }
-};
-
-      body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick })
-    });
-    
-    const data = await res.json();
-    if (data.ok) {
-      document.getElementById("modal-support").style.display = "none";
-      document.getElementById("support-text").value = "";
-    } else {
-      alert("Ошибка сервера: " + (data.error || "Неизвестная ошибка"));
-    }
-  } catch(e) {
     alert("Ошибка сети: " + e.message);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; }
