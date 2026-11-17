@@ -2,7 +2,7 @@
   "use strict";
 
   const PERMANENT = 4102444800;
-  const SUPPORT_URL = "https://t.me/crymbog";
+  const SUPPORT_URL = "support.html";
   const MAPS = ["Dust II", "Mirage", "Inferno", "Vertigo"];
   const MAP_IMAGES = {
     "Mirage": "assets/maps/mirage.jpeg",
