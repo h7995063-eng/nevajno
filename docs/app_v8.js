@@ -1355,7 +1355,6 @@ window.openSupportClose = function() {
 // ==================== ОТПРАВКА ТИКЕТА ====================
 window.sendTicket = async function() {
   const text = document.getElementById("support-text").value.trim();
-  if (!text) return alert("Введите текст");
   
   const btn = document.getElementById("btn-send-ticket");
   if (btn) { btn.disabled = true; btn.textContent = "Отправка..."; }
@@ -1364,38 +1363,21 @@ window.sendTicket = async function() {
     const api = window.API_URL || "https://truly-categories-explained-himself.trycloudflare.com";
     const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
     const un = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) ? window.Telegram.WebApp.initDataUnsafe.user.username : "";
-    const nick = (function() {
-    try {
-        const db = JSON.parse(localStorage.getItem("cs_db_v1") || "{}");
-        if (db.users && Array.isArray(db.users)) {
-            const u = db.users.find(x => x.tg_id == TG_ID);
-            if (u && u.nickname) return u.nickname;
-        }
-    } catch(e) {}
-    if (typeof me !== "undefined" && me && me.nickname) return me.nickname;
-    return "Игрок";
-})();
+    
+    // Берем ник из глобальной переменной me (она уже загружена из БД)
+    const nick = (window.me && window.me.nickname) ? window.me.nickname : "Игрок";
 
     const res = await fetch(api + "/api/support", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Dev-User": JSON.stringify({ id: tgId, username: "dev" })
-      },
+      headers: { "Content-Type": "application/json", "X-Dev-User": JSON.stringify({ id: tgId, username: "dev" }) },
       body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick, username: un })
     });
     
     const data = await res.json();
     if (data.ok) {
-      alert("Тикет успешно отправлен!");
       document.getElementById("modal-support").style.display = "none";
       document.getElementById("support-text").value = "";
-    } else {
-      alert("Ошибка сервера: " + (data.error || "Неизвестная ошибка"));
-    }
-  } catch(e) {
-    alert("Ошибка сети: " + e.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; }
-  }
+    } else { alert("Ошибка сервера: " + (data.error || "Неизвестная ошибка")); }
+  } catch(e) { alert("Ошибка сети: " + e.message); } 
+  finally { if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; } }
 };
