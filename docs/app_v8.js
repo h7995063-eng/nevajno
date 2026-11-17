@@ -1357,25 +1357,72 @@ window.openSupportClose = function() {
 window.sendTicket = async function() {
   const text = document.getElementById("support-text").value.trim();
   if (!text) return alert("Введите текст");
-  
+
   const btn = document.getElementById("btn-send-ticket");
   if (btn) { btn.disabled = true; btn.textContent = "Отправка..."; }
-  
+
   try {
     const api = window.API_URL || "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
-    const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
-    const un = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) ? window.Telegram.WebApp.initDataUnsafe.user.username : "";
-    const nick = (function() {
-    if (window.me && window.me.nickname) return window.me.nickname;
+
+    // 1) TG ID — надёжно из Telegram
+    let tgId = null;
     try {
+      const tgUser = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
+      if (tgUser && tgUser.id) tgId = Number(tgUser.id);
+    } catch(e) {}
+    if (!tgId && typeof window.me !== "undefined" && window.me && window.me.tg_id) tgId = Number(window.me.tg_id);
+    if (!tgId) {
+      try {
+        const stored = JSON.parse(localStorage.getItem("cs_tg_id") || "null");
+        if (stored) tgId = Number(stored);
+      } catch(e) {}
+    }
+    if (!tgId) return alert("Не удалось определить ваш Telegram ID. Перезайдите в приложение.");
+
+    // 2) username из Telegram
+    let un = "";
+    try {
+      const tgUser = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
+      un = (tgUser && tgUser.username) || "";
+    } catch(e) {}
+
+    // 3) Ник — надёжно: window.me → /api/auth → localStorage → "Игрок"
+    let nick = "";
+    if (window.me && window.me.nickname) {
+      nick = window.me.nickname;
+    }
+
+    if (!nick) {
+      try {
+        const r = await fetch(api + "/api/auth", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Dev-User": JSON.stringify({ id: tgId, username: "dev" })
+          },
+          body: JSON.stringify({})
+        });
+        const d = await r.json();
+        if (d && d.user && d.user.nickname) nick = d.user.nickname;
+        if (d && d.user) window.me = d.user;
+      } catch(e) {
+        console.warn("[sendTicket] /api/auth fail:", e);
+      }
+    }
+
+    if (!nick) {
+      try {
         const db = JSON.parse(localStorage.getItem("cs_db_v1") || "{}");
         if (db.users && Array.isArray(db.users)) {
-            const u = db.users.find(x => x.tg_id == TG_ID);
-            if (u && u.nickname) return u.nickname;
+          const u = db.users.find(x => Number(x.tg_id) === tgId);
+          if (u && u.nickname) nick = u.nickname;
         }
-    } catch(e) {}
-    return "Игрок";
-})();
+      } catch(e) {}
+    }
+
+    if (!nick) nick = "Игрок";
+
+    console.log("[sendTicket] tgId=", tgId, "nick=", nick, "un=", un);
 
     const res = await fetch(api + "/api/support", {
       method: "POST",
@@ -1385,7 +1432,7 @@ window.sendTicket = async function() {
       },
       body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick, username: un })
     });
-    
+
     const data = await res.json();
     if (data.ok) {
       alert("Тикет успешно отправлен!");
@@ -1395,6 +1442,7 @@ window.sendTicket = async function() {
       alert("Ошибка сервера: " + (data.error || "Неизвестная ошибка"));
     }
   } catch(e) {
+    console.error("[sendTicket] error:", e);
     alert("Ошибка сети: " + e.message);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; }
