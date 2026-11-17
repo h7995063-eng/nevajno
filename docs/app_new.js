@@ -1345,11 +1345,6 @@ window.openSupportClose = function() {
     m.classList.remove("show");
     setTimeout(() => m.style.display = "none", 200);
     alert("Ошибка сети: " + e.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; }
-  }
-}
-
 // ==================== ГЛОБАЛЬНАЯ ОТПРАВКА ТИКЕТА ====================
 
 // ==================== ОТПРАВКА ТИКЕТА (ФИНАЛЬНАЯ) ====================
