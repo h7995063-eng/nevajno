@@ -1306,36 +1306,7 @@ window.API_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
 })();
 
 // ==================== ОТПРАВКА ТИКЕТА ====================
-async function sendTicket() {
-  const text = document.getElementById("support-text").value.trim();
-  if (!text) return toast("Введите текст", "err");
-  const btn = document.getElementById("btn-send-ticket");
-  btn.disabled = true;
-  btn.textContent = "Отправка...";
-  try {
-    const res = await fetch(API_URL + "/api/support", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Dev-User": JSON.stringify({ id: TG_ID, username: "dev" })
-      },
-      body: JSON.stringify({ text: text, tg_id: TG_ID, nickname: me ? me.nickname : "Игрок" })
-    });
-    const data = await res.json();
-    if (data.ok) {
-      toast("Тикет отправлен!");
-      document.getElementById("modal-support").style.display = "none";
-      document.getElementById("support-text").value = "";
-    } else {
-      throw new Error(data.error || "Ошибка");
-    }
-  } catch(e) {
-    toast(e.message, "err");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Отправить тикет";
-  }
-}
+
 
 // ==================== МОДАЛКА ПОДДЕРЖКИ ====================
 window.openSupport = function() {
@@ -1375,3 +1346,37 @@ window.openSupportClose = function() {
     setTimeout(() => m.style.display = "none", 200);
   }
 };
+
+async function sendTicket() {
+  const text = document.getElementById("support-text").value.trim();
+  const btn = document.getElementById("btn-send-ticket");
+  if (btn) { btn.disabled = true; btn.textContent = "Отправка..."; }
+  
+  try {
+    // Берем адрес из конфига или ставим дефолтный
+    const api = window.API_URL || (typeof API_URL !== "undefined" ? API_URL : "https://discussed-delhi-appears-devel.trycloudflare.com");
+    const tgId = typeof TG_ID !== "undefined" ? TG_ID : 6999358439;
+    const nick = (typeof me !== "undefined" && me) ? me.nickname : "Игрок";
+
+    const res = await fetch(api + "/api/support", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Dev-User": JSON.stringify({ id: tgId, username: "dev" })
+      },
+      body: JSON.stringify({ text: text, tg_id: tgId, nickname: nick })
+    });
+    
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById("modal-support").style.display = "none";
+      document.getElementById("support-text").value = "";
+    } else {
+      alert("Ошибка сервера: " + (data.error || "Неизвестная ошибка"));
+    }
+  } catch(e) {
+    alert("Ошибка сети: " + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; }
+  }
+}
