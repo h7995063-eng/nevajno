@@ -110,30 +110,20 @@
   function apiCandidates() {
     const list = [];
     try {
-        const fromUrl = new URLSearchParams(location.search).get("api");
-        if (fromUrl) {
-            const cleanUrl = fromUrl.replace(/\/+$/, "");
-            list.push(cleanUrl);
-        }
+      const fromUrl = new URLSearchParams(location.search).get("api");
+      if (fromUrl) {
+        const cleanUrl = fromUrl.replace(/\/+$/, "");
+        list.push(cleanUrl);
+      }
     } catch(e) {}
     
     if (list.length === 0 && window.API_URL) {
-        const conf = String(window.API_URL).replace(/\/+$/, "");
-        if (conf) list.push(conf);
+      const conf = String(window.API_URL).replace(/\/+$/, "");
+      if (conf) list.push(conf);
     }
     
     list.push("");
     return list;
-}
-
-  async function ping(base) {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 6000);
-    try {
-      const res = await fetch(base + "/api/ping", { cache: "no-store", signal: ctrl.signal, headers: { "Bypass-Tunnel-Reminder": "true" } });
-      const data = await res.json();
-      return Boolean(res.ok && data && data.ok);
-    } catch (e) { return false; } finally { clearTimeout(timer); }
   }
 
   async function findApi() {
