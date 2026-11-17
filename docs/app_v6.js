@@ -1,4 +1,14 @@
 
+console.log('=== 1. СКРИПТ ЗАГРУЖЕН ===');
+window.addEventListener('error', function(e) {
+    console.log('❌ ОШИБКА JS:', e.message, 'в файле', e.filename, 'строка', e.lineno);
+});
+console.log('=== 2. АДРЕС СЕРВЕРА:', window.API_URL, '===');
+setTimeout(() => {
+    console.log('=== 3. ПРОШЛО 3 СЕКУНДЫ, ПРИЛОЖЕНИЕ ВСЕ ЕЩЕ ГРУЗИТСЯ ===');
+}, 3000);
+
+
 try {
     localStorage.clear();
     sessionStorage.clear();
