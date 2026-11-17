@@ -1,4 +1,4 @@
-window.API_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
+window.API_URL = "https://new-tunnel-123.trycloudflare.com";
 (() => {
   "use strict";
 
@@ -159,7 +159,7 @@ window.API_URL = "https://discussed-delhi-appears-devel.trycloudflare.com";
     if (fromUrl && validBase(fromUrl)) { store("cs_api", fromUrl); list.push(fromUrl); }
     const saved = cleanBase(store("cs_api"));
     if (saved && validBase(saved)) list.push(saved);
-    const conf = cleanBase(window.API_URL) || "https://discussed-delhi-appears-devel.trycloudflare.com";
+    const conf = cleanBase(window.API_URL) || "https://new-tunnel-123.trycloudflare.com";
     if (conf && validBase(conf)) list.push(conf);
     list.push("");
     return list.filter((v, i) => list.indexOf(v) === i);

@@ -112,25 +112,6 @@ IMAGE_MAX_BYTES = 5 * 1024 * 1024
 
 app = Flask(__name__, static_folder=None)
 
-@app.route("/api/support", methods=["POST", "OPTIONS"])
-def api_support():
-    if request.method == "OPTIONS": return jsonify(ok=True)
-    tg_id = g.tg["id"]
-    data = request.json
-    category = data.get("category", "Другое")
-    message = data.get("message", "")
-    
-    con = db()
-    con.execute("INSERT INTO support_tickets (tg_id, category, message, created_at) VALUES (?, ?, ?, ?)", (tg_id, category, message, now()))
-    con.commit()
-    
-    # Отправляем в ТГ
-    try:
-        text = f"📩 Новое обращение\n👤 От: {tg_id}\n📂 Категория: {category}\n📝 Текст: {message}"
-        requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", json={"chat_id": LOG_CHAT_ID, "message_thread_id": LOG_THREAD_ID, "text": text}, timeout=5)
-    except: pass
-    
-    return jsonify(ok=True)
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024
 ONLINE = {}
 LAST_NOTIFY = {}
@@ -1562,36 +1543,17 @@ def static_files(name):
 init_db()
 threading.Thread(target=worker_loop, daemon=True).start()
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
 # ==================== СИСТЕМА ТИКЕТОВ ====================
-import os
-import requests
-from flask import request, jsonify
+print("🔵 Подключаем тикеты...")
+try:
+    from support_api import init_support_routes
+    init_support_routes(app, BOT_TOKEN)
+    print("🟢 Модуль тикетов успешно подключен!")
+except Exception as e:
+    import traceback
+    print("🔴 Ошибка подключения тикетов:", e)
+    traceback.print_exc()
 
-ADMIN_CHAT_ID = "-1003741583506"
-BOT_TOKEN = os.getenv("BOT_TOKEN", "9226738939:AAFO3UtMr_3Mg4l_JqqC1CT_Hsa8dWh6vWA")
-
-@app.route("/api/support", methods=["POST"])
-def send_support_ticket():
-    data = request.json
-    text = data.get("text", "").strip()
-    if not text:
-        return jsonify({"ok": False, "error": "Пустой текст"}), 400
-    tg_id = data.get("tg_id")
-    nickname = data.get("nickname", "Неизвестный")
-    if not tg_id:
-        return jsonify({"ok": False, "error": "Нет TG ID"}), 400
-    msg_text = f"🎫 <b>Новый тикет</b>\n\n👤 <b>Ник:</b> {nickname}\n🆔 <b>TG ID:</b> <code>{tg_id}</code>\n\n💬 <b>Сообщение:</b>\n{text}\n\n<i>Нажмите 'Ответить' на это сообщение, чтобы написать игроку.</i>"
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": ADMIN_CHAT_ID, "text": msg_text, "parse_mode": "HTML"}
-    try:
-        response = requests.post(url, json=payload)
-        res_data = response.json()
-        if res_data.get("ok"):
-            return jsonify({"ok": True, "message": "Тикет отправлен"})
-        return jsonify({"ok": False, "error": "Ошибка Telegram API"}), 500
-    except Exception as e:
-        return jsonify({"ok": False, "error": str(e)}), 500
-# =========================================================
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))

@@ -229,42 +229,74 @@ def publish_results(message, state):
     states.pop(message.from_user.id, None)
 
 
-if __name__ == "__main__":
-    print("Бот запущен")
-    bot.infinity_polling()
 
 # ==================== ОТВЕТ НА ТИКЕТЫ ====================
 import re
-from aiogram import types
 
-@dp.message_handler(is_reply=True)
-async def handle_admin_reply(message: types.Message):
+
+
+# ==================== ОБРАБОТКА ТИКЕТОВ ====================
+import re
+
+# 1. Обработка нажатий на кнопки
+@bot.callback_query_handler(func=lambda call: True)
+def handle_ticket_buttons(call):
+    if call.message.chat.id != -1003741583506:
+        return
+
+    action, user_tg_id = call.data.split("_")
+    
+    if action == "accept":
+        # Просто подтверждаем, что тикет принят, и просим ответить Reply'ем
+        bot.answer_callback_query(call.id, "✅ Тикет принят. Ответьте на это сообщение.")
+        bot.reply_to(call.message, "✍️ Напишите ваш ответ ответом (Reply) на это сообщение.")
+        
+    elif action == "reject":
+        # Подтверждаем и просим написать причину Reply'ем
+        bot.answer_callback_query(call.id, "❌ Тикет отклоняется. Напишите причину.")
+        bot.reply_to(call.message, "⚠️ Напишите причину отклонения ответом (Reply) на это сообщение.")
+
+# 2. Обработка ответов админа
+@bot.message_handler(func=lambda message: True)
+def handle_all_messages_telebot(message):
     if message.chat.id != -1003741583506:
         return
+    if not message.reply_to_message:
+        return
+        
     replied_msg = message.reply_to_message
-    if not replied_msg or not replied_msg.text:
-        return
-    match = re.search(r"TG ID:</b> <code>(\d+)</code>", replied_msg.text)
-    if not match:
-        await message.reply("❌ Не удалось найти TG ID игрока в этом сообщении.")
-        return
-    user_tg_id = match.group(1)
     admin_answer = message.text
-    try:
-        await bot.send_message(
-            chat_id=user_tg_id,
-            text=f"💬 <b>Ответ поддержки:</b>\n\n{admin_answer}",
-            parse_mode="HTML"
-        )
-        await message.reply("✅ Ответ отправлен игроку в ЛС!")
-    except Exception as e:
-        await message.reply(f"❌ Ошибка: {e}")
-# =========================================================
-        await bot.send_message(
-            chat_id=user_tg_id,
-            text=f"💬 <b>Ответ поддержки:</b>\n\n{admin_answer}",
-            parse_mode="HTML"
-        )
-        await message.reply("✅ Ответ отправлен игроку в ЛС!")
-    except Exception as e:
-        await message.reply(f"❌ Ошибка: {e}")
+    
+    # Проверяем, ответил ли админ на сообщение "Напишите причину отклонения"
+    if replied_msg.text and "причину отклонения" in replied_msg.text.lower():
+        # Ищем ID игрока в оригинальном тикете
+        original_ticket = replied_msg.reply_to_message
+        if original_ticket and original_ticket.text:
+            match = re.search(r"TG ID:</b>\s*<code>(\d+)</code>", original_ticket.text)
+            if match:
+                user_tg_id = match.group(1)
+                try:
+                    bot.send_message(int(user_tg_id), f"❌ <b>Ваш тикет отклонен.</b>\n\nПричина: {admin_answer}", parse_mode="HTML")
+                    bot.reply_to(message, "✅ Причина отправлена игроку.")
+                except Exception as e:
+                    bot.reply_to(message, f"❌ Ошибка отправки: {e}")
+                return
+
+    # Если это просто ответ на тикет или на сообщение "Напишите ваш ответ"
+    match = re.search(r"TG ID:</b>\s*<code>(\d+)</code>", replied_msg.text)
+    if match:
+        user_tg_id = match.group(1)
+        try:
+            bot.send_message(
+                int(user_tg_id),
+                f"💬 <b>Ответ поддержки:</b>\n\n{admin_answer}",
+                parse_mode="HTML"
+            )
+            bot.reply_to(message, "✅ Ответ успешно отправлен!")
+        except Exception as e:
+            bot.reply_to(message, f"❌ Ошибка: {e}")
+
+# ==================== ЗАПУСК БОТА ====================
+if __name__ == "__main__":
+    print("🚀 Бот запускается...")
+    bot.infinity_polling()
