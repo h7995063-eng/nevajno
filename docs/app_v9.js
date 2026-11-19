@@ -350,11 +350,11 @@ window.me = null;
   }
 
   function bootFailed(message) {
-    $("#load-msg").textContent = message;
-    $("#api-current").textContent = API || "этот же адрес";
-    $("#in-api").value = API;
+    const safe = message && /server|сервер|connect|timeout|network|fetch/i.test(message)
+      ? "Сервера CYBERSHOKE временно недоступны"
+      : message;
+    $("#load-msg").textContent = safe;
     $("#btn-retry").classList.remove("hidden");
-    $("#api-fix").classList.remove("hidden");
   }
 
   async function saveApi() {
@@ -510,8 +510,15 @@ window.me = null;
       <div class="card row" data-lobby-id="${my.id}"><div class="grow"><h3>Матч завершён · ${esc(my.map)}</h3><div class="meta"><span>${ICON("trophy")}Посмотреть результат</span></div></div>
       <button class="btn primary sm" data-open="${my.id}" type="button">${ICON("game")}Открыть</button></div>` : "";
     const list = $("#lobby-list");
+    const ad = JSON.parse(localStorage.getItem("cybershoke_ad")) || null;
+    const adHtml = (ad && ad.image) ? `
+      <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; position:relative;">
+        <img src="${ad.image}" style="width:100%; height:auto; display:block;">
+        ${ad.text ? `<div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding:15px; color:#fff; font-weight:bold; font-size:16px;">${ad.text}</div>` : ''}
+      </div>` : '';
+
     list.innerHTML = lobbies.length || extra
-      ? extra + lobbies.map((l) => {
+      ? adHtml + extra + lobbies.map((l) => {
         const action = l.mine
           ? `<button class="btn primary sm" data-open="${l.id}" type="button">${ICON("game")}Открыть</button>`
           : l.status === "playing" ? '<span class="pill gold">идёт матч</span>'
@@ -1045,11 +1052,16 @@ window.me = null;
 
   async function loadAdminTab() {
     $$("#admin-tabs .fchip").forEach((c) => c.classList.toggle("active", c.dataset.atab === adminTab));
-    ["players", "news", "stats"].forEach((t) => $(`#atab-${t}`).classList.toggle("hidden", t !== adminTab));
+    ["players", "news", "stats", "ad"].forEach((t) => $(`#atab-${t}`).classList.toggle("hidden", t !== adminTab));
     if (adminTab === "players") { const d = await adm({ action: "list" }); adminUsers = d.players; drawAdminList(); }
     if (adminTab === "news") {
       const d = await api("/api/posts");
       $("#admin-news-list").innerHTML = d.posts.length ? d.posts.map((p) => postCard(p, true)).join("") : '<div class="card empty">Новостей пока нет.</div>';
+    }
+    if (adminTab === "ad") {
+      const ad = JSON.parse(localStorage.getItem("cybershoke_ad")) || { text: "", image: "" };
+      if ($("#ad-text")) $("#ad-text").value = ad.text;
+      if ($("#ad-image")) $("#ad-image").value = ad.image;
     }
     if (adminTab === "stats") {
       const s = await adm({ action: "stats" });
@@ -1275,7 +1287,12 @@ window.me = null;
     }
   });
 
-  $("#btn-retry").addEventListener("click", boot);
+  $("#btn-retry").addEventListener("click", () => {
+    try {
+      if (tg && tg.close) tg.close();
+      else window.close();
+    } catch(e) {}
+  });
   $("#btn-api-save").addEventListener("click", saveApi);
   $("#btn-accept").addEventListener("click", () => { store("terms", "1"); show("s-register"); });
   $("#btn-register").addEventListener("click", register);
