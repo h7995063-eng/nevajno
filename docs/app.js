@@ -1024,12 +1024,13 @@ window.API_URL = "https://racing-steps-corporations-copies.trycloudflare.com";
 
   async function loadAdminTab() {
     $$("#admin-tabs .fchip").forEach((c) => c.classList.toggle("active", c.dataset.atab === adminTab));
-    ["players", "news", "stats"].forEach((t) => $(`#atab-${t}`).classList.toggle("hidden", t !== adminTab));
+    ["players", "news", "stats", "ads"].forEach((t) => $(`#atab-${t}`).classList.toggle("hidden", t !== adminTab));
     if (adminTab === "players") { const d = await adm({ action: "list" }); adminUsers = d.players; drawAdminList(); }
     if (adminTab === "news") {
       const d = await api("/api/posts");
       $("#admin-news-list").innerHTML = d.posts.length ? d.posts.map((p) => postCard(p, true)).join("") : '<div class="card empty">Новостей пока нет.</div>';
     }
+    if (adminTab === "ads") { renderAdminAds(); }
     if (adminTab === "stats") {
       const s = await adm({ action: "stats" });
       const items = [["users", "Игроков", s.users], ["bolt", "Онлайн", s.online], ["game", "Активных лобби", s.lobbies], ["trophy", "Матчей", s.matches], ["check", "Результатов начислено", s.finished], ["news", "Постов", s.posts], ["star", "С подпиской", s.premium]];
