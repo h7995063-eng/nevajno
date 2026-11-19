@@ -6,156 +6,387 @@
 <title>Правила и Поддержка — CYBERSHOKE</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  :root { --bg: #171a1f; --card: #232b33; --text: #e1e1e1; --text-dim: #8b959e; --accent: #3b82f6; --border: #2d3748; }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding-bottom: 40px; }
-  .header { display: flex; align-items: center; padding: 15px; background: #1a222a; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
-  .back-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 0 15px 0 0; }
-  .header h1 { font-size: 18px; margin: 0; font-weight: 600; }
-  .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+  :root {
+    --bg: #0f121a;
+    --card: #1a1f2b;
+    --card-hover: #232a3a;
+    --text: #ffffff;
+    --text-dim: #8b98a8;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.3);
+    --border: #2a3040;
+    --danger: #ef4444;
+  }
   
-  /* Стили для кнопок */
-  .action-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
-  .action-btn:active { background: #2c3742; }
-  .action-btn svg { width: 20px; height: 20px; fill: var(--accent); }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
+  body {
+    margin: 0; padding: 0;
+    background: linear-gradient(180deg, #0f121a 0%, #171a1f 100%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding-bottom: 40px;
+    min-height: 100vh;
+  }
 
-  /* Стили для выдвижных правил */
-  .rule-block { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
-  .rule-header { padding: 15px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: #fff; }
-  .rule-header::after { content: '+'; font-size: 20px; color: var(--text-dim); font-weight: normal; transition: transform 0.3s; }
-  .rule-block.active .rule-header::after { content: '-'; transform: rotate(180deg); }
-  .rule-content { padding: 0 15px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s; color: var(--text-dim); font-size: 14px; line-height: 1.5; }
-  .rule-block.active .rule-content { max-height: 1000px; padding: 0 15px 15px 15px; }
-  .rule-content ul { padding-left: 20px; margin: 10px 0; }
-  .rule-content li { margin-bottom: 8px; }
-  .punish { color: #ef4444; font-size: 12px; font-weight: bold; margin-top: 10px; display: block; background: rgba(239, 68, 68, 0.1); padding: 8px; border-radius: 6px; }
+  /* Анимации появления */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-  /* Стили для формы поддержки */
-  .support-form { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: none; }
+  .animate-in {
+    animation: fadeInUp 0.4s ease-out forwards;
+  }
+
+  /* Шапка */
+  .header {
+    display: flex; align-items: center;
+    padding: 15px 20px;
+    background: rgba(26, 31, 43, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .back-btn {
+    background: none; border: none;
+    color: #fff; font-size: 24px;
+    cursor: pointer; padding: 0 15px 0 0;
+    transition: transform 0.2s;
+  }
+  .back-btn:active { transform: scale(0.9); }
+  .header h1 { font-size: 18px; margin: 0; font-weight: 700; letter-spacing: 0.5px; }
+
+  .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+
+  /* Вкладки */
+  .tabs {
+    display: flex;
+    background: var(--card);
+    border-radius: 12px;
+    padding: 5px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .tab-btn {
+    flex: 1; padding: 12px;
+    background: none; border: none;
+    color: var(--text-dim);
+    font-size: 14px; font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .tab-btn.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 15px var(--accent-glow);
+  }
+
+  /* Кнопка поддержки */
+  .action-btn {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    width: 100%; padding: 18px;
+    background: linear-gradient(135deg, #1a1f2b 0%, #232a3a 100%);
+    border: 1px solid var(--accent);
+    border-radius: 14px;
+    color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 25px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .action-btn:active { transform: scale(0.98); background: var(--accent); }
+  .action-btn svg { width: 22px; height: 22px; fill: var(--accent); transition: fill 0.3s; }
+  .action-btn:active svg { fill: #fff; }
+
+  /* Правила (аккордеон) */
+  .rule-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .rule-block.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+  }
+  .rule-header {
+    padding: 18px;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    color: #fff;
+    transition: background 0.2s;
+  }
+  .rule-header:active { background: var(--card-hover); }
+  .rule-icon {
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+    transition: transform 0.3s, background 0.3s;
+  }
+  .rule-block.active .rule-icon {
+    transform: rotate(45deg);
+    background: var(--accent);
+  }
+  .rule-icon::before { content: '+'; font-size: 18px; color: var(--text-dim); }
+  .rule-block.active .rule-icon::before { color: #fff; }
+
+  .rule-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 18px;
+    color: var(--text-dim);
+    font-size: 14px; line-height: 1.6;
+  }
+  .rule-block.active .rule-content {
+    max-height: 2000px;
+    padding: 0 18px 18px 18px;
+  }
+
+  .rule-sub {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .rule-sub:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .rule-sub-title { color: #fff; font-weight: 600; margin-bottom: 6px; font-size: 15px; }
+  .punish {
+    color: var(--danger); font-size: 12px; font-weight: 700;
+    margin-top: 8px; display: inline-block;
+    background: rgba(239, 68, 68, 0.1);
+    padding: 6px 10px; border-radius: 6px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  /* FAQ */
+  .faq-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .faq-q {
+    padding: 16px; font-weight: 600; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .faq-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 16px; color: var(--text-dim); font-size: 14px; line-height: 1.5;
+  }
+  .faq-item.active .faq-a {
+    max-height: 500px; padding: 0 16px 16px 16px;
+  }
+
+  /* Форма поддержки */
+  .support-form {
+    background: var(--card);
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    display: none;
+    animation: fadeInUp 0.3s ease-out;
+  }
   .support-form.active { display: block; }
-  .support-form h3 { margin-top: 0; color: #fff; }
-  .support-form input, .support-form textarea, .support-form select { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 8px; font-family: inherit; font-size: 14px; }
-  .support-form textarea { height: 100px; resize: vertical; }
-  .warning-box { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 12px; color: #ef4444; line-height: 1.4; }
-  .submit-btn { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-  .submit-btn:active { background: #2563eb; }
+  .support-form h3 { margin: 0 0 20px 0; font-size: 20px; color: #fff; }
+  
+  .form-group { margin-bottom: 15px; }
+  .form-group label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; font-weight: 600; }
+  .form-control {
+    width: 100%; padding: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: #fff; border-radius: 10px;
+    font-family: inherit; font-size: 15px;
+    transition: border-color 0.3s;
+  }
+  .form-control:focus { outline: none; border-color: var(--accent); }
+  textarea.form-control { height: 120px; resize: vertical; }
+  
+  .warning-box {
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 4px solid var(--danger);
+    padding: 15px; border-radius: 8px;
+    margin-bottom: 20px; font-size: 13px; color: #fca5a5;
+    line-height: 1.5;
+  }
+  
+  .submit-btn {
+    width: 100%; padding: 16px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 12px;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all 0.3s;
+    box-shadow: 0 4px 15px var(--accent-glow);
+  }
+  .submit-btn:active { transform: scale(0.98); background: #2563eb; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <button class="back-btn" onclick="window.history.back()">←</button>
-  <h1>Правила и Поддержка</h1>
+  <h1>CYBERSHOKE • Инфо</h1>
 </div>
 
 <div class="container">
   
-  <!-- Кнопка Поддержка -->
-  <button class="action-btn" onclick="toggleSupport()">
-    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
-    Связаться с поддержкой
-  </button>
+  <!-- Вкладки -->
+  <div class="tabs animate-in">
+    <button class="tab-btn active" id="tab-rules" onclick="switchTab('rules')">Правила</button>
+    <button class="tab-btn" id="tab-faq" onclick="switchTab('faq')">FAQ</button>
+  </div>
 
-  <!-- Форма поддержки (скрыта по умолчанию) -->
-  <div id="supportForm" class="support-form">
-    <h3>Новая заявка</h3>
-    
-    <div class="warning-box">
-      ⚠️ Внимание: За бессмысленную отправку заявок выносится предупреждение / Мут. В противном случае — бан без возможности разблокировки.
+  <!-- Контент: ПРАВИЛА -->
+  <div id="content-rules">
+    <button class="action-btn animate-in" onclick="toggleSupport()" style="animation-delay: 0.1s;">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+      Связаться с поддержкой
+    </button>
+
+    <!-- Форма -->
+    <div id="supportForm" class="support-form">
+      <h3>Новая заявка</h3>
+      <div class="warning-box">
+        ⚠️ <b>Внимание:</b> За бессмысленную отправку заявок выносится предупреждение / Мут. В противном случае — бан без возможности разблокировки.
+      </div>
+      <div class="form-group">
+        <label>Тема обращения</label>
+        <select id="supportTopic" class="form-control">
+          <option value="Жалоба на игрока">Жалоба на игрока</option>
+          <option value="Жалоба на администратора">Жалоба на администратора</option>
+          <option value="Проблема с лобби">Проблема с лобби</option>
+          <option value="Техническая проблема">Техническая проблема</option>
+          <option value="Другое">Другое</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ваш игровой ник / TG ID</label>
+        <input type="text" id="supportNick" class="form-control" placeholder="Например: sky#1234">
+      </div>
+      <div class="form-group">
+        <label>Описание проблемы</label>
+        <textarea id="supportText" class="form-control" placeholder="Опишите ситуацию подробно..."></textarea>
+      </div>
+      <button class="submit-btn" onclick="submitSupport()">Отправить заявку</button>
     </div>
 
-    <select id="supportTopic">
-      <option value="Жалоба на игрока">Жалоба на игрока</option>
-      <option value="Жалоба на администратора">Жалоба на администратора</option>
-      <option value="Проблема с лобби">Проблема с лобби</option>
-      <option value="Техническая проблема">Техническая проблема</option>
-      <option value="Другое">Другое</option>
-    </select>
-
-    <input type="text" id="supportNick" placeholder="Ваш игровой ник или Telegram ID">
-    <textarea id="supportText" placeholder="Подробно опишите ситуацию..."></textarea>
-    
-    <button class="submit-btn" onclick="submitSupport()">Отправить заявку</button>
+    <h2 style="color:#fff; font-size:18px; margin-top:30px; margin-bottom:15px; font-weight:700;">Правила площадки</h2>
+    <div id="rulesList"></div>
   </div>
 
-  <h2 style="color:#fff; font-size:18px; margin-top:30px; margin-bottom:15px;">Правила площадки</h2>
-  <div id="rulesList">
-    <!-- Блоки правил будут добавлены через JS -->
+  <!-- Контент: FAQ -->
+  <div id="content-faq" style="display:none;">
+    <div class="faq-item animate-in">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('active')">Как сменить ник?</div>
+      <div class="faq-a">Ник меняется в профиле. Если у вас возникли проблемы — напишите в поддержку.</div>
+    </div>
+    <div class="faq-item animate-in" style="animation-delay: 0.1s;">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('active')">Как попасть в лобби?</div>
+      <div class="faq-a">Перейдите во вкладку "Лобби", выберите подходящую комнату и нажмите "Присоединиться".</div>
+    </div>
+    <div class="faq-item animate-in" style="animation-delay: 0.2s;">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('active')">Почему не работает кнопка "Начать игру"?</div>
+      <div class="faq-a">Убедитесь, что в лобби набралось нужное количество игроков (обычно 10). Если все на месте, но кнопка не работает — перезагрузите приложение.</div>
+    </div>
+    <div class="faq-item animate-in" style="animation-delay: 0.3s;">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('active')">Что делать, если я нашел баг?</div>
+      <div class="faq-a">Сообщите о баге в поддержку через форму выше, прикрепив скриншот. За найденные баги администрация может выдать награду.</div>
+    </div>
   </div>
-  
+
 </div>
 
 <script>
-  // Правила (структура данных)
+  // Правила
   const RULES = [
     { title: "1. ОБЩЕНИЕ И ПОВЕДЕНИЕ", items: [
-      { subtitle: "1.1. Оскорбления", text: "Запрещены прямые оскорбления участников, унижения, травля и переходы на личности. Запрещено оскорбление родственников.", punish: "WARN / MUTE / BAN в зависимости от тяжести." },
-      { subtitle: "1.2. Провокации и конфликты", text: "Запрещено намеренно провоцировать участников, разжигать конфликты и продолжать ссоры после просьбы администрации.", punish: "WARN / MUTE / BAN." },
-      { subtitle: "1.3. Флуд и спам", text: "Запрещено отправлять много одинаковых сообщений, злоупотреблять CAPS LOCK, засорять чат бессмысленными сообщениями и многократно отправлять стикеры/GIF/эмодзи.", punish: "MUTE." },
-      { subtitle: "1.4. Неприемлемый контент", text: "Запрещены материалы 18+, шокирующие и жестокие материалы, а также распространение оскорбительного контента.", punish: "MUTE / BAN." }
+      { subtitle: "1.1. Оскорбления", text: "Запрещены прямые оскорбления участников, унижения, травля и переходы на личности. Запрещено оскорбление родственников.", punish: "WARN / MUTE / BAN" },
+      { subtitle: "1.2. Провокации", text: "Запрещено намеренно провоцировать, разжигать конфликты и продолжать ссоры после просьбы администрации.", punish: "WARN / MUTE / BAN" },
+      { subtitle: "1.3. Флуд и спам", text: "Запрещен спам, CAPS LOCK, бессмысленные сообщения и многократная отправка стикеров/GIF.", punish: "MUTE" },
+      { subtitle: "1.4. Неприемлемый контент", text: "Запрещены материалы 18+, шокирующий контент и оскорбительные материалы.", punish: "MUTE / BAN" }
     ]},
-    { title: "2. ПРАВИЛА ИГРЫ И МАТЧЕЙ", items: [
-      { subtitle: "2.1. Честная игра", text: "Запрещено использовать читы, баги и сторонние программы для преимущества. Запрещено намеренно портить игру своей команде.", punish: "BAN / дисквалификация." },
-      { subtitle: "2.2. Срыв матчей", text: "Запрещено покидать матч без причины, мешать проведению, затягивать начало и отказываться от согласованных условий.", punish: "WARN / временный BAN." },
-      { subtitle: "2.3. Нечестные результаты", text: "Запрещено подделывать результаты, отправлять чужие скриншоты, предоставлять ложную статистику и договариваться о фиктивных результатах.", punish: "Аннулирование результата / BAN." },
-      { subtitle: "2.4. AFK и бездействие", text: "Запрещено намеренно бездействовать во время матча и систематически создавать неудобства команде своим отсутствием.", punish: "WARN / временный BAN." }
+    { title: "2. ИГРА И МАТЧИ", items: [
+      { subtitle: "2.1. Честная игра", text: "Запрещены читы, баги и сторонние программы для преимущества. Запрещено портить игру своей команде.", punish: "BAN / дисквалификация" },
+      { subtitle: "2.2. Срыв матчей", text: "Запрещено покидать матч без причины, мешать проведению, затягивать начало и отказываться от условий.", punish: "WARN / временный BAN" },
+      { subtitle: "2.3. Нечестные результаты", text: "Запрещена подделка результатов, чужие скриншоты, ложная статистика и фиктивные договоренности.", punish: "Аннулирование / BAN" },
+      { subtitle: "2.4. AFK", text: "Запрещено намеренно бездействовать во время матча.", punish: "WARN / временный BAN" }
     ]},
     { title: "3. ПРАВИЛА ЛОББИ", items: [
-      { subtitle: "3.1. Создание лобби", text: "Запрещено создавать фальшивые лобби, создавать лобби без намерения играть и вводить участников в заблуждение.", punish: "WARN / MUTE / временный BAN." },
-      { subtitle: "3.2. Участие в лобби", text: "Запрещено занимать место без намерения участвовать, мешать набору и намеренно срывать сбор команды.", punish: "WARN / MUTE / временный BAN." }
+      { subtitle: "3.1. Создание лобби", text: "Запрещены фальшивые лобби без намерения играть и введение участников в заблуждение.", punish: "WARN / MUTE / временный BAN" },
+      { subtitle: "3.2. Участие", text: "Запрещено занимать место без намерения играть и срывать сбор команды.", punish: "WARN / MUTE / временный BAN" }
     ]},
     { title: "4. РЕКЛАМА И ССЫЛКИ", items: [
-      { subtitle: "4.1. Реклама", text: "Запрещена реклама сторонних проектов без разрешения админов, массовые рассылки и переманивание участников.", punish: "MUTE / BAN." },
-      { subtitle: "4.2. Ссылки", text: "Запрещено распространять подозрительные и вредоносные ссылки, а также маскировать ссылки с целью обмана.", punish: "MUTE / BAN." }
+      { subtitle: "4.1. Реклама", text: "Запрещена реклама сторонних проектов без разрешения, массовые рассылки и переманивание.", punish: "MUTE / BAN" },
+      { subtitle: "4.2. Ссылки", text: "Запрещены подозрительные и вредоносные ссылки, а также их маскировка.", punish: "MUTE / BAN" }
     ]},
     { title: "5. ОБМАН И МОШЕННИЧЕСТВО", items: [
-      { subtitle: "5.1. Обман участников", text: "Запрещено выдавать себя за администратора, обманывать ради доступа или ценностей и распространять ложную информацию от имени проекта.", punish: "BAN без права разблокировки." }
+      { subtitle: "5.1. Обман", text: "Запрещено выдавать себя за админа, обманывать ради доступа или ценностей и распространять ложную информацию.", punish: "BAN без разблокировки" }
     ]}
   ];
 
   // Рендер правил
-  const rulesContainer = document.getElementById('rulesList');
-  RULES.forEach((section, index) => {
-    let itemsHtml = section.items.map(item => `
-      <div style="margin-bottom: 15px;">
-        <div style="color:#fff; font-weight:600; margin-bottom:5px;">${item.subtitle}</div>
+  const rulesList = document.getElementById('rulesList');
+  RULES.forEach((section, i) => {
+    let items = section.items.map(item => `
+      <div class="rule-sub">
+        <div class="rule-sub-title">${item.subtitle}</div>
         <div>${item.text}</div>
         <div class="punish">Наказание: ${item.punish}</div>
       </div>
     `).join('');
 
-    const block = document.createElement('div');
-    block.className = 'rule-block';
+    let block = document.createElement('div');
+    block.className = 'rule-block animate-in';
+    block.style.animationDelay = (i * 0.05) + 's';
     block.innerHTML = `
-      <div class="rule-header" onclick="this.parentElement.classList.toggle('active')">${section.title}</div>
-      <div class="rule-content">${itemsHtml}</div>
+      <div class="rule-header" onclick="this.parentElement.classList.toggle('active')">
+        ${section.title}
+        <div class="rule-icon"></div>
+      </div>
+      <div class="rule-content">${items}</div>
     `;
-    rulesContainer.appendChild(block);
+    rulesList.appendChild(block);
   });
 
-  // Логика формы поддержки
+  // Логика
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    
+    if (tab === 'rules') {
+      document.getElementById('content-rules').style.display = 'block';
+      document.getElementById('content-faq').style.display = 'none';
+    } else {
+      document.getElementById('content-rules').style.display = 'none';
+      document.getElementById('content-faq').style.display = 'block';
+    }
+  }
+
   function toggleSupport() {
-    const form = document.getElementById('supportForm');
-    form.classList.toggle('active');
+    document.getElementById('supportForm').classList.toggle('active');
   }
 
   function submitSupport() {
-    const topic = document.getElementById('supportTopic').value;
     const nick = document.getElementById('supportNick').value;
     const text = document.getElementById('supportText').value;
+    if (!nick || !text) { alert("Заполните ник и описание."); return; }
     
-    if (!nick || !text) { alert("Пожалуйста, заполните ник и описание проблемы."); return; }
-
-    // Демо-отправка
-    alert("Заявка в поддержку успешно отправлена! Администрация рассмотрит её в ближайшее время.");
+    // Тут будет отправка на сервер (fetch)
+    alert("Заявка успешно отправлена! Администрация свяжется с вами.");
     
-    // Очищаем форму
     document.getElementById('supportNick').value = '';
     document.getElementById('supportText').value = '';
     toggleSupport();
   }
 
-  // Инициализация Telegram WebApp
   if (window.Telegram?.WebApp) {
     window.Telegram.WebApp.ready();
     window.Telegram.WebApp.expand();
