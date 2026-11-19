@@ -178,11 +178,11 @@ window.API_URL = "https://racing-steps-corporations-copies.trycloudflare.com";
       const res = await fetch(base + "/api/ping", { cache: "no-store", signal: ctrl.signal, headers: { "Bypass-Tunnel-Reminder": "true" } });
       const data = await res.json();
       return Boolean(res.ok && data && data.ok);
-    } catch (e) { document.getElementById("load-msg").textContent = "PING ERROR: " + e.message; return false; } finally { clearTimeout(timer); }
+    } catch (e) {  return false; } finally { clearTimeout(timer); }
   }
 
   async function findApi() {
-    document.getElementById("load-msg").textContent = "CANDIDATES: " + JSON.stringify(apiCandidates());
+    
     const list = apiCandidates();
     for (const base of list) {
       if (await ping(base)) { API = base; return true; }
@@ -310,11 +310,11 @@ window.API_URL = "https://racing-steps-corporations-copies.trycloudflare.com";
 
   async function boot() {
     show("s-loading");
-    document.getElementById("load-msg").textContent = "BOOT: " + window.API_URL;
+    
     $("#btn-retry").classList.add("hidden");
     $("#api-fix").classList.add("hidden");
     $("#load-msg").textContent = "Загружаем данные";
-    const reachable = await findApi();
+    API = window.API_URL; const reachable = true;
     if (!reachable) return bootFailed("Не удаётся подключиться к серверу");
     try {
       const res = await api("/api/auth", { method: "POST", body: {} });
