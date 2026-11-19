@@ -1,4 +1,4 @@
-window.API_URL = window.API_URL || "";
+window.API_URL = window.API_URL || "https://delicious-score-desire-models.trycloudflare.com";
 (() => {
   "use strict";
 
@@ -94,7 +94,7 @@ window.API_URL = window.API_URL || "";
     return `${Math.floor(m / 1440)} дн назад`;
   }
 
-  try { localStorage.removeItem("cs_api"); } catch(e) {} 
+  /* fix: keep saved API */ 
   const tg = (window.Telegram && window.Telegram.WebApp) || null;
   if (tg) { try { tg.ready(); tg.expand(); } catch (e) {} }
 
