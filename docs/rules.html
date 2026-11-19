@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Правила и Поддержка — CYBERSHOKE</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root { --bg: #171a1f; --card: #232b33; --text: #e1e1e1; --text-dim: #8b959e; --accent: #3b82f6; --border: #2d3748; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding-bottom: 40px; }
+  .header { display: flex; align-items: center; padding: 15px; background: #1a222a; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+  .back-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 0 15px 0 0; }
+  .header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+  
+  /* Стили для кнопок */
+  .action-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
+  .action-btn:active { background: #2c3742; }
+  .action-btn svg { width: 20px; height: 20px; fill: var(--accent); }
+
+  /* Стили для выдвижных правил */
+  .rule-block { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+  .rule-header { padding: 15px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: #fff; }
+  .rule-header::after { content: '+'; font-size: 20px; color: var(--text-dim); font-weight: normal; transition: transform 0.3s; }
+  .rule-block.active .rule-header::after { content: '-'; transform: rotate(180deg); }
+  .rule-content { padding: 0 15px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s; color: var(--text-dim); font-size: 14px; line-height: 1.5; }
+  .rule-block.active .rule-content { max-height: 1000px; padding: 0 15px 15px 15px; }
+  .rule-content ul { padding-left: 20px; margin: 10px 0; }
+  .rule-content li { margin-bottom: 8px; }
+  .punish { color: #ef4444; font-size: 12px; font-weight: bold; margin-top: 10px; display: block; background: rgba(239, 68, 68, 0.1); padding: 8px; border-radius: 6px; }
+
+  /* Стили для формы поддержки */
+  .support-form { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: none; }
+  .support-form.active { display: block; }
+  .support-form h3 { margin-top: 0; color: #fff; }
+  .support-form input, .support-form textarea, .support-form select { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 8px; font-family: inherit; font-size: 14px; }
+  .support-form textarea { height: 100px; resize: vertical; }
+  .warning-box { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 12px; color: #ef4444; line-height: 1.4; }
+  .submit-btn { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+  .submit-btn:active { background: #2563eb; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="window.history.back()">←</button>
+  <h1>Правила и Поддержка</h1>
+</div>
+
+<div class="container">
+  
+  <!-- Кнопка Поддержка -->
+  <button class="action-btn" onclick="toggleSupport()">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+    Связаться с поддержкой
+  </button>
+
+  <!-- Форма поддержки (скрыта по умолчанию) -->
+  <div id="supportForm" class="support-form">
+    <h3>Новая заявка</h3>
+    
+    <div class="warning-box">
+      ⚠️ Внимание: За бессмысленную отправку заявок выносится предупреждение / Мут. В противном случае — бан без возможности разблокировки.
+    </div>
+
+    <select id="supportTopic">
+      <option value="Жалоба на игрока">Жалоба на игрока</option>
+      <option value="Жалоба на администратора">Жалоба на администратора</option>
+      <option value="Проблема с лобби">Проблема с лобби</option>
+      <option value="Техническая проблема">Техническая проблема</option>
+      <option value="Другое">Другое</option>
+    </select>
+
+    <input type="text" id="supportNick" placeholder="Ваш игровой ник или Telegram ID">
+    <textarea id="supportText" placeholder="Подробно опишите ситуацию..."></textarea>
+    
+    <button class="submit-btn" onclick="submitSupport()">Отправить заявку</button>
+  </div>
+
+  <h2 style="color:#fff; font-size:18px; margin-top:30px; margin-bottom:15px;">Правила площадки</h2>
+  <div id="rulesList">
+    <!-- Блоки правил будут добавлены через JS -->
+  </div>
+  
+</div>
+
+<script>
+  // Правила (структура данных)
+  const RULES = [
+    { title: "1. ОБЩЕНИЕ И ПОВЕДЕНИЕ", items: [
+      { subtitle: "1.1. Оскорбления", text: "Запрещены прямые оскорбления участников, унижения, травля и переходы на личности. Запрещено оскорбление родственников.", punish: "WARN / MUTE / BAN в зависимости от тяжести." },
+      { subtitle: "1.2. Провокации и конфликты", text: "Запрещено намеренно провоцировать участников, разжигать конфликты и продолжать ссоры после просьбы администрации.", punish: "WARN / MUTE / BAN." },
+      { subtitle: "1.3. Флуд и спам", text: "Запрещено отправлять много одинаковых сообщений, злоупотреблять CAPS LOCK, засорять чат бессмысленными сообщениями и многократно отправлять стикеры/GIF/эмодзи.", punish: "MUTE." },
+      { subtitle: "1.4. Неприемлемый контент", text: "Запрещены материалы 18+, шокирующие и жестокие материалы, а также распространение оскорбительного контента.", punish: "MUTE / BAN." }
+    ]},
+    { title: "2. ПРАВИЛА ИГРЫ И МАТЧЕЙ", items: [
+      { subtitle: "2.1. Честная игра", text: "Запрещено использовать читы, баги и сторонние программы для преимущества. Запрещено намеренно портить игру своей команде.", punish: "BAN / дисквалификация." },
+      { subtitle: "2.2. Срыв матчей", text: "Запрещено покидать матч без причины, мешать проведению, затягивать начало и отказываться от согласованных условий.", punish: "WARN / временный BAN." },
+      { subtitle: "2.3. Нечестные результаты", text: "Запрещено подделывать результаты, отправлять чужие скриншоты, предоставлять ложную статистику и договариваться о фиктивных результатах.", punish: "Аннулирование результата / BAN." },
+      { subtitle: "2.4. AFK и бездействие", text: "Запрещено намеренно бездействовать во время матча и систематически создавать неудобства команде своим отсутствием.", punish: "WARN / временный BAN." }
+    ]},
+    { title: "3. ПРАВИЛА ЛОББИ", items: [
+      { subtitle: "3.1. Создание лобби", text: "Запрещено создавать фальшивые лобби, создавать лобби без намерения играть и вводить участников в заблуждение.", punish: "WARN / MUTE / временный BAN." },
+      { subtitle: "3.2. Участие в лобби", text: "Запрещено занимать место без намерения участвовать, мешать набору и намеренно срывать сбор команды.", punish: "WARN / MUTE / временный BAN." }
+    ]},
+    { title: "4. РЕКЛАМА И ССЫЛКИ", items: [
+      { subtitle: "4.1. Реклама", text: "Запрещена реклама сторонних проектов без разрешения админов, массовые рассылки и переманивание участников.", punish: "MUTE / BAN." },
+      { subtitle: "4.2. Ссылки", text: "Запрещено распространять подозрительные и вредоносные ссылки, а также маскировать ссылки с целью обмана.", punish: "MUTE / BAN." }
+    ]},
+    { title: "5. ОБМАН И МОШЕННИЧЕСТВО", items: [
+      { subtitle: "5.1. Обман участников", text: "Запрещено выдавать себя за администратора, обманывать ради доступа или ценностей и распространять ложную информацию от имени проекта.", punish: "BAN без права разблокировки." }
+    ]}
+  ];
+
+  // Рендер правил
+  const rulesContainer = document.getElementById('rulesList');
+  RULES.forEach((section, index) => {
+    let itemsHtml = section.items.map(item => `
+      <div style="margin-bottom: 15px;">
+        <div style="color:#fff; font-weight:600; margin-bottom:5px;">${item.subtitle}</div>
+        <div>${item.text}</div>
+        <div class="punish">Наказание: ${item.punish}</div>
+      </div>
+    `).join('');
+
+    const block = document.createElement('div');
+    block.className = 'rule-block';
+    block.innerHTML = `
+      <div class="rule-header" onclick="this.parentElement.classList.toggle('active')">${section.title}</div>
+      <div class="rule-content">${itemsHtml}</div>
+    `;
+    rulesContainer.appendChild(block);
+  });
+
+  // Логика формы поддержки
+  function toggleSupport() {
+    const form = document.getElementById('supportForm');
+    form.classList.toggle('active');
+  }
+
+  function submitSupport() {
+    const topic = document.getElementById('supportTopic').value;
+    const nick = document.getElementById('supportNick').value;
+    const text = document.getElementById('supportText').value;
+    
+    if (!nick || !text) { alert("Пожалуйста, заполните ник и описание проблемы."); return; }
+
+    // Демо-отправка
+    alert("Заявка в поддержку успешно отправлена! Администрация рассмотрит её в ближайшее время.");
+    
+    // Очищаем форму
+    document.getElementById('supportNick').value = '';
+    document.getElementById('supportText').value = '';
+    toggleSupport();
+  }
+
+  // Инициализация Telegram WebApp
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+  }
+</script>
+</body>
+</html>
