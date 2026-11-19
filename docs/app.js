@@ -1451,3 +1451,49 @@ window.openSupportClose = function() {
       container.innerHTML = `<div class="error">Ошибка загрузки: ${e.message}</div>`;
     }
   }
+
+  // ==========================================
+  // ВКЛАДКА "РЕКЛАМА" В АДМИНКЕ
+  // ==========================================
+  document.addEventListener("click", (e) => {
+    if (e.target && e.target.matches('[data-admin-tab="ads"]')) {
+      // Скрываем контент других вкладок (если есть)
+      document.querySelectorAll('#admin-body > *:not(.tabs):not(#admin-ads-container)').forEach(el => el.classList.add('hidden'));
+      
+      // Показываем контейнер рекламы
+      const adsCont = document.getElementById("admin-ads-container");
+      if (adsCont) {
+        adsCont.classList.remove("hidden");
+        renderAdminAds(); // Вызываем функцию, которую мы добавили ранее
+      }
+      
+      // Меняем активный класс на кнопках
+      document.querySelectorAll('[data-admin-tab]').forEach(btn => btn.classList.remove('active'));
+      e.target.classList.add('active');
+    }
+    
+    // Возврат на вкладку Игроки
+    if (e.target && e.target.matches('[data-admin-tab="players"]')) {
+      document.getElementById("admin-ads-container").classList.add("hidden");
+      // Показываем остальной контент (возвращаем как было)
+      document.querySelectorAll('#admin-body > *:not(.tabs):not(#admin-ads-container)').forEach(el => el.classList.remove('hidden'));
+      
+      document.querySelectorAll('[data-admin-tab]').forEach(btn => btn.classList.remove('active'));
+      e.target.classList.add('active');
+    }
+  });
+
+  // Вспомогательная функция для отправки формы с файлом
+  async function uploadAdImage(file, position) {
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("position", position);
+    
+    const res = await api("/api/admin/ads", {
+      method: "POST",
+      form: formData,
+      admin: adminPass
+    });
+    return res;
+  }
+

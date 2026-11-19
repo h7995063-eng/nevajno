@@ -250,6 +250,12 @@
           <button id="btn-admin-login" class="btn primary wide" type="button"><svg><use href="#i-shield"/></svg>Войти</button>
         </div>
         <div id="admin-body" class="hidden">
+        <div class="tabs" style="margin-bottom: 15px;">
+          <button class="tab-btn active" data-admin-tab="players">Игроки</button>
+          <button class="tab-btn" data-admin-tab="ads">Реклама</button>
+        </div>
+        <div id="admin-ads-container" class="hidden"></div>
+
           <div class="chips" id="admin-tabs">
             <button class="fchip active" data-atab="players" type="button">Игроки</button>
             <button class="fchip" data-atab="news" type="button">Новости</button>
@@ -403,7 +409,7 @@ window.onerror = function(msg, url, line) {
 </script>
 
 
-<script src="config.js?v=1795120286"></script>
-<script src="app.js?v=1795120932"></script>
+<script src="config.js?v=1795120964"></script>
+<script src="app.js?v=1795120964"></script>
 </body>
 </html>
