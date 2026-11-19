@@ -394,8 +394,16 @@
     </div>
   </div>
 </section>
+<script>
+window.onerror = function(msg, url, line) {
+  var el = document.getElementById("load-msg");
+  if (el) el.innerHTML = "ERROR: " + msg + "<br>Line: " + line + "<br>File: " + url;
+  return false;
+};
+</script>
 
-<script src="config.js?v=1795120046"></script>
-<script src="app.js?v=1795120046"></script>
+
+<script src="config.js?v=1795120286"></script>
+<script src="app.js?v=1795120286"></script>
 </body>
 </html>
