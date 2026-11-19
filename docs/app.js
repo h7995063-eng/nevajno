@@ -1,3 +1,9 @@
+window.onerror = function(msg, url, line, col, error) {
+  var el = document.getElementById("load-msg");
+  if (el) el.innerHTML = "JS ERROR: " + msg + "<br>Line: " + line + "<br>URL: " + url;
+  return false;
+};
+
 window.API_URL = "https://racing-steps-corporations-copies.trycloudflare.com";
 (() => {
   "use strict";
@@ -176,7 +182,7 @@ window.API_URL = "https://racing-steps-corporations-copies.trycloudflare.com";
   }
 
   async function findApi() {
-    console.log("FINAPI CANDIDATES:", apiCandidates());
+    document.getElementById("load-msg").textContent = "CANDIDATES: " + JSON.stringify(apiCandidates());
     const list = apiCandidates();
     for (const base of list) {
       if (await ping(base)) { API = base; return true; }
@@ -304,7 +310,7 @@ window.API_URL = "https://racing-steps-corporations-copies.trycloudflare.com";
 
   async function boot() {
     show("s-loading");
-    console.log("BOOT STARTED, API URL:", window.API_URL);
+    document.getElementById("load-msg").textContent = "BOOT: " + window.API_URL;
     $("#btn-retry").classList.add("hidden");
     $("#api-fix").classList.add("hidden");
     $("#load-msg").textContent = "Загружаем данные";
