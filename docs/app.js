@@ -1362,3 +1362,92 @@ window.openSupportClose = function() {
     setTimeout(() => m.style.display = "none", 200);
   }
 };
+
+  // ==========================================
+  // ЛОГИКА ДЛЯ РЕКЛАМЫ В АДМИНКЕ
+  // ==========================================
+  async function renderAdminAds() {
+    const container = document.getElementById("admin-ads-container");
+    if (!container) return;
+
+    container.innerHTML = '<div class="loading">Загрузка баннеров...</div>';
+    try {
+      const ads = await api("/api/ads");
+      
+      let html = `
+        <div class="card" style="margin-bottom: 20px;">
+          <h3 style="margin-top:0;">Добавить баннер</h3>
+          <div class="input-group">
+            <label>Позиция:</label>
+            <select id="ad-position" class="input">
+              <option value="top">Сверху (главная)</option>
+              <option value="history">В истории матчей</option>
+              <option value="bottom">Внизу страницы</option>
+              <option value="sidebar">В боковой панели</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin-top:10px;">
+            <input type="file" id="ad-image" accept="image/*" class="input">
+          </div>
+          <button id="btn-upload-ad" class="btn primary" style="margin-top:10px;">Загрузить</button>
+        </div>
+        <h3>Загруженные баннеры</h3>
+        <div class="ads-list">
+      `;
+
+      if (ads.length === 0) {
+        html += '<div class="empty">Баннеров пока нет.</div>';
+      } else {
+        ads.forEach(ad => {
+          html += `
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <div>
+                <img src="${ad.url}" style="max-height:50px; border-radius:5px; margin-right:10px; vertical-align:middle;">
+                <span>Позиция: <b>${ad.position}</b></span>
+              </div>
+              <button class="btn danger btn-del-ad" data-id="${ad.id}" style="padding:5px 10px;">Удалить</button>
+            </div>
+          `;
+        });
+      }
+      html += '</div>';
+      container.innerHTML = html;
+
+      // Обработчик загрузки
+      document.getElementById("btn-upload-ad").addEventListener("click", async () => {
+        const fileInput = document.getElementById("ad-image");
+        const position = document.getElementById("ad-position").value;
+        if (!fileInput.files.length) return toast("Выберите файл", "err");
+
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
+        formData.append("position", position);
+
+        try {
+          await api("/api/admin/ads", { method: "POST", form: formData, admin: adminPass });
+          toast("Баннер загружен!", "ok");
+          renderAdminAds(); // Перерисовываем список
+        } catch (e) {
+          toast("Ошибка загрузки: " + e.message, "err");
+        }
+      });
+
+      // Обработчик удаления
+      document.querySelectorAll(".btn-del-ad").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          if (!confirm("Удалить этот баннер?")) return;
+          const id = btn.getAttribute("data-id");
+          try {
+            await api(`/api/admin/ads/${id}`, { method: "DELETE", admin: adminPass });
+            toast("Баннер удален", "ok");
+            renderAdminAds();
+          } catch (e) {
+            toast("Ошибка: " + e.message, "err");
+          }
+        });
+      });
+
+    } catch (e) {
+      container.innerHTML = `<div class="error">Ошибка загрузки: ${e.message}</div>`;
+    }
+  }
