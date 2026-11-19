@@ -123,7 +123,7 @@
       <button class="nav-item hidden" id="nav-admin" data-view="admin"><svg><use href="#i-shield"/></svg>Админка</button>
     </nav>
     <button class="nav-item" onclick="openOther()" type="button"><svg><use href="#i-star"/></svg>Прочее</button>
-      <button class="nav-item" onclick="window.open('rules.html', '_blank')" type="button"><svg><use href="#i-star"/></svg>Правила</button>
+      
     <button class="nav-item side-support" onclick="window.openSupport(); return false;"><svg><use href="#i-headset"/></svg>Поддержка</button>
   </aside>
 
@@ -442,6 +442,10 @@
   <div style="background:#141824; border:1px solid #2a3040; border-radius:16px; padding:24px; width:90%; max-width:480px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
       <h3 style="color:#fff; margin:0; font-size:20px;">Прочее</h3>
+      <button class="nav-item" onclick="openRulesPage()" type="button" style="margin-top:10px; width:100%; justify-content:flex-start; padding:15px; background: #2c3742; border-radius: 8px; border: 1px solid #3b82f6;">
+        <svg style="margin-right:10px; fill:#3b82f6;"><use href="#i-star"/></svg>Правила площадки
+      </button>
+    
       <button onclick="document.getElementById('modal-other').style.display='none'" style="background:none; border:none; color:#8b98a8; font-size:24px; cursor:pointer;">&times;</button>
     </div>
     <div style="display:flex; flex-direction:column; gap:12px;">
@@ -451,6 +455,20 @@
     </div>
   </div>
 </div>
+
+
+<script>
+function openRulesPage() {
+    // Закрываем модальное окно "Прочее", если оно открыто
+    if (typeof closeOther === 'function') {
+        closeOther();
+    }
+    
+    // Открываем страницу правил внутри текущего окна (в Mini App)
+    // Используем window.location.href для перехода на ту же вкладку
+    window.location.href = 'rules.html';
+}
+</script>
 
 </body>
 </html>
