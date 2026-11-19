@@ -256,6 +256,7 @@
             <button class="fchip active" data-atab="players" type="button">Игроки</button>
             <button class="fchip" data-atab="news" type="button">Новости</button>
             <button class="fchip" data-atab="stats" type="button">Обзор</button>
+            <button class="fchip" data-atab="ad" type="button">Реклама</button>
           </div>
           <div id="atab-players">
             <div class="input search"><svg><use href="#i-user"/></svg><input id="in-admin-search" placeholder="Поиск по нику или ID"></div>
@@ -265,7 +266,8 @@
             <button class="btn primary wide" data-act="news-create" type="button"><svg><use href="#i-plus"/></svg>Создать пост</button>
             <div id="admin-news-list" class="list"></div>
           </div>
-          <div id="atab-stats" class="hidden">
+          <div id="atab-ad" class="hidden"><h3>Реклама</h3><div style="margin-bottom:15px;"><label style="color:#8b959e; font-size:12px;">Текст</label><input type="text" id="ad-text" class="input" style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:6px;"></div><div style="margin-bottom:15px;"><label style="color:#8b959e; font-size:12px;">Ссылка на картинку</label><input type="text" id="ad-image" class="input" style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:6px;"></div><button class="btn primary" onclick="saveAd()">Сохранить</button></div>
+<div id="atab-stats" class="hidden">
             <div id="admin-stats" class="grid"></div>
             <button class="btn ghost wide" data-act="channel-test" type="button"><svg><use href="#i-send"/></svg>Проверить отправку в паблик</button>
             <div id="channel-test-result" class="list"></div>
