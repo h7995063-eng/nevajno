@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PING TEST</title>
+</head>
+<body style="background:#111;color:#fff;font-family:monospace;padding:20px;">
+    <h2>Тест подключения к туннелю</h2>
+    <div id="log">Загрузка...</div>
+    <script>
+        const URL = "https://racing-steps-corporations-copies.trycloudflare.com";
+        const log = (msg) => { document.getElementById("log").innerHTML += "<br>" + msg; };
+        log("URL: " + URL);
+        log("Пробуем fetch...");
+        fetch(URL + "/api/ping", { 
+            cache: "no-store",
+            headers: { "Bypass-Tunnel-Reminder": "true" }
+        })
+        .then(res => {
+            log("Статус ответа: " + res.status);
+            return res.text();
+        })
+        .then(text => {
+            log("Тело ответа: " + text);
+            log("✅ ВСЁ РАБОТАЕТ! Проблема была в коде app.js, а не в сети.");
+        })
+        .catch(err => {
+            log("❌ ОШИБКА: " + err.message);
+            log("Скорее всего, Cloudflare блокирует запрос из браузера (CORS).");
+        });
+    </script>
+</body>
+</html>
