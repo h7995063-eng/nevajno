@@ -1,1 +1,1 @@
-window.API_URL = "https://truly-categories-explained-himself.trycloudflare.com";
+window.API_URL = "https://delicious-score-desire-models.trycloudflare.com";
