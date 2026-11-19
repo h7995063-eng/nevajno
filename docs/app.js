@@ -1031,6 +1031,7 @@ window.API_URL = "https://racing-steps-corporations-copies.trycloudflare.com";
       $("#admin-news-list").innerHTML = d.posts.length ? d.posts.map((p) => postCard(p, true)).join("") : '<div class="card empty">Новостей пока нет.</div>';
     }
     if (adminTab === "ads") { renderAdminAds(); }
+    if (adminTab === "ads") { renderAdminAds(); }
     if (adminTab === "stats") {
       const s = await adm({ action: "stats" });
       const items = [["users", "Игроков", s.users], ["bolt", "Онлайн", s.online], ["game", "Активных лобби", s.lobbies], ["trophy", "Матчей", s.matches], ["check", "Результатов начислено", s.finished], ["news", "Постов", s.posts], ["star", "С подпиской", s.premium]];
