@@ -167,7 +167,7 @@ window.API_URL = "https://racing-steps-corporations-copies.trycloudflare.com";
     if (saved && validBase(saved)) list.push(saved);
     const conf = cleanBase(window.API_URL) || "";
     if (conf && validBase(conf)) list.push(conf);
-    list.push("");
+    // list.push("");
     return list.filter((v, i) => list.indexOf(v) === i);
   }
 
@@ -178,7 +178,7 @@ window.API_URL = "https://racing-steps-corporations-copies.trycloudflare.com";
       const res = await fetch(base + "/api/ping", { cache: "no-store", signal: ctrl.signal, headers: { "Bypass-Tunnel-Reminder": "true" } });
       const data = await res.json();
       return Boolean(res.ok && data && data.ok);
-    } catch (e) { return false; } finally { clearTimeout(timer); }
+    } catch (e) { document.getElementById("load-msg").textContent = "PING ERROR: " + e.message; return false; } finally { clearTimeout(timer); }
   }
 
   async function findApi() {
