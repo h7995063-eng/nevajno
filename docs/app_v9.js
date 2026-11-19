@@ -1448,3 +1448,47 @@ window.sendTicket = async function() {
     if (btn) { btn.disabled = false; btn.textContent = "Отправить тикет"; }
   }
 };
+
+function loadAdBanner() {
+  var ad = JSON.parse(localStorage.getItem("cybershoke_ad")) || null;
+  var container = document.getElementById("ad-banner-container");
+  var emptyMsg = document.getElementById("empty-lobby-msg");
+  
+  if (ad && ad.image && container) {
+    document.getElementById("ad-banner-img").src = ad.image;
+    document.getElementById("ad-banner-text").innerText = ad.text || "";
+    container.style.display = "block";
+    if (emptyMsg) emptyMsg.style.display = "none";
+  } else {
+    if (container) container.style.display = "none";
+    if (emptyMsg) emptyMsg.style.display = "block";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  setTimeout(loadAdBanner, 500);
+});
+
+function renderAdminAdForm() {
+  var container = document.getElementById("admin-form-container") || document.getElementById("admin-content");
+  if (!container) return;
+  
+  var ad = JSON.parse(localStorage.getItem("cybershoke_ad")) || { text: "", image: "" };
+  
+  var html = '<h2>Управление рекламой</h2>';
+  html += '<div style="background:#1a1f24; padding:20px; border-radius:12px; border:1px solid #2d3748;">';
+  html += '  <div style="margin-bottom:15px;"><label style="color:#8b959e; font-size:12px;">Текст на баннере</label><input type="text" id="ad-text" class="input" value="' + ad.text + '" style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:6px;"></div>';
+  html += '  <div style="margin-bottom:15px;"><label style="color:#8b959e; font-size:12px;">Ссылка на картинку (URL)</label><input type="text" id="ad-image" class="input" value="' + ad.image + '" style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:6px;"></div>';
+  html += '  <button class="btn btn-green" onclick="saveAd()">Сохранить</button>';
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+function saveAd() {
+  var text = document.getElementById("ad-text").value;
+  var image = document.getElementById("ad-image").value;
+  localStorage.setItem("cybershoke_ad", JSON.stringify({ text: text, image: image }));
+  alert("Реклама сохранена!");
+  loadAdBanner();
+}
