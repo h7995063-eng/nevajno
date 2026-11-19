@@ -1,4 +1,4 @@
-window.API_URL = window.API_URL || "https://delicious-score-desire-models.trycloudflare.com";
+window.API_URL = "https://delicious-score-desire-models.trycloudflare.com";
 (() => {
   "use strict";
 
