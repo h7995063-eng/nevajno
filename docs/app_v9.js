@@ -14,19 +14,19 @@ try {
     sessionStorage.clear();
     console.log('Кэш очищен принудительно');
 } catch(e) {}
-window.API_URL = 'https://dose-eternal-civilian-nevertheless.trycloudflare.com';
+window.API_URL = 'https://consumers-brother-should-highlighted.trycloudflare.com';
 
 
 // ==================== ПРИНУДИТЕЛЬНЫЙ СБРОС КЭША ====================
 try {
     localStorage.removeItem('cs_api');
     localStorage.removeItem('api_url');
-    localStorage.setItem('cs_api', 'https://dose-eternal-civilian-nevertheless.trycloudflare.com');
+    localStorage.setItem('cs_api', 'https://consumers-brother-should-highlighted.trycloudflare.com');
 } catch(e) { console.error('Ошибка localStorage', e); }
-window.API_URL = 'https://dose-eternal-civilian-nevertheless.trycloudflare.com';
+window.API_URL = 'https://consumers-brother-should-highlighted.trycloudflare.com';
 // ==================================================================
 
-window.API_URL = "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
+window.API_URL = "https://consumers-brother-should-highlighted.trycloudflare.com";
 (() => {
   "use strict";
 window.me = null;
@@ -188,7 +188,7 @@ window.me = null;
     if (fromUrl && validBase(fromUrl)) { store("cs_api", fromUrl); list.push(fromUrl); }
     const saved = cleanBase(store("cs_api"));
     if (saved && validBase(saved)) list.push(saved);
-    const conf = cleanBase(window.API_URL) || "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
+    const conf = cleanBase(window.API_URL) || "https://consumers-brother-should-highlighted.trycloudflare.com";
     if (conf && validBase(conf)) list.push(conf);
     list.push("");
     return list.filter((v, i) => list.indexOf(v) === i);
@@ -1379,7 +1379,7 @@ window.sendTicket = async function() {
   if (btn) { btn.disabled = true; btn.textContent = "Отправка..."; }
 
   try {
-    const api = window.API_URL || "https://dose-eternal-civilian-nevertheless.trycloudflare.com";
+    const api = window.API_URL || "https://consumers-brother-should-highlighted.trycloudflare.com";
 
     // 1) TG ID — надёжно из Telegram
     let tgId = null;
