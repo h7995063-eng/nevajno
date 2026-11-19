@@ -1,1 +1,1 @@
-window.API_URL = "https://delicious-score-desire-models.trycloudflare.com";
+window.API_URL = "https://racing-steps-corporations-copies.trycloudflare.com";
